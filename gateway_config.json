@@ -1,0 +1,13 @@
+{
+    "gateway_proto":"wss",
+    "gateway_host":"gateway-ark.romanport.com:43297",
+    "gateway_target_version":1,
+    "gateway_min_version":1,
+    "gateway_endpoints": {
+        "master":"master",
+        "subserver":"subserver",
+        "frontend":"user"
+    },
+    "reconnect_delay_seconds":20,
+    "buffer_size":4096
+}

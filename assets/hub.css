@@ -1,0 +1,283 @@
+/* Loader */
+.hub_loader_window {
+    width:150px;
+    height:150px;
+    position: relative;
+}
+
+.hub_loader_bar {
+    background-color:#5585e6;
+    position: absolute;
+    height: 12px;
+    top:0;
+    left:0;
+    right:50%;
+    animation: hub_loader 2.5s infinite;
+}
+
+@keyframes hub_loader {
+    from {
+        left:0;
+        right:100%;
+    }
+    50% {
+        left:0;
+        right:0;
+    }
+    to {
+        left:100%;
+        right:0;
+    }
+}
+
+
+/* Main */
+
+.hub_container {
+    /* Contains hub segments. */
+    display:block;
+    margin:auto;
+    max-width:1300px;
+    width:100%;
+    transition:all 250ms;
+    transition-timing-function: cubic-bezier(0.06, 0.79, 0.58, 1);
+    padding-top:80px;
+    opacity:0;
+    margin-top:50px;
+}
+
+.hub_container_active {
+    padding-top:0px;
+    opacity:1;
+}
+
+.hub_section {
+    margin:8px;
+}
+
+.hub_section_title {
+    padding:5px;
+    font-size:15px;
+    text-transform: uppercase;
+    color: #e6e6e6;
+    text-align: center;
+    margin-bottom:5px;
+}
+
+/* Ark news specific */
+.hub_arknews_box {
+    background-color:#252629;
+    border-radius: 5px;
+    font-size:15px;
+    color:white;
+    overflow:hidden;
+    max-height: 150px;
+    border: 1px solid #3e3e3e;
+    cursor:pointer;
+}
+
+.hub_arknews_content {
+    padding: 15px;
+    overflow: hidden;
+    color: #c1c1c1;
+    position: relative;
+    height: -webkit-fill-available;
+}
+
+.hub_arknews_title {
+    font-size:18px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.hub_arknews_image {
+    float:right;
+    width:30%;
+    height: -webkit-fill-available;
+    background-position: center;
+    background-size: cover;
+    margin-left: 10px;
+}
+
+.hub_arknews_hide {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: rgb(37,38,41);
+    background: -moz-linear-gradient(0deg, rgba(37,38,41,1) 0%, rgba(37,38,41,1) 33%, rgba(37,38,41,0) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(37,38,41,1) 0%, rgba(37,38,41,1) 33%, rgba(37,38,41,0) 100%);
+    background: linear-gradient(0deg, rgba(37,38,41,1) 0%, rgba(37,38,41,1) 33%, rgba(37,38,41,0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#252629",endColorstr="#252629",GradientType=1);
+}
+
+/* Server list specific */
+.ark_serverlist_container {
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    justify-content: center;
+    margin-right:5px;
+}
+
+/* Event specific */
+.hub_events_box {
+    background-color:#252629;
+    border-radius: 5px;
+    font-size:15px;
+    color:white;
+    overflow:hidden;
+    border: 1px solid #3e3e3e;
+    position: relative;
+    margin-bottom:15px;
+
+    display: inline-block;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: calc(50% - 12px);
+}
+
+@media only screen 
+and (max-width : 1000px) {
+    .hub_events_box {
+        display:block;
+        margin-left:0;
+        margin-right:0;
+        width:unset;
+    }
+}
+
+.hub_events_header {
+    margin: 10px 16px;
+    font-size:18px;
+    height: 44px;
+    vertical-align: middle;
+    position: relative;
+}
+
+.hub_events_header_img {
+    position:absolute;
+    top:5px;
+    left:0px;
+    border-radius: 34px;
+    width: 34px;
+    height: 34px;
+}
+
+.hub_events_header_name {
+    color:white;
+    position:absolute;
+    left:48px;
+    font-size:18px;
+    top:2px;
+}
+
+.hub_events_header_sub {
+    color:#c1c1c1;
+    position:absolute;
+    left:48px;
+    font-size:15px;
+    bottom:2px;
+}
+
+.hub_events_area {
+    height: calc(61px * 6);
+    overflow-y: scroll;
+}
+
+.hub_events_evt {
+    padding: 10px;
+    background-color: #1d1d1e;
+    border-top: 1px solid #3e3e3e;
+    height: 40px;
+}
+
+.hub_events_evt_icons {
+    width:141px; /* Three icons */
+    display: inline-block;
+}
+
+.hub_events_evt_text {
+    position: relative;
+    height:40px;
+    width: calc(100% - 152px);
+    padding-left: 5px;
+    margin-left:5px;
+    display:inline-block;
+    border-left: 1px solid #3e3e3e;
+}
+
+.hub_events_evt_name {
+    color:white;
+    position:absolute;
+    left:10px;
+    font-size:15px;
+    top: 2px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    right: 0;
+}
+
+.hub_events_evt_sub {
+    color:#c1c1c1;
+    position:absolute;
+    left:10px;
+    font-size:13px;
+    bottom: 6px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    right: 0;
+}
+
+.hub_events_evt_sub_img {
+    height: 13px;
+    width: 13px;
+    background-image: url('/assets/ark_event_time.svg');
+    background-size: 13px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 3px;
+}
+
+.hub_circle_big {
+    height: 40px;
+    width: 40px;
+    border: 1px solid #3e3e3e;
+    background-color:white;
+    background-repeat: no-repeat;
+    background-position:center;
+    background-size: 30px;
+    border-radius: 28px;
+    display:inline-block;
+    margin-right:5px;
+}
+
+.hub_circle_big_failed {
+    background-image: url('https://ark.romanport.com/assets/img_failed_transparent.png');
+    background-size: 20px;
+}
+
+.hub_circle_event {
+    border: none;
+    background-color:transparent;
+    background-size: 40px;
+    border-radius: 0;
+}
+
+.hub_circle_fill {
+    background-size:cover;
+}
+
+.fs_popup_hub {
+    background-color: #33363c;
+    font-family: 'Roboto', sans-serif;
+    overflow-y: scroll;
+    background-image: url(/assets/demo_bg.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ark Web Map - Create Server</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/master.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/createserver_main.css" />
+    <script src="assets/createserver_main.js"></script>
+    <script src="/assets/user_portable.js"></script>
+    <script src="assets/createserver_remotemsgs.js"></script>
+    <script>
+        cs.slides = [
+            {
+                "name":"Intro",
+                "onInit":function(c) {
+
+                },
+                "defaultNav":{
+                    "hasBack":false,
+                    "hasContinue":false
+                },
+                "onBack":function() {
+                    return false;
+                },
+                "onContinue":cs.onSubmitStep1
+            },
+            {
+                "name":"Download",
+                "onInit":function(c) {
+
+                },
+                "defaultNav":{
+                    "hasBack":true,
+                    "hasContinue":false
+                },
+                "onBack":function() {
+                    return true;
+                },
+                "onContinue":function() {
+                    return true;
+                }
+            },
+            {
+                "name":"Ports",
+                "onInit":function(c) {
+
+                },
+                "defaultNav":{
+                    "hasBack":false,
+                    "hasContinue":true
+                },
+                "onBack":function() {
+                    return false;
+                },
+                "onContinue":function() {
+                    cs.nct.doTest();
+                    return false;
+                }
+            },
+            {
+                "name":"Save",
+                "onInit":function(c) {
+                    //Fill the map selector
+                    cs.updateMapSelectionForm(document.getElementById('server_map_form_verify'), config.compatible_maps[cs.current_settings.map_index]);
+                    cs.save.onType(document.getElementById('server_save_entry').value);
+                },
+                "defaultNav":{
+                    "hasBack":false,
+                    "hasContinue":false
+                },
+                "onBack":function() {
+                    return false;
+                },
+                "onContinue":function() {
+                    //Submit final
+                    cs.submitFinal();
+                    return true;
+                }
+            },
+            {
+                "name":"Finishing",
+                "onInit":function(c) {
+
+                },
+                "defaultNav":{
+                    "hasBack":false,
+                    "hasContinue":false
+                },
+                "onBack":function() {
+                    return false;
+                },
+                "onContinue":function() {
+                    return true;
+                }
+            }
+        ]
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div class="dialog_footer">
+            <div class="dialog_footer_content">
+                
+            </div>
+        </div>
+        <div class="dialog_slider_container">
+            <div class="dialog_slider" id="dialog_slider">
+                <div class="dialog_slider_cell">
+                    <div class="cell_title">Welcome!</div>
+                    <div class="cell_content">To add your Ark server to Ark Web Map, make sure that your server meets these requirements, then click next.<br>
+                        <ul>
+                            <li>Ability to download and run the Ark Web Map companion program.</li>
+                            <li>Ability to forward additional ports for the Ark Web Map companion program.</li>
+                            <li>Direct access to your Ark server save file.</li>
+                            <li>Windows 7+ or Linux capable of running .NET Core.</li>
+                        </ul>
+
+                    </div>
+                </div>
+                <div class="dialog_slider_cell">
+                    <div class="cell_title">Add an Ark server</div>
+                    <div class="cell_content">To add your Ark server to Ark Web Map, you'll need to download a companion program to your Ark server on the next screen.</div>
+                    <div class="servername_form" style="left: 90px; top: 112px;">
+                        <div class="servername_form_side" style="left: 170px;">
+                            <div class="form_entry" id="server_name_entry_form">
+                                <div class="form_entry_title">Server Name <div class="form_entry_title_warn">- Too long</div></div>
+                                <div class="form_entry_input">
+                                    <input class="form_entry_input_text" id="server_name_entry" type="text" placeholder="2-24 characters">
+                                </div>
+                            </div>
+                            <div class="form_entry" id="server_map_entry_form">
+                                <div class="form_entry_title">Server Map <div class="form_entry_title_warn"></div></div>
+                                <div class="form_entry_input" id="server_map_form">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="servername_form_side" style="left:10px;">
+                            <div class="servername_img servername_img_noimg" onclick="document.getElementById('image_picker').click();" id="servername_img"><div>Upload<br>Icon</div></div>
+                            <input id="image_picker" type="file" name="f" style="display: none;" onchange="cs.onSubmitServerIcon();">
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog_slider_cell">
+                    <div class="cell_title">Download Companion Software</div>
+                    <div class="cell_content">Ark Web Map uses a companion program to read your Ark: Survival Evolved save file. It will never write to it. You'll need to forward ports on the next screen.</div>
+                    <div class="downloadbtns_container">
+                        <div class="master_btn master_btn_blue downloadbtns_btn" onclick="cs.downloadBinary('windows');">Windows</div>
+                        <div class="master_btn master_btn_blue downloadbtns_btn" onclick="cs.downloadBinary('linux');">Linux</div>
+                    </div>
+                    <div class="cell_content" style=" text-align: center; ">then, type the code displayed in the software below</div>
+                    <div class="downloadbtns_container"><input type="text" placeholder="123456" maxlength="6" oninput="cs.onCodeEdited(this.value);" class="downloadbtns_code"></div>
+                </div>
+                <div class="dialog_slider_cell">
+                    <div class="cell_title">Configure Ports</div>
+                    <div class="cell_content">The Ark Web Map server requires one open port that is used to communicate with the web panel. Please choose a TCP port to open.</div>
+                    <div class="nct_input"><input type="number" placeholder="7779" maxlength="6" class="downloadbtns_code" id="nct_port"><div id="nct_msg" class="nct_std" style="display:none;"></div></div>
+                </div>
+                <div class="dialog_slider_cell">
+                    <div class="cell_title">Configure Ark Save</div>
+                    <div class="cell_content">Ark Web Map loads data from your Ark save file. It will never modify it. Point to the directory where your Ark save file is stored and verify that the map matches.<br><br>Usually, the save file is located in the Ark/Saved/SavedArks folder. As you type, the file will be verified.</div>
+                    <div class="form_entry" id="server_save_entry_form" style="margin-top:20px;">
+                        <div class="form_entry_title">Save Path <div class="form_entry_title_warn"></div><div class="form_entry_note" id="server_save_entry_form_waiting"> - Verifying...</div></div>
+                        <div class="form_entry_input">
+                            <input class="form_entry_input_text" style="width: 450px;" id="server_save_entry" type="text" oninput="cs.save.onType(this.value);" value="C:\Program Files (x86)\Steam\steamapps\common\ARK\ShooterGame\Saved\SavedArks\" placeholder="Usually in SavedArks">
+                        </div>
+                    </div>
+                    <div class="form_entry" id="server_save_map_entry_form">
+                        <div class="form_entry_title">Server Map <div class="form_entry_title_warn"></div></div>
+                        <div class="form_entry_input" id="server_map_form_verify"></div>
+                    </div>
+                </div>
+                <div class="dialog_slider_cell">
+                    <div class="cell_title">Finishing Up</div>
+                    <div class="cell_content">Waiting for the Ark Web Map service, one moment...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        cs.init();
+    </script>
+</body>
+</html>

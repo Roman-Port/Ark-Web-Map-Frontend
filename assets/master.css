@@ -1,0 +1,118 @@
+.master_btn {
+    padding: 8px 14px;
+    color:white;
+    font-size:15px;
+    border:1px;
+    display:inline-block;
+    border:1px solid;
+    margin-right:5px;
+    border-radius: 5px;
+    cursor: pointer;
+    vertical-align: top;
+}
+
+.master_btn_rtl {
+    margin-right:0;
+    margin-left:5px;
+}
+
+.master_btn_working {
+    opacity: 0.5;
+}
+
+.master_btn_blue {
+    background-color:#5585e6;
+    color:white;
+    border:1px solid #5585e6;
+}
+
+.master_btn_blue_outline {
+    color:white;
+    border:1px solid #5585e6;
+}
+
+.master_btn_red {
+    background-color:#e65555;
+    color:white;
+    border:1px solid #e65555;
+}
+
+.master_btn_red_outline {
+    color:white;
+    border:1px solid #e65555;
+}
+
+.master_switch_zone .master_btn {
+    vertical-align: middle;
+    position: absolute;
+    left: 230px;
+    padding:5px 14px;
+}
+
+.master_switch {
+    height: 12px;
+    width: 30px;
+    border-radius: 12px;
+    position: relative;
+    border: 1px solid rgb(62, 62, 62);
+    background-color: rgb(37, 38, 41);
+    transition:all 150ms;
+    padding: 8px 14px;
+    /* Built on master btn */
+}
+
+.master_switch div {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    left: 4px;
+    border-radius: 30px;
+    transition:all 150ms;
+}
+
+.master_switch_active {
+    background-color:#5585e6;
+}
+
+.master_switch_active div {
+    left:calc(100% - 20px - 4px);
+}
+
+.master_switch_zone {
+    position: relative;
+    min-width:300px;
+    min-height:28px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #717171;
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.master_switch_zone span {
+    line-height: 28px;
+}
+
+.master_switch_zone .master_switch {
+    vertical-align: middle;
+    position: absolute;
+    left:230px;
+    padding: 8px 14px;
+}
+
+.master_switch_zone_subtext {
+    display: block;
+    margin-top:10px;
+    font-size:15px;
+    color:gray;
+}
+
+::-webkit-scrollbar { width: 10px; height: 3px; border-radius:5px; overflow:hidden;}
+::-webkit-scrollbar-button {  display:none; }
+::-webkit-scrollbar-track {  background-color: #44474d; border-radius:5px;}
+::-webkit-scrollbar-track-piece { }
+::-webkit-scrollbar-thumb { min-height: 30px; background-color: #9d9ea0;  border-radius:5px;}
+::-webkit-scrollbar-corner { background-color: #44474d;}}
+::-webkit-resizer { background-color: #44474d;}

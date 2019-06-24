@@ -1,0 +1,308 @@
+<html id="html">
+    <head>
+        <meta charset="UTF-8">
+        <title>Ark Web Map</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/view.css">
+        <link rel="stylesheet" href="/assets/top_nav.css">
+        <link rel="stylesheet" href="/assets/bottom_modal.css">
+        <link rel="stylesheet" href="/assets/dino_list_sidebar.css">
+        <link rel="stylesheet" href="/assets/mini_map_modal.css">
+        <link rel="stylesheet" href="/assets/hub.css">
+        <link rel="stylesheet" href="/assets/user_settings.css">
+        <link rel="stylesheet" href="/assets/dino_popout_user.css">
+        <link rel="stylesheet" href="/assets/popup_form.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+        <style>
+            .leaflet-left {
+                left: 13px;
+                transition: all 150ms;
+                animation-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
+            }
+
+            .nav_offset {
+                top: 120px;
+            }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+        <link rel="shortcut icon" href="/favicon.ico">
+        <meta name="msapplication-TileColor" content="#00a300">
+        <meta name="msapplication-config" content="/browserconfig.xml">
+        <meta name="theme-color" content="#ffffff">
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-5630889835669988",
+            enable_page_level_ads: true
+        });
+        </script>
+        <style>
+            .leaflet-marker-icon {
+                transition:transform 100ms;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="loader_view" id="loader_view">
+            <table style="width: 100%; height:100%;">
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <img src="/assets/icon_hires.png" height="90" width="90" style="margin-bottom:30px;">
+                        <div class="loader_view_text">Connecting...</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="warning_top" id="warning_top">
+            <table style="width: 100%; height:100%;">
+                <tr>
+                    <td style="text-align: center; vertical-align: middle; color:white;" id="warning_top_content">
+                        
+                    </td>
+                </tr>
+            </table>
+            <img src="/assets/icons/baseline-close-24px.svg" class="warning_top_close" onclick="collap.setState('warning_banner', false);">
+        </div>
+        <div class="pform_area" id="pform_area">
+            <table style="width: 100%; height:100%;">
+                <tr>
+                    <td style="text-align: center; vertical-align: middle;" id="pform_area_link">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="main_view" class="main_view fs_popup_active_bg">
+            <!-- Top nav -->
+            <div class="top_nav">
+                <div class="top_title">
+                    Ark<span class="top_title_big">WebMap</span>
+                </div>
+                <div class="top_title_arrow"></div>
+                <div class="top_nav_title_area">
+                    <div class="top_nav_title_name" id="map_title"><!-- Server name --></div>
+                    <div class="top_nav_title_sub" id="map_sub_title"><!-- Last updated --></div>
+                </div>
+                <div class="top_nav_search">
+                    <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" onfocus="uinav.onSearchFocus()" onblur="uinav.onSearchBlur()" oninput="uinav.onSearchInput();">
+                    <select class="top_nav_search_select" onchange="uinav.onSearchTypeChange(this);">
+                        <option value="0">All</option>
+                        <option value="1">Tribemembers</option>
+                        <option value="2">Items</option>
+                        <option value="3">Dinos</option>
+                        <option value="4">Baby Dinos</option>
+                    </select>
+                </div>
+                <div class="top_nav_btn_area">
+                    <div id="alerts_area" style="display: inline-block;">
+
+                    </div>
+                    <div class="top_nav_btn_area_sectioner" id="alerts_area_s" style="display:none;"></div>
+                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_edit">Edit</div>
+                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-exit_to_app-24px.svg);" id="nav_btn_leave">Leave</div>
+                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-lock-24px.svg);" id="nav_btn_private">Private</div>
+                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-public-24px.svg);" id="nav_btn_public">Public</div>
+                    <div class="top_nav_btn_area_sectioner"></div>
+                </div>
+            </div>
+
+            <!-- Bottom nav -->
+            <div class="bottom_nav">
+                <div class="bottom_nav_servers" id="bottom_nav_servers">
+
+                </div>
+
+                <!-- Rpws bottom modal I stole from my appstore -->
+                <div class="bottom_modal_rpws" id="bottom_modal_rpws"></div>
+            </div>
+
+            <!-- Left sidebar -->
+            <div class="sidebar_part smooth_anim sidebar_part_active" id="sidebar_part" style="display:none;">
+
+                <!-- Servers list -->
+                <div class="sidebar_servers">
+                    
+                    <div id="server_list">
+
+                    </div>
+                </div>
+
+                <!-- No session mask -->
+                <div class="no_session_mask smooth_anim" id="no_session_mask">
+                    
+                </div>
+            </div>
+            <div class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" id="map_part" style="background-color:#1c1d21;">
+                <!-- Actual map -->
+                <canvas class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" style=" z-index: 999; background: transparent; pointer-events: none; " id="map_draw_part"></canvas>
+                <div class="map_btns">
+                    <div class="top_nav_btn top_nav_btn_hidden" onclick="this.classList.toggle('map_layer_select_active');" style="background-image: url(/assets/icons/baseline-layers-24px.svg); min-width:150px;" id="map_btn_layers"><span id="map_btn_layers_title">Add Layer...</span><div id="map_btn_layers_content" class="map_layer_select_content"></div></div>
+                </div>
+
+            </div>
+            <!-- Sidebar dino list -->
+            <div class="dino_sidebar smooth_anim dino_sidebar_open" id="dino_sidebar_container">
+                <div id="dino_sidebar" class="dino_sidebar_helper">
+
+                </div>
+                <div class="bottom_nav_me_badge">
+                    <div class="sidebar_server_badge sidebar_profile_image_badge" id="my_badge" style="background-image: url(&quot;https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/32/3212a8c5a45904e73f3b72142f9eb0c0946ba34e_full.jpg&quot;);"></div>
+                    <div class="me_badge_text">
+                        <div class="me_badge_text_title" id="me_badge_title">RomanPort</div>
+                        <div class="me_badge_text_sub" id="me_badge_tribe">The TSA</div>
+                    </div>
+                    <div class="sidebar_server_badge sidebar_profile_image_badge me_badge_settings" onclick="usett.show();"></div>
+                </div>
+            </div>
+            <!-- Map menu -->
+            <div class="bottom_modal smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" id="bottom_modal">
+                <div class="bottom_modal_closebtn" onclick="map_menu.hide();"><img src="/assets/icons/baseline-close-24px.svg" style=" position: absolute; top: 15px; left: 10px; "></div>
+                <div class="bottom_modal_bar" id="bottom_modal_bar"></div>
+                <div class="bottom_modal_color_area" id="bottom_modal_color_area"></div>
+                <img class="bottom_modal_dino_icon" id="bottom_modal_dino_icon">
+    
+                <div class="stats_area">
+                    <div class="stats_column" id="stats_column">
+                        <div class="stats_item">
+                            <div class="stats_item_bar">
+                                
+                            </div>
+                            <div class="stats_item_content">
+                                <img src="/resources/ui/status/health.png">
+                                <div class="title">Health</div>
+                                <div class="amount">10,000 / 10,000</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="inventory_area" id="inventory_area_container">
+                    <div id="inventory_area" style="margin:auto;">
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dino selector -->
+            <div class="dino_selector" id="dino_selector">
+                <div class="dino_selector_top">
+                    <input type="text" placeholder="Dinosaur Name" oninput="ark.searchDinoPicker(this.value);">
+                </div>
+                <div id="dino_selector_results" style="transition:all 300ms; overflow:auto; height: calc(100% - 100px);">
+    
+                </div>
+            </div>
+    
+            <!-- Custom -->
+            <div class="dino_selector" id="custom_view"></div>
+    
+            <!-- Dino search window -->
+            <div class="dino_search_window dino_search_window_disabled" id="dino_search_window">
+                <input type="text" id="dino_search_window_input" oninput="ark.onStartSearchTyping(this.value);">
+                <div class="dino_search_window_close" onclick="ark.hideSearchWindow();"><img src="/assets/icons/baseline-close-24px.svg"></div>
+                <div class="dino_search_window_content" id="dino_search_window_content">
+    
+                </div>
+            </div>
+    
+            <!-- Dino notifications cards -->
+            <div class="dino_n_card_holder" id="dino_n_card_holder">
+                
+            </div>
+        </div>
+
+        
+
+        <!-- New custom menu -->
+        <table class="new_custom_area new_custom_area_inactive" id="new_custom_area">
+            <tr>
+                <td style="text-align: center; vertical-align: middle;">
+                    <div class="new_custom_box" id="new_custom_box">
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- User settings -->
+        <div class="fs_popup" id="fs_popup">
+            <div class="usersett_content">
+                <div class="usersett_area">
+                    <div class="usersett_sectionheader">Me</div>
+                    <div class="usersett_me" style="height:110px;">
+                        <div class="usersett_me_icon" id="usersett_me_icon"></div>
+                        <div class="usersett_me_text_title" style="top:15px;">Name</div>
+                        <div class="usersett_me_text_content" style="top:35px;" id="mame_usersett"></div>
+                        <div class="usersett_me_text_title" style="top:60px;">Steam ID</div>
+                        <div class="usersett_me_text_content" style="top:80px;" id="steamid_usersett"></div>
+                        <div class="usersett_me_btns">
+                            <div class="master_btn master_btn_rtl master_btn_red" onclick="usett.signOut('@this');">Sign Out</div>
+                        </div>
+                        <div class="usersett_me_btns" style="bottom:15px; top:unset;">
+                            <div class="master_btn master_btn_rtl master_btn_red_outline" onclick="usett.signOut('@all');">Sign Out Everywhere</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="usersett_area">
+                    <div class="usersett_sectionheader">Filter</div>
+                    <div class="usersett_contentbox">
+                        <div class="master_switch_zone" style="margin-top:10px;"><span>Filter</span> <div id="usersett_filter_switch" onclick="ark_users.me.user_settings.vulgar_filter_on = !ark_users.me.user_settings.vulgar_filter_on; ark.setSwitchActive(ark_users.me.user_settings.vulgar_filter_on, this);" class="master_btn master_switch"><div></div></div></div>
+                        <div class="master_switch_zone"><span>Show Blocked</span> <div class="master_btn master_switch" id="usersett_filter_censored_switch" onclick="ark_users.me.user_settings.vulgar_show_censored_on = !ark_users.me.user_settings.vulgar_show_censored_on; ark.setSwitchActive(ark_users.me.user_settings.vulgar_show_censored_on, this);"><div></div></div><div class="master_switch_zone_subtext">If checked, dinos will be shown but their names will not be.</div></div>
+                        <div class="master_switch_zone" id="usersett_customfiltertoggle"><span>Show Custom Block List</span> <div class="master_btn master_btn_blue" id="usersett_filter_blocked_list" onclick="usett.setCustomFilterWords(true);">Show</div><div class="master_switch_zone_subtext">Allows you to add your own list of words, separated by line.</div></div>
+                        
+                        <textarea class="usersett_textara" placeholder="Type custom words, separated by new lines" id="usersett_customfilter" style="display:none;"></textarea>
+                        <div style="margin-top:5px;">The filter hides dinosaur names that contain vulgar or offensive language.</div>
+                    </div>
+                </div>
+                <div class="usersett_area">
+                    <div class="usersett_sectionheader">Hidden Servers</div>
+                    <div id="hidden_servers_usersett"></div>
+                </div>
+                <div class="usersett_area">
+                    <div class="usersett_sectionheader">About ArkWebMap</div>
+                    <div class="usersett_contentbox">
+                        ArkWebMap © 2019 <a target="_blank" href="https://romanport.com/">RomanPort</a><br>
+                        <a href="https://github.com/Roman-Port/Ark-Web-Map" target="_blank">Open Source</a><br>
+                        Game content is believed to be used under Fair Use. ArkWebMap is not affiliated with the game publisher.
+                    </div>
+                </div>
+            </div>
+            <div class="fs_popup_closebtn" onclick="usett.hide();"></div>
+        </div>
+
+        <div class="fs_popup fs_popup_hub fs_popup_active" id="ui_hub">
+            <div class="hub_container smooth_anim" id="hub_container">
+                    
+            </div>
+        </div>
+    </body>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+    <script src="/assets/map.js"></script>
+    <script src="/assets/map_modal.js"></script>
+    <script src="/assets/baby_manager.js"></script>
+    <script src="/assets/user_portable.js"></script>
+    <script src="/assets/bottom_modal.js"></script>
+    <script src="/assets/permissions.js"></script>
+    <script src="/assets/collapsible.js"></script>
+    <script src="/assets/dino_list_sidebar.js"></script>
+    <script src="/assets/hub.js"></script>
+    <script src="/assets/item_search.js"></script>
+    <script src="/assets/user_settings.js"></script>
+    <script src="/assets/blocked_words.js"></script>
+    <script src="/assets/dino_popout_user.js"></script>
+    <script src="/assets/top_nav.js"></script>
+    <script src="/assets/gateway.js"></script>
+    <script src="/assets/popup_form.js"></script>
+    <script src="/assets/main.js"></script>
+
+    <script>
+        ark.init();
+    </script>
+</html>

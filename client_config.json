@@ -1,0 +1,70 @@
+{
+    "latest_release": {
+        "version_id":1.1,
+        "release_notes":"Welcome to ArkWebMap!\nThis is a test of the updater.",
+        "download_page":"https://ark.romanport.com/releases/?id=1.1",
+        "binaries":{
+            "windows":{
+                "url":"https://ark.romanport.com/releases/download/1.1/windows.zip",
+                "updater_url":"https://ark.romanport.com/releases/download/1.1/windows_updater.zip",
+                "updater_cmd":"ArkWebMapSubServerUpdater.exe",
+                "exe_name":"ArkWebMapSlaveServerConsole.exe",
+                "virustotal":"https://virustotal.com/"
+            },
+            "linux":{
+                "url":"https://ark.romanport.com/releases/download/1.1/linux.zip",
+                "updater_url":"https://ark.romanport.com/releases/download/1.1/linux_updater.zip",
+                "updater_cmd":"",
+                "exe_name":"ArkWebMapSlaveServerConsole.exe",
+                "virustotal":"https://virustotal.com/"
+            }
+        }
+    },
+    "sub_server_config": {
+        "minimum_release_id":1.1,
+        "startup_message":null,
+        "endpoints":{
+            "server_setup_proxy": "https://ark.romanport.com/api/server_setup_proxy/{clientSessionId}?from=Server",
+            "base_bridge_url":"https://ark.romanport.com/api/bridge/",
+            "server_api_prefix":"https://ark.romanport.com/api/servers/"
+        }
+    },
+    "compatible_maps": [
+        {
+            "friendly_name":"Extinction",
+            "internal_name":"Extinction",
+            "icon_url":"https://ark.romanport.com/assets/images/map_icons/generic_orange.png",
+            "tiles_supported":true
+        },
+        {
+            "friendly_name":"The Center",
+            "internal_name":"TheCenter",
+            "icon_url":"https://ark.romanport.com/assets/images/map_icons/generic_blue.png",
+            "tiles_supported":true
+        },
+        {
+            "friendly_name":"The Island",
+            "internal_name":"TheIsland",
+            "icon_url":"https://ark.romanport.com/assets/images/map_icons/generic_blue.png",
+            "tiles_supported":false
+        },
+        {
+            "friendly_name":"Scorched Earth",
+            "internal_name":"ScorchedEarth",
+            "icon_url":"https://ark.romanport.com/assets/images/map_icons/generic_orange.png",
+            "tiles_supported":false
+        },
+        {
+            "friendly_name":"Aberration",
+            "internal_name":"Aberration",
+            "icon_url":"https://ark.romanport.com/assets/images/map_icons/generic_violet.png",
+            "tiles_supported":false
+        },
+        {
+            "friendly_name":"Ragnorok",
+            "internal_name":"Ragnorok",
+            "icon_url":"https://ark.romanport.com/assets/images/map_icons/generic_blue.png",
+            "tiles_supported":false
+        }
+    ]
+}

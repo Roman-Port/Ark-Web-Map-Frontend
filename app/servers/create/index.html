@@ -19,7 +19,7 @@
                 },
                 "defaultNav":{
                     "hasBack":false,
-                    "hasContinue":false
+                    "hasContinue":true
                 },
                 "onBack":function() {
                     return false;
@@ -43,23 +43,6 @@
                 }
             },
             {
-                "name":"Ports",
-                "onInit":function(c) {
-
-                },
-                "defaultNav":{
-                    "hasBack":false,
-                    "hasContinue":true
-                },
-                "onBack":function() {
-                    return false;
-                },
-                "onContinue":function() {
-                    cs.nct.doTest();
-                    return false;
-                }
-            },
-            {
                 "name":"Save",
                 "onInit":function(c) {
                     //Fill the map selector
@@ -76,6 +59,22 @@
                 "onContinue":function() {
                     //Submit final
                     cs.submitFinal();
+                    return true;
+                }
+            },
+            {
+                "name":"Mod",
+                "onInit":function(c) {
+                    
+                },
+                "defaultNav":{
+                    "hasBack":false,
+                    "hasContinue":true
+                },
+                "onBack":function() {
+                    return true;
+                },
+                "onContinue":function() {
                     return true;
                 }
             },
@@ -112,7 +111,6 @@
                     <div class="cell_content">To add your Ark server to Ark Web Map, make sure that your server meets these requirements, then click next.<br>
                         <ul>
                             <li>Ability to download and run the Ark Web Map companion program.</li>
-                            <li>Ability to forward additional ports for the Ark Web Map companion program.</li>
                             <li>Direct access to your Ark server save file.</li>
                             <li>Windows 7+ or Linux capable of running .NET Core.</li>
                         </ul>
@@ -154,11 +152,6 @@
                     <div class="downloadbtns_container"><input type="text" placeholder="123456" maxlength="6" oninput="cs.onCodeEdited(this.value);" class="downloadbtns_code"></div>
                 </div>
                 <div class="dialog_slider_cell">
-                    <div class="cell_title">Configure Ports</div>
-                    <div class="cell_content">The Ark Web Map server requires one open port that is used to communicate with the web panel. Please choose a TCP port to open.</div>
-                    <div class="nct_input"><input type="number" placeholder="7779" maxlength="6" class="downloadbtns_code" id="nct_port"><div id="nct_msg" class="nct_std" style="display:none;"></div></div>
-                </div>
-                <div class="dialog_slider_cell">
                     <div class="cell_title">Configure Ark Save</div>
                     <div class="cell_content">Ark Web Map loads data from your Ark save file. It will never modify it. Point to the directory where your Ark save file is stored and verify that the map matches.<br><br>Usually, the save file is located in the Ark/Saved/SavedArks folder. As you type, the file will be verified.</div>
                     <div class="form_entry" id="server_save_entry_form" style="margin-top:20px;">
@@ -170,6 +163,13 @@
                     <div class="form_entry" id="server_save_map_entry_form">
                         <div class="form_entry_title">Server Map <div class="form_entry_title_warn"></div></div>
                         <div class="form_entry_input" id="server_map_form_verify"></div>
+                    </div>
+                </div>
+                <div class="dialog_slider_cell">
+                    <div class="cell_title">Install the Ark Web Map Companion Mod <span class="cell_title_i">(Optional)</span></div>
+                    <div class="cell_content">The Ark Web Map Companion Mod is used to push realtime events, show online players, send notifications, and more.<br><br>To install, download the mod from the Steam Workshop and open the "GameUserSettings.ini" file in "ShooterGame/Saved/Config/WindowsServer". Add the "ActiveMods=1775128245", or add the mod ID 1775128245.</div>
+                    <div class="downloadbtns_container">
+                        <div class="master_btn master_btn_blue downloadbtns_btn" onclick="cs.openiframe('steam://openurl/https://steamcommunity.com/sharedfiles/filedetails/?id=1775128245');">Open Steam</div>
                     </div>
                 </div>
                 <div class="dialog_slider_cell">

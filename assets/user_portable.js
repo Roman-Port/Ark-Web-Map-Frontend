@@ -37,9 +37,13 @@ ark_users.serverRequest = function(url, args, callback) {
         args.method = "GET";
     }
     xmlhttp.open(args.method, url, true);
-    xmlhttp.withCredentials = true;
-    if(args.nocreds != null) {
-        xmlhttp.withCredentials = !args.nocreds;
+    if(args.nocreds == null || !args.nocreds) {
+        //Include auth. If we don't have a token, redirect to login now
+        if(localStorage.getItem("access_token") == null) {
+            window.location = "/login/";
+        } else {
+            xmlhttp.setRequestHeader("Authorization", "Bearer "+localStorage.getItem("access_token"));
+        }
     }
     xmlhttp.send(args.body);
 }

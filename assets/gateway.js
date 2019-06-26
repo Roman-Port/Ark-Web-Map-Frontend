@@ -45,25 +45,14 @@ gateway.getConfig = function(callback) {
     }
 
     //Grab the config
-    ark.serverRequest("https://ark.romanport.com/gateway_config.json", {nocreds:true}, function(e) {
+    ark.serverRequest("https://ark.romanport.com/config/gateway_config.json", {nocreds:true}, function(e) {
         gateway.config = e;
         callback(e);
     });
 }
 
 gateway.getToken = function() {
-    //Get the access token from our cookies. Janky.
-    var index = document.cookie.indexOf("user_token");
-    if(index == -1) {
-        return null;
-    }
-    var cookieArea = document.cookie.substr(index + "user_token=".length);
-    index = cookieArea.indexOf(";");
-    if(index == -1) {
-        return cookieArea;
-    } else {
-        return cookieArea.substr(0, index);
-    }
+    return localStorage.getItem("access_token");
 }
 
 gateway.onMsg = function(evt) {

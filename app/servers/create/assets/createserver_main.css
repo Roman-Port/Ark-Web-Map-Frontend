@@ -289,3 +289,16 @@ body {
     margin-bottom: 20px;
     text-align: center;
 }
+
+.cell_title_i {
+    font-style: italic;
+    font-weight: 200;
+    font-size: 10px;
+}
+
+.hidden_iframe {
+    pointer-events: none;
+    opacity: 0;
+    width:1px;
+    height:1px;
+}

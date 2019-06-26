@@ -19,7 +19,7 @@ cs.init = function() {
     //Try and authenticate us just to check if we're logged in
     ark_users.refreshUserData(function(e) {
         //Load config
-        ark_users.serverRequest("https://ark.romanport.com/client_config.json", {}, function(c) {
+        ark_users.serverRequest("https://ark.romanport.com/config/games/0/client_config.json", {}, function(c) {
             config = c;
 
             //Fill the map selection form
@@ -33,6 +33,16 @@ cs.init = function() {
         //Go to login
         window.location = "https://ark.romanport.com/login/?callback="+encodeURIComponent(window.location);
     });
+}
+
+cs.openiframe = function(url) {
+    var e = cs.createNode("iframe", "hidden_iframe");
+    e.src = url;
+    document.body.appendChild(e);
+
+    window.setTimeout(function() {
+        e.remove();
+    }, 1000);
 }
 
 cs.updateMapSelectionForm = function(e, mapData) {

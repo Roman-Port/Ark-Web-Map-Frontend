@@ -1,0 +1,6 @@
+{
+    "server_endpoint":"wss://lightspeed-ark.romanport.com:43296/?id={clientId}&creds={clientToken}&game={clientGame}",
+    "reconnect_delay_seconds":5,
+    "buffer_size":8192,
+    "client_endpoint_prefix":"https://lightspeed-ark.romanport.com/{serverId}"
+}

@@ -71,6 +71,7 @@ gateway.onMsg = function(evt) {
         case 3: draw_map.onRx(d); break;
         case 7: draw_map.onGatewayMapEvent(d); break;
         case 8: map.remoteUpdateMultipleRealtime(d.updates); break;
+        case 9: ark.onServerStateChanged(d.serverId, d.isUp); break;
     }
 }
 

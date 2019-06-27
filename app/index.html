@@ -44,7 +44,7 @@
         </script>
         <style>
             .leaflet-marker-icon {
-                transition:transform 100ms;
+                transition:transform 200ms;
             }
         </style>
     </head>
@@ -216,7 +216,8 @@
             </div>
         </div>
 
-        
+        <!-- Create server dialog -->
+        <iframe src="/app/servers/create/" id="server_setup" class="server_setup_frame server_setup_frame_disabled"></iframe>
 
         <!-- New custom menu -->
         <table class="new_custom_area new_custom_area_inactive" id="new_custom_area">
@@ -277,7 +278,6 @@
 
         <div class="fs_popup fs_popup_hub fs_popup_active" id="ui_hub">
             <div class="hub_container smooth_anim" id="hub_container">
-                    
             </div>
         </div>
     </body>

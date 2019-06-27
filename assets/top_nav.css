@@ -228,6 +228,13 @@
     background-color: #33363c;
 }
 
+.bottom_nav_server_badge_add {
+    background-color: #33363c;
+    background-image: url(/assets/icons/baseline-add-24px.svg);
+    background-size: 28px;
+    background-repeat: no-repeat;
+}
+
 .bottom_nav_server_badge_sep {
     margin: 10px 5px;
     height: calc(70px - 10px - 10px);
@@ -239,7 +246,7 @@
 }
 
 .bottom_nav_server_badge:hover {
-    margin-top:0;
+    /* Raise this in the future? */
 }
 
 .bottom_nav_me_badge {

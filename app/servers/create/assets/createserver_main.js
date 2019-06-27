@@ -556,3 +556,10 @@ cs.finishSubmittingRefreshLoopFunc = function() {
     
     });
 }
+
+window.addEventListener('click', function(evt) {
+	if(evt.path.length <= 3) {
+        //Close. Send to parent
+        window.parent.postMessage('message');
+    }
+});

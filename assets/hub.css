@@ -37,10 +37,11 @@
     /* Contains hub segments. */
     display:block;
     margin:auto;
-    max-width:1300px;
-    width:100%;
+    max-width:1000px;
+    width:calc(100% - 40px);
     transition:all 250ms;
     transition-timing-function: cubic-bezier(0.06, 0.79, 0.58, 1);
+    padding:20px;
     padding-top:80px;
     opacity:0;
     margin-top:50px;
@@ -53,6 +54,11 @@
 
 .hub_section {
     margin:8px;
+    padding: 10px;
+    background-color: #1d1d1e;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #50545b;
 }
 
 .hub_section_title {
@@ -60,7 +66,7 @@
     font-size:15px;
     text-transform: uppercase;
     color: #e6e6e6;
-    text-align: center;
+    text-align: left;
     margin-bottom:5px;
 }
 
@@ -189,8 +195,10 @@ and (max-width : 1000px) {
 .hub_events_evt {
     padding: 10px;
     background-color: #1d1d1e;
-    border-top: 1px solid #3e3e3e;
     height: 40px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #50545b;
 }
 
 .hub_events_evt_icons {
@@ -201,7 +209,7 @@ and (max-width : 1000px) {
 .hub_events_evt_text {
     position: relative;
     height:40px;
-    width: calc(100% - 152px);
+    width: calc(100% - 152px - 66px);
     padding-left: 5px;
     margin-left:5px;
     display:inline-block;
@@ -244,6 +252,18 @@ and (max-width : 1000px) {
     margin-right: 3px;
 }
 
+.hub_events_evt_sub_hover {
+    display:none;
+}
+
+.hub_events_evt:hover .hub_events_evt_sub_hover {
+    display:inline;
+}
+
+.hub_events_evt:hover .hub_events_evt_sub_nohover {
+    display:none;
+}
+ 
 .hub_circle_big {
     height: 40px;
     width: 40px;
@@ -280,4 +300,49 @@ and (max-width : 1000px) {
     background-image: url(/assets/demo_bg.png);
     background-size: contain;
     background-repeat: no-repeat;
+}
+
+.fs_popup_hub_nobg {
+    background-image:unset;
+}
+
+.hub_events_evt_servericon {
+    width: 42px;
+    border-right: 1px solid #3e3e3e;
+    padding-right: 10px;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.hub_eventsarea {
+    width:calc(100% - 280px);
+    display:inline-block;
+    vertical-align: top;
+    padding-top: 8px;
+}
+
+.hub_sidearea {
+    width:280px;
+    display:inline-block;
+    vertical-align: top;
+}
+
+.hub_server_entry {
+    margin-right:5px;
+    margin-bottom:5px;
+    border-radius: 50%;
+    width:40px;
+    height:40px;
+    background-size:100%;
+    background-position: center;
+    cursor: pointer;
+    display:inline-block;
+    position: relative;
+}
+
+.hub_no_servers {
+    width:100%;
+    font-size:15px;
+    color:white;
+    text-align: center;
 }

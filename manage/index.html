@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Delta Map - Provider Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/manage/manage.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/manage/manage_pform.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/master.css" />
+    <script src="/assets/manage/manage.js"></script>
+    <script src="/assets/manage/manage_pform.js"></script>
+</head>
+<body>
+    <div class="pform_area" id="pform_area">
+        <table style="width: 100%; height:100%;">
+            <tr>
+                <td style="text-align: center; vertical-align: middle;" id="pform_area_link">
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="bottom_modal bottom_modal_error" id="bottom_modal"></div>
+    <div class="top_bar">
+        <div class="constrained">
+            <div class="top_bar_section">
+                <span class="title">Delta<span class="title_big">WebMap</span></span>
+            </div>
+            <div class="top_bar_section" id="tab_top_0" onclick="main.chooseTab(0);">
+                Servers
+            </div>
+            <div class="top_bar_section" id="tab_top_1" onclick="main.chooseTab(1);">
+                Machines
+            </div>
+            <div class="top_bar_section" id="tab_top_2" onclick="main.chooseTab(2);">
+                Users
+            </div>
+            <div class="top_bar_section" id="tab_top_3" onclick="main.chooseTab(3);">
+                API
+            </div>
+            <div class="top_bar_section top_bar_rightsection">
+                <span id="me_name"></span><img src="" class="top_bar_profilepic" id="me_img">
+            </div>
+        </div>
+    </div>
+    <div class="content constrained">
+        <!-- Servers -->
+        <div class="content_tab" id="tab_content_0">
+            <h1>Servers <div class="master_btn master_btn_blue master_btn_rtl" onclick="main.showServerEnrollForm();" style="float:right">Enroll New</div></h1>
+            <p>Here, you can see all of the instances that are registered under this provider. You may link a server to a client, or add a new server here. For automatic enrolls, you should use the API.</p>
+
+            <table style="width:100%" id="servers_table">
+                <tr>
+                    <th>Name</th>
+                    <th>Client</th>
+                    <th>Machine Name</th>
+                    <th>Game</th>
+                    <th>Map</th>
+                    <th>Active</th>
+                    <th>Manage</th>
+                </tr>
+                <tr>
+                    <td>TestServer1</td> 
+                    <td>RomanPort</td>
+                    <td>US-East-1</td>
+                    <td>ARK: Survival Evolved</td>
+                    <td>Extinction</td>
+                    <td>Yes</td>
+                    <td><a href="javascript:">Manage</a></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Machines -->
+        <div class="content_tab" id="tab_content_1">
+            <h1>Machines <div class="master_btn master_btn_blue master_btn_rtl" style="float:right" onclick="main.showMachineEnrollForm()">Enroll New</div></h1>
+            <p>Here, you can see all of the physical machines that are running. Physical machines are considered to be each client that you download. Multiple servers can run on one physical machine.</p>
+
+            <table style="width:100%" id="machines_table">
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Game</th>
+                    <th>Active Servers</th>
+                    <th>Active</th>
+                    <th>Manage</th>
+                </tr>
+                <tr>
+                    <td>US-East-1</td> 
+                    <td>US East</td>
+                    <td>ARK: Survival Evolved</td>
+                    <td>1</td>
+                    <td>Yes</td>
+                    <td><a href="javascript:">Manage</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        main.init();
+    </script>
+</body>
+</html>

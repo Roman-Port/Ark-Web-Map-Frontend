@@ -151,7 +151,7 @@ map.dino_marker_list_index = 0;
 /* Tribe dinos */
 map.onEnableTribeDinos = function(callback) {
     //Query tribe dinos
-    ark.serverRequestWithOfflineFallback(ark.session.endpoint_tribes, "tribe", "Failed to refresh tribe data.", function(d) {
+    ark.serverRequestWithOfflineFallback(ark.session.endpoint_tribes, "tribe", {}, function(d) {
         //Add dinos
         for(var i = 0; i<d.dinos.length; i+=1) {
             var dino = d.dinos[i];

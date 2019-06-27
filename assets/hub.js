@@ -70,14 +70,22 @@ hub.create = function() {
         //Grab the container
         var container = document.getElementById('hub_container');
 
-        //Add ark news
-        var arknews = hub.arknews.create(d, container);
+        //If the user has no servers, show a message
+        if(d.servers.length == 0) {
+            hub.showNoServers();
+        } else {
+            var left = ark.createDom("div", "hub_eventsarea", container);
+            var right = ark.createDom("div", "hub_sidearea", container);
 
-        //Add server list
-        var serverList = hub.serverList.create(d, container);
+            //Add ark news
+            //var arknews = hub.arknews.create(d, container);
 
-        //Add main news section
-        var serverevents = hub.events.create(d, container);
+            //Add server list
+            var serverList = hub.serverList.create(d, right);
+
+            //Add main news section
+            var serverevents = hub.events.create(d, left);
+        }
 
         //Show
         container.classList.add('hub_container_active');
@@ -91,6 +99,23 @@ hub.create = function() {
             ark.onInitStepComplete();
         }
     });
+}
+
+hub.showNoServers = function() {
+    //It's pretty quiet in here. If you own a server, you should <a href="javascript:ark.showCreateServers();">add your server</a>. If not, ask your server owner to add Ark Web Map, or <a href="javascript:usett.signOut('@this');">log out</a>.
+    var e = ark.createDom("div", "hub_no_servers", document.getElementById('hub_container'));
+    ark.createDom("span", "", e).innerText = "It's pretty quiet in here. You have no ARK servers added.\n\nIf you own a server, you should ";
+    var btna = ark.createDom("span", "link", e);
+    btna.innerText = "add your server";
+    btna.addEventListener('click', ark.showCreateServers);
+    ark.createDom("span", "", e).innerText = ". If not, ask your server owner to add Ark Web Map, or ";
+    var btnb = ark.createDom("span", "link", e);
+    btnb.innerText = "log out";
+    btnb.addEventListener('click', function() {usett.signOut('@this');});
+    ark.createDom("span", "", e).innerText = ".";
+
+    //Remove bg
+    document.getElementById('ui_hub').classList.add('fs_popup_hub_nobg');
 }
 
 /* Ark news */
@@ -118,17 +143,32 @@ hub.arknews.create = function(d, parent) {
 hub.serverList = {};
 hub.serverList.create = function(d, parent) {
     //Create the box
-    var inner = ark.createDom("div", "ark_serverlist_container");
+    var inner = ark.createDom("div", "");
     
     for(var i = 0; i<d.servers.length; i+=1) {
         var s = d.servers[i];
-        var e = ark.createServerEntryBadge(s, function() {
+        /*var e = ark.createServerEntryBadge(s, function() {
             ark.switchServer(this.x_server_data);
             collap.toggle("ui_hub");
         });
         if(e != null) {
             inner.appendChild(e);
-        }
+        }*/
+        var e = ark.createDom("div", "hub_server_entry", inner);
+        e.style.backgroundImage = "url("+s.image_url+")";
+
+        var ee = ark.createDom("div", "sidebar_server_badge_text", e);
+        ee.innerText = s.display_name;
+        var et = ark.createDom("div", "sidebar_server_badge_text_triangle", ee);
+
+        e.x_server_data = s;
+        e.addEventListener('click', function() {
+            if(ark.loadingStatus == 0) {
+                ark.switchServer(this.x_server_data);
+                collap.toggle("ui_hub");
+            }
+            
+        });
     }
 
     //Create frame
@@ -141,37 +181,21 @@ hub.events.create = function(d, parent) {
     //Create the inner boxes for each server
     var container = ark.createDom("div", "");
 
-    //Add server boxes
+    //Create server dict
+    var serverDict = {};
     for(var i = 0; i<d.servers.length; i+=1) {
-        var server = d.servers[i];
-        if(d.servers_hub[server.id] != null) {
-            hub.events.createServer(server, container, d.servers_hub[server.id]);
-        }
-        
+        serverDict[d.servers[i].id] = i;
     }
 
-    //Wrap in a section
-    return hub.makeSectionArea("Server Events", container, parent);
-}
-
-hub.events.createServer = function(data, container, hubData) {
-    //Create the box
-    var box = ark.createDom("div", "hub_events_box", container);
-
-    //Make header
-    var header = ark.createDom("div", "hub_events_header", box);
-    ark.createDom("img", "hub_events_header_img", header).src = data.image_url;
-    ark.createDom("span", "hub_events_header_name", header).innerText = data.display_name;
-    ark.createDom("span", "hub_events_header_sub", header).innerText = data.map_name;
-
-    //Now, add the events section
-    var esection = ark.createDom("div", "hub_events_area", box);
-
-    //Loop through events and add them.
-    for(var i = 0; i<hubData.events.length; i+=1) {
-        var event = hubData.events[i];
-        hub.events.eventTypes[event.type](event, hubData.profiles, data, esection);
+    //Add each event
+    for(var i = 0; i<d.log.length; i+=1) {
+        var event = d.log[i];
+        hub.events.eventTypes[event.type](event, d.steam_profiles, d.servers[serverDict[event.serverId]], container);
     }
+
+    //Add
+    parent.appendChild(container);
+    return container;
 }
 
 /* Event tools */
@@ -180,8 +204,8 @@ hub.events.createDinoIcon = function(data) {
     var cir = ark.createDom("div", "hub_circle_big");
 
     //If we have a dino entry, add the class image
-    if(data.dinoEntry != null) {
-        cir.style.backgroundImage = "url('"+data.dinoEntry.icon_url+"')";
+    if(data.dinoImg != null) {
+        cir.style.backgroundImage = "url('"+data.dinoImg+"')";
     } else {
         //Fallback
         cir.classList.add("hub_circle_big_failed");
@@ -196,12 +220,12 @@ hub.events.createPlayerIcon = function(data, profiles) {
     var cir = ark.createDom("div", "hub_circle_big hub_circle_fill");
 
     //If we have a dino entry, add the class image
-    if(data.name == "Your Tribe") {
+    if(data.name == "Your Tribe" || data.name == null) {
         //Ark did not provide a user. Use our profile URL
         cir.style.backgroundImage = "url('"+ark_users.me.profile_image_url+"')";
     }
-    else if(data.profile != null) {
-        var playerData = profiles[data.profile.steamPlayerId];
+    else if(data.steamPlayerId != null) {
+        var playerData = profiles[data.steamPlayerId];
         if(playerData != null) {
             cir.style.backgroundImage = "url('"+playerData.avatarfull+"')";
         }
@@ -236,8 +260,8 @@ hub.events.createIcon = function(url) {
 hub.events.createDinoName = function(data, includeClassname, includeLevel, server) {
     if(data.isTamed) {
         var str = "";
-        if(data.profile != null) {
-            if(data.profile.tribeId == server.tribeid) {
+        if(data.tribeId != null) {
+            if(data.tribeId == server.tribeid) {
                 str += "Our ";
             }
         }
@@ -261,11 +285,19 @@ hub.events.createDinoName = function(data, includeClassname, includeLevel, serve
 }
 
 hub.events.createPlayerName = function(data) {
-    //In tyhe future, you'll be able to hover over this
-    var str = data.name+" ";
-    var e = ark.createDom("span", "");
-    e.innerText = str;
-    return e;
+    if(data.name == null) {
+        //Generic "your tribe"
+        var str = "Your Tribe ";
+        var e = ark.createDom("span", "");
+        e.innerText = str;
+        return e;
+    } else {
+        //In tyhe future, you'll be able to hover over this
+        var str = data.name+" ";
+        var e = ark.createDom("span", "");
+        e.innerText = str;
+        return e;
+    }
 }
 
 hub.events.createPlayerOrDinoName = function(data, includeClassname, includeLevel, server) {
@@ -296,10 +328,46 @@ hub.events.addText = function(text, evt, container) {
 
     //Add time.
     var time = ark.createDom("div", "hub_events_evt_sub", a);
+    var timeString = hub.events.convertTime(evt.time);
     ark.createDom("div", "hub_events_evt_sub_img", time);
-    ark.createDom("span", "", time).innerText = evt.gameDay+" "+evt.gameTime;
+    ark.createDom("span", "hub_events_evt_sub_nohover", time).innerText = timeString;
+    ark.createDom("span", "hub_events_evt_sub_hover", time).innerText = "Ark "+evt.gameDay+" "+evt.gameTime;
 
     return a;
+}
+
+hub.events.addServerIcon = function(e, server) {
+    var serverIcon = ark.createDom("div", "hub_events_evt_servericon", e);
+    var serverIconInner = hub.events.createIcon(server.image_url);
+    serverIconInner.style.borderRadius = "50%";
+    serverIcon.appendChild(serverIconInner);
+}
+
+hub.events.convertTime = function(time) {
+    var t = new Date(time);
+    var o = new Date() - t;
+    o = o/1000/60; //Now in minutes
+    if(o < 5) {
+        return "Now";
+    }
+    if(o < 30) {
+        return "About a half hour ago";
+    }
+    if(o <= 60) {
+        return "About an hour ago";
+    }
+    o = Math.ceil(o/60); //Now in hours
+    if(o <= 24) {
+        return "About "+o.toString()+" hours ago";
+    }
+    o = Math.floor(o/24); //Days
+    if(o == 1) {
+        return "About a day ago";
+    }
+    if(o == 2) {
+        return "About "+o.toString()+" days ago";
+    }
+    return "Around "+ark.dateToString(d);
 }
 
 /* Event types */
@@ -308,28 +376,32 @@ hub.events.eventTypes = {};
 hub.events.eventTypes[0] = function(evt, profiles, server, container) { //Player tamed dino
     var e = ark.createDom("div", "hub_events_evt", container);
 
+    hub.events.addServerIcon(e, server);
+
     var icons = ark.createDom("div", "hub_events_evt_icons", e);
-    icons.appendChild(hub.events.createDinoIcon(evt.tamedTarget));
+    icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.tamedTarget));
     icons.appendChild(hub.events.createIcon("https://ark.romanport.com/resources/ui/events/Condition_Befriended_Icon.png"));
-    icons.appendChild(hub.events.createPlayerIcon(evt.tribePlayerTarget, profiles));
+    icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.tribePlayerTarget, profiles));
 
     hub.events.addText([
-        hub.events.createPlayerName(evt.tribePlayerTarget),
+        hub.events.createPlayerOrDinoName(evt.targets.tribePlayerTarget),
         "tamed a ",
-        hub.events.createDinoName(evt.tamedTarget, false, true, server)
+        hub.events.createPlayerOrDinoName(evt.targets.tamedTarget, false, true, server)
     ], evt, e);
 }
 hub.events.eventTypes[1] = function(evt, profiles, server, container) { //Target killed target
     var e = ark.createDom("div", "hub_events_evt", container);
 
+    hub.events.addServerIcon(e, server);
+
     var icons = ark.createDom("div", "hub_events_evt_icons", e);
-    icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.killer, profiles));
+    icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.killer, profiles));
     icons.appendChild(hub.events.createIcon("https://ark.romanport.com/resources/ui/events/Sword_Icon.png"));
-    icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.victim, profiles));
+    icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.victim, profiles));
 
     hub.events.addText([
-        hub.events.createPlayerOrDinoName(evt.killer, false, false, server),
+        hub.events.createPlayerOrDinoName(evt.targets.killer, false, false, server),
         "killed ",
-        hub.events.createPlayerOrDinoName(evt.victim, false, false, server)
+        hub.events.createPlayerOrDinoName(evt.targets.victim, false, false, server)
     ], evt, e);
 }

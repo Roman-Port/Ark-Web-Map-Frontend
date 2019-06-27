@@ -35,7 +35,7 @@ dinosidebar.sectionCount = 5;
 dinosidebar.activeSection = 0; //0 being all
 
 dinosidebar.fetchAndGenerate = function(callback) {
-    ark.serverRequestWithOfflineFallback(ark.session.endpoint_tribes_overview, "overview", "Failed to fetch tribe overview data.", function(d) {
+    ark.serverRequestWithOfflineFallback(ark.session.endpoint_tribes_overview, "overview", {}, function(d) {
         dinosidebar.latest_data = d;
         dinosidebar.generate(d);
         ark.setTribeName(d.tribeName);

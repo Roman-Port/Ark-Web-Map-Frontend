@@ -83,23 +83,17 @@ ark.serverRequest = function(url, args, callback) {
                 args.failOverride(this);
             } else {
                 if (this.readyState == 4 && this.status == 502) {
-                    //Host offline
-                    bottom_modal.forceHideBottomModalNoArgs();
-                    bottom_modal.reportError("This server is offline. Please try again later.");
-                    
-                } else if (this.readyState == 4 && this.status == 500) {
-                    //Known server error.
-                    var err = JSON.parse(this.responseText);
-                    bottom_modal.forceHideBottomModalNoArgs();
-                    bottom_modal.reportError("Couldn't fetch data.\n\nError: "+err.message);
-                } else if (this.readyState == 4 && this.status == 521) {
-                    //This is the error code returned by the Ark master server proxy. Abort.
+                    //This is the error code when the subserver is offline.
                     if(args.overrideProxyOffline != null) {
                         args.overrideProxyOffline();
                     } else {
                         ark.onConnectedServerStop();
                     }
-                    
+                } else if (this.readyState == 4 && this.status == 500) {
+                    //Known server error.
+                    var err = JSON.parse(this.responseText);
+                    bottom_modal.forceHideBottomModalNoArgs();
+                    bottom_modal.reportError("Couldn't fetch data.\n\nError: "+err.message);
                 } else if (this.readyState == 4 && this.status == 401) {
                     //Not authenticated
                     window.location = "/login";
@@ -170,7 +164,7 @@ ark.onNetError = function(errorCode, args) {
     }
 }
 
-ark.serverRequestWithOfflineFallback = function(url, fallbackKey, name, callback) {
+ark.serverRequestWithOfflineFallback = function(url, fallbackKey, args, callback) {
     //URL: The URL to try
     //fallbackKey: The key to use in the fallback offline data
     //name: The custom error text to show
@@ -178,12 +172,23 @@ ark.serverRequestWithOfflineFallback = function(url, fallbackKey, name, callback
 
     //If we already know the server is offline, use the offline data.
     if(!ark.isCurrentServerOnline) {
-        callback(ark.currentServerOfflineData[fallbackKey]);
-        return;
+        if(ark.currentServerOfflineData == null) {
+            //Fetch offline data
+            //Server is offline! Fetch offline data.
+            ark.fetchOfflineData(function(ds) {
+                ark.currentServerOfflineData = ds;
+                callback(ark.currentServerOfflineData[fallbackKey]);
+                
+            });
+            return;
+        } else {
+            callback(ark.currentServerOfflineData[fallbackKey]);
+            return;
+        }
     }
 
     //AFAIK the server is up! Try
-    ark.serverRequest(url, {"customErrorText":name, "overrideProxyOffline":function() {
+    args["overrideProxyOffline"] = function() {
         //Server is offline! Fetch offline data if we need to do so.
         ark.isCurrentServerOnline = false;
         if(ark.currentServerOfflineData == null) {
@@ -194,7 +199,8 @@ ark.serverRequestWithOfflineFallback = function(url, fallbackKey, name, callback
         } else {
             callback(ark.currentServerOfflineData[fallbackKey]);
         }
-    }}, function(d) {
+    }
+    ark.serverRequest(url, args, function(d) {
         //Online.
         ark.isCurrentServerOnline = true;
         callback(d);
@@ -202,24 +208,7 @@ ark.serverRequestWithOfflineFallback = function(url, fallbackKey, name, callback
 }
 
 ark.openSession = function(callback, url) {
-    ark.serverRequest(url, {"customErrorText":"Failed to create session.", "overrideProxyOffline":function() {
-        //Server is offline! Fetch offline data.
-        ark.isCurrentServerOnline = false;
-        ark.fetchOfflineData(function(ds) {
-            var d = ds.session;
-            ark.session = d;
-            ark.session_events_url = d.endpoint_events;
-
-            //Reset start time
-            ark.session_start_time = new Date();
-
-            //Set last updated time
-            ark.updateLastEditedUi();
-
-            callback(d);
-        });
-    }}, function(d) {
-        ark.isCurrentServerOnline = true;
+    ark.serverRequestWithOfflineFallback(url, "session", {}, function(d) {
         ark.session = d;
         ark.session_events_url = d.endpoint_events;
 
@@ -231,6 +220,24 @@ ark.openSession = function(callback, url) {
 
         callback(d);
     });
+}
+
+ark.onServerStateChanged = function(serverId, isUp) {
+    //Find this on the server list
+    for(var i = 0; i<ark_users.me.servers.length; i+=1) {
+        if(ark_users.me.servers[i].id == serverId) {
+            ark_users.me.servers[i].is_online = isUp;
+        }
+    }
+
+    //If this is the active server, update
+    if(ark.currentServerId == serverId) {
+        if(isUp) {
+            ark.onActiveServerUp();
+        } else {
+            ark.onActiveServerDown();
+        }
+    }
 }
 
 ark.addAlert = function(iconUrl, text, id, onClick) {
@@ -334,6 +341,7 @@ ark.getGameTimeOffset = function() {
 }
 
 ark.onActiveServerDown = function() {
+    ark.isCurrentServerOnline = false;
     //Called when the current server goes offline
     console.log("Active server just went down.");
 
@@ -344,6 +352,7 @@ ark.onActiveServerDown = function() {
 }
 
 ark.onActiveServerUp = function(doReload) {
+    ark.isCurrentServerOnline = true;
     //Called when the current server goes online
     console.log("Active server just went up.");
 
@@ -360,7 +369,20 @@ ark.currentServer = null;
 ark.isCurrentServerOnline = false;
 ark.currentServerOfflineData = null;
 
-ark.switchServer = function(serverData) {
+ark.switchServer = function(serverDataInput) {
+    //Get this from the master server list
+    var serverData = null;
+    for(var i = 0; i<ark_users.me.servers.length; i+=1) {
+        if(ark_users.me.servers[i].id == serverDataInput.id) {
+            serverData = ark_users.me.servers[i];
+            break;
+        }
+    }
+    if(serverData == null) {
+        confirm.log("Couldn't find server in master server list.");
+        return;
+    }
+
     //Ignore if we're still loading a server
     if(ark.loadingStatus != 0) {
         console.log("Will not switch server; A server is already loading!");
@@ -428,7 +450,7 @@ ark.forceJoinServer = function(url, id, name, ownerId, serverInfo) {
     //Show
     ark.setMainContentVis(true);
     ark.loadingStatus = 4;
-    ark.isCurrentServerOnline = true; //TEMP, TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ark.isCurrentServerOnline = serverInfo.is_online;
     ark.currentServerOfflineData = null;
     ark.openSession(function(session) {
         //Set blank tribe name while loading
@@ -506,7 +528,6 @@ ark.refreshServers = function(callback) {
         ark.createDom("div", "bottom_nav_server_badge bottom_nav_server_badge_hub", serverList).addEventListener('click', function() {
             collap.setState("ui_hub", true);  
         });
-        //ark.createDom("div", "bottom_nav_server_badge_sep", serverList);
 
         //Add the users' servers
         for(var i = 0; i<user.servers.length; i+=1) {
@@ -517,6 +538,11 @@ ark.refreshServers = function(callback) {
                 serverList.appendChild(e);
             }
         }
+
+        //Add the "add server" button
+        ark.createDom("div", "bottom_nav_server_badge bottom_nav_server_badge_add", serverList).addEventListener('click', function() {
+            document.getElementById('server_setup').classList.remove("server_setup_frame_disabled");
+        });
 
         //Try and add the active server badge back
         ark.setActiveServerBadge(ark.currentServerId);
@@ -846,8 +872,17 @@ ark.appendToDinoItemSearch = function(query, page, doClear) {
     //Deactivate
     var parent = document.getElementById('dino_search_window_content');
     parent.classList.add("sidebar_search_content_load");
+
+    //Stop if the current server is offline
+    if(!ark.isCurrentServerOnline) {
+        if(doClear) {
+            parent.innerHTML = "";
+        }
+        console.log("Refusing to search items because the current server is offline.");
+        return;
+    }
+
     //Make a request
-    
     ark.serverRequest(ark.session.endpoint_tribes_itemsearch.replace("{query}", query)+"&p="+page.toString(), {}, function(d) {
         //Check if this matches the latest
         if(d.query != ark.latestTribeItemSearchQuery) {
@@ -1212,14 +1247,9 @@ ark.promptDeleteServer = function(serverId) {
 }
 
 ark.onConnectedServerStop = function() {
-    //Deinit
-    ark.deinitCurrentServer();
-
-    //Refresh user server list
-    ark.refreshServers(function(){});
-
-    //Show message
-    ark.showWarning("Lost connection to this ARK server, try again later");
+    //This is a legacy function. Redirect
+    console.log("Legacy onConnectedServerStop called. Redirecting...");
+    ark.onActiveServerDown();
 }
 
 ark.showWarning = function(text) {
@@ -1529,3 +1559,15 @@ var create_server_d = {
         window.location = "/create";
     }
 };
+
+ark.showCreateServers = function() {
+    document.getElementById('server_setup').classList.remove("server_setup_frame_disabled");
+}
+
+window.addEventListener("message", function() {
+    //Fired from server setup iframe to hide
+    document.getElementById('server_setup').classList.add("server_setup_frame_disabled");
+    window.setTimeout(function() {
+        document.getElementById('server_setup').contentWindow.location.reload();
+    }, 200);
+})

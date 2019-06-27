@@ -122,7 +122,8 @@ usett.hide = function() {
 usett.signOut = function(type) {
     ark.serverRequest("https://ark.romanport.com/api/users/@me/tokens/"+type+"/devalidate", {"type":"post"}, function(c) {
         //Destroy view.
-        ark.destroyAllWithMsg("You signed out. Refresh the page to sign in again.");
+        //ark.destroyAllWithMsg("You signed out. Refresh the page to sign in again.");
+        window.location = "/";
     });
 }
 

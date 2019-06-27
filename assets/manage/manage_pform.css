@@ -18,7 +18,7 @@
 
 .pform_body {
     font-family: 'Roboto', sans-serif;
-    width: 400px;
+    width: 500px;
     margin:auto;
     border-radius: 5px;
     overflow: hidden;
@@ -86,7 +86,7 @@
     border: 1px solid #cacaca;
     transition:border 150ms;
     color: black;
-    width: 100%;
+    width: calc(100% - 24px);
     display:block;
     border-radius: 5px;
 }
@@ -94,6 +94,10 @@
 .pform_input_input:focus{
     outline: none;
     border:1px solid #5585e6;
+}
+
+.pform_select {
+    width:100%;
 }
 
 /* bottom subtext */

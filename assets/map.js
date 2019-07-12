@@ -545,7 +545,7 @@ draw_map.onDrawEnd = function() {
 draw_map.lastZoom = null;
 
 draw_map.onDrawMove = function(screenPos, mapPos) {
-    if(!draw_map.isDown) { return; }
+    if(!draw_map.isDown || draw_map.activeMapId == -1) { return; }
 
     //Check if we're close enough to the last to ignore
     /*if(draw_map.lastPoint != null) {

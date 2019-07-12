@@ -99,6 +99,12 @@ main.init = function() {
         //Fill UI
         document.getElementById('me_name').innerText = me.name;
         document.getElementById('me_img').src = me.icon;
+        
+        //Fill access tokens
+        var at = document.getElementsByClassName('api_token');
+        for(var i = 0; i<at.length; i+=1) {
+            at[i].innerText = me.api_token;
+        }
     });
 }
 
@@ -184,7 +190,7 @@ main.hideLoader = function(text) {
     var delay = 1;
     if(text != null) {
         e.innerText = text;
-        delay = 2000;
+        delay = 8000;
     }
     window.setTimeout(function() {
         e.classList.remove("bottom_modal_active");
@@ -277,6 +283,42 @@ main.createServers = function(next) {
     next();
 }
 
+main.createClients = function(next) {
+    //Create table
+    main.tableHelper(document.getElementById('clients_table'), main.me.clients, function(d) {
+        var man = main.createDom("span", "link");
+        man.innerText = "Manage";
+
+        var count = 0;
+        for(var i = 0; i<main.me.servers.length; i+=1) {
+            if(main.me.servers[i].client_id == d.id) {
+                count++;
+            }
+        }
+
+        var invite = main.createDom("span", "");
+        if(d.invite_code == null) {
+            invite.classList.add("i");
+            invite.innerText = "Redeemed ";
+            var cinvite = main.createDom("span", "link", invite);
+            cinvite.innerText = "Remove";
+        } else {
+            invite.innerText = d.invite_code;
+        }
+
+        return [
+            d.name,
+            d.id,
+            invite,
+            count.toString(),
+            man
+        ];
+    });
+
+    //Done
+    next();
+}
+
 main.tabs = [
     {
         onSwitch:main.createServers
@@ -285,7 +327,7 @@ main.tabs = [
         onSwitch:main.createMachines
     },
     {
-        onSwitch:function(next){next();}
+        onSwitch:main.createClients
     },
     {
         onSwitch:function(next){next();}
@@ -400,7 +442,7 @@ main.showServerEnrollForm = function() {
         },
         {
             "type":"bottom",
-            "text":"A client represents one of your customers. You should create a client for the server owner in the \"Users\" tab. Multiple servers can be assigned to one client. Clients can use the account you create to manage their Delta Web Map servers as a normal consumer would. For more info, view the \"Users\" tab."
+            "text":"A client represents one of your customers. You should create a client for the server owner in the \"Clients\" tab. Multiple servers can be assigned to one client. Clients can use the account you create to manage their Delta Web Map servers as a normal consumer would. For more info, view the \"Clients\" tab."
         },
         {
             "type":"select",
@@ -449,4 +491,69 @@ main.showServerEnrollForm = function() {
             main.refreshTab();
         });
     }, function(){});
+}
+
+main.promptDeleteServer = function(id) {
+    pform.show([
+        {
+            "type":"bottom",
+            "text":"Removing a server will also remove the associated DeltaWebMap server. This action cannot be undone."
+        },
+    ], "Delete Server", "Confirm", function(){
+
+        //Verify
+        var name = document.getElementById('f_name').value;
+        if(name.length > 24 || name.length < 2) {
+            return [
+                {
+                    "id":"f_name",
+                    "text":"2-24 characters are required."
+                }
+            ];
+        }
+
+        var clientId = document.getElementById('f_user').value;
+        if(clientId == "") {
+            clientId = null;
+        }
+        
+        //Send
+        var body = {
+            "name":name,
+            "clientId":clientId,
+            "machineId":document.getElementById('f_machine').value,
+            "mapName":document.getElementById('f_ark_map').value,
+            "mapPath":document.getElementById('f_ark_path').value,
+            "serverName":name
+        };
+        main.serverRequest("https://ark.romanport.com/api/providers/servers/@new", {
+            "type":"post",
+            "body":JSON.stringify(body),
+            "name":"Creating Server..."
+        }, function(c) {
+            main.me.servers.push(c);
+            main.refreshTab();
+        });
+    }, function(){}, "pform_short");
+}
+
+main.promptResetApiToken = function() {
+    pform.show([
+        {
+            "type":"bottom",
+            "text":"Resetting the API token will require you to update all machine configuration files. You cannot undo this action. Proceed?"
+        },
+    ], "Reset API Token", "Confirm", function(){
+        main.serverRequest("https://ark.romanport.com/api/providers/reset_api_token", {
+            "type":"post",
+            "name":"Resetting API Token..."
+        }, function(c) {
+            main.me.api_token = c.api_token;
+			//Fill access tokens
+            var at = document.getElementsByClassName('api_token');
+            for(var i = 0; i<at.length; i+=1) {
+                at[i].innerText = main.me.api_token;
+            }
+        });
+    }, function(){}, "pform_short");
 }

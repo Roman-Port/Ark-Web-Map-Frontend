@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Log In Providers / Ark Web Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/master.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/login.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/manage/login/login.css" />
+    <script src="/assets/manage/login/login.js"></script>
+</head>
+<body>
+    <div class="top_banner"></div>
+    <div class="login_box">
+        <div class="login_title">Provider Sign In</div>
+
+        <div class="login_sub">
+            <span id="login_subtext">Sign in with your provider username and password, or create an account.</span><br>
+            <div class="form_title">E-Mail <span class="form_err" id="username_err"></span></div>
+            <input type="email" class="form_input" id="username">
+            <div class="form_title">Password <span class="form_err" id="password_err"></span></div>
+            <input type="password" class="form_input" id="password">
+            <div id="create_area" class="img_picker_area hidden">
+                <div class="basic_uploader">
+                    <div class="form_title">Icon <span class="form_err" id="profile_image_err"></span></div>
+                    <input type="button" class="form_input form_filebtn" value="Choose Square Icon" onclick="document.getElementById('img').click();">
+                </div>
+                <div class="img_picker_input">
+                    <div class="form_title">Display Name <span class="form_err" id="profile_name_err"></span></div>
+                    <input type="text" class="form_input" id="name">
+                </div>
+                <input type="file" class="form_file" id="img">
+            </div>
+            <br>By signing in, you're agreeing to our <a style="color:#5585e6;" target="_blank" href="/privacy">Privacy Policy</a>.
+        </div>
+
+        <a href="javascript:login.submit();"><div class="master_btn master_btn_blue master_btn_rtl" id="sign_in_btn" style="padding: 10px 30px; float: right;">Sign In</div></a> <a href="javascript:login.toggleSignUp()" id="create_btn" class="create_acc_btn">Create Account</a>
+    </div>
+</body>
+</html>

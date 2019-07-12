@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Log In / Ark Web Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/master.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/assets/login.css" />
+</head>
+<body>
+    <div class="top_banner"></div>
+    <div class="login_box">
+        <div class="login_title" id="title">Redeeming...</div>
+
+        <div class="login_sub" id="sub"></div>
+    </div>
+
+    <script>
+
+    function SetText(title, sub) {
+        document.getElementById('title').innerText = title;
+        document.getElementById('sub').innerText = sub;
+    }
+    
+    function DoRedeem() {
+        var code = window.location.hash;
+        if(code.length <= 1) {
+            SetText("Redeem Failed - No Code", "There was no code included in this URL. Make sure you copied it correctly.");
+            return;
+        }
+        code = code.substr(1);
+
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var reply = JSON.parse(this.responseText);
+                if(reply.ok) {
+                    SetText(reply.msg, reply.sub_msg);
+                    window.setTimeout(function() {
+                        window.location = reply.next;
+                    }, 3000);
+                } else {
+                    SetText("Redeem Failed", "This code expired, or it was never valid to begin with. Ask for a new code.");
+                }
+            } else if(this.readyState == 4) {
+                SetText("Redeem Failed - Server Error", "There was a server error. Check your connection and try again later.");
+            }
+        }
+        xmlhttp.open("post", "https://", true);
+        xmlhttp.send(body);
+    }
+    
+    </script>
+</body>
+</html>

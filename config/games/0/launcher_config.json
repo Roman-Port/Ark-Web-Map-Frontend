@@ -18,5 +18,20 @@
         "maintenance_on":true,
         "maintenance_msg":"Testing!",
         "maintenance_skippable":false
+    },
+    "base_subserver_config":{
+        "debug_mode":false,
+        "child_config":{
+           "resources_url":"https://ark.romanport.com/resources",
+           "save_map":"Extinction",
+           "save_location":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ARK\\ShooterGame\\Saved\\SavedArks\\",
+           "base_permissions":[
+              "allowViewTamedTribeDinoStats",
+              "allowSearchTamedTribeDinoInventories",
+              "allowHeatmap",
+              "allowHeatmapDinoFilter"
+           ],
+           "permissions_version":0
+        }
     }
 }

@@ -27,6 +27,14 @@ th {
     display:block;
     margin:auto;
     max-width:800px;
+    width:calc(100% - 30px);
+}
+
+indent1 {
+    margin-left:20px;
+}
+indent2 {
+    margin-left:40px;
 }
 
 .top_bar {
@@ -44,6 +52,7 @@ th {
     box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.09);
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
+    background-color:white;
 }
 
 .top_bar_section {
@@ -93,8 +102,9 @@ th {
 }
 
 .content {
-    padding-top:55px;
+    padding-top:40px;
     font-family: 'Roboto', sans-serif;
+    margin-bottom:40px;
 }
 
 .content_tab {
@@ -105,7 +115,58 @@ th {
     display:block;
 }
 
-.bottom_modal{position:fixed;left:20px;right:20px;bottom:-150px;color:black;-webkit-box-shadow:0px 5px 24px 0px rgba(0,0,0,0.27);-moz-box-shadow:0px 5px 24px 0px rgba(0,0,0,0.27);box-shadow:0px 5px 24px 0px rgba(0,0,0,0.27);padding:10px;text-align:left;background-color:white;border-radius:5px;transition:bottom 300ms;font-family:'d-din';transition-timing-function:cubic-bezier(0.51, 0.62, 0.23, 0.96);z-index:99999;}
+.bottom_modal{font-family: 'Roboto', sans-serif;position:fixed;left:20px;right:20px;bottom:-150px;color:black;-webkit-box-shadow:0px 5px 24px 0px rgba(0,0,0,0.27);-moz-box-shadow:0px 5px 24px 0px rgba(0,0,0,0.27);box-shadow:0px 5px 24px 0px rgba(0,0,0,0.27);padding:10px;text-align:left;background-color:white;border-radius:5px;transition:bottom 300ms;transition-timing-function:cubic-bezier(0.51, 0.62, 0.23, 0.96);z-index:99999;}
 .bottom_modal_active{bottom:20px;}
 .bottom_modal_error{border-left:5px solid red;}
 .bottom_modal{right:unset;left:20px;right:unset;padding-right:60px;}
+
+.code {
+    font-family: 'Inconsolata', monospace;
+    background-color:#eeeeee;
+}
+
+.code_bracket {
+    color:#ff5252;
+}
+
+.code_block {
+    padding: 12px;
+    background-color: #e8e6e6;
+    border: 1px solid #cacaca;
+    color: black;
+    display: block;
+    border-radius: 5px;
+    overflow-x:auto;
+    font-family: 'Inconsolata', monospace;
+}
+
+.help_img {
+    max-height: 300px;
+    max-width: 100%;
+}
+
+.ref_header {
+
+}
+
+.ref_header_type {
+    padding: 12px;
+    background-color: #e8e6e6;
+    border: 1px solid #cacaca;
+    color: black;
+    display: block;
+    border-radius: 5px;
+    float:left;
+    margin-right:10px;
+}
+
+.ref_header_path {
+    padding: 12px;
+    background-color: #e8e6e6;
+    border: 1px solid #cacaca;
+    color: black;
+    display: block;
+    border-radius: 5px;
+    overflow-x:auto;
+    display:block;
+}

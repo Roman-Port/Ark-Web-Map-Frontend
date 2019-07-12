@@ -367,7 +367,7 @@ hub.events.convertTime = function(time) {
     if(o == 2) {
         return "About "+o.toString()+" days ago";
     }
-    return "Around "+ark.dateToString(d);
+    return "Around "+ark.dateToString(t);
 }
 
 /* Event types */

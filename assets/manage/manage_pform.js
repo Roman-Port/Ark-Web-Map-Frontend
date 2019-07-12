@@ -1,8 +1,11 @@
 var pform = {};
 
-pform.show = function(items, title, okText, okCallback, cancelCallback) {
+pform.show = function(items, title, okText, okCallback, cancelCallback, customClass) {
     //Create
     var e = main.createDom("div", "pform_body");
+    if(customClass != null) {
+        e.classList.add(customClass);
+    }
     var content = main.createDom("div", "pform_content", e);
     var bottom = main.createDom("div", "pform_bottom", e);
     main.createDom("div", "pform_title", content).innerText = title;

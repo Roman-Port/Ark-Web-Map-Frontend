@@ -1,0 +1,109 @@
+.create_acc_btn {
+    line-height: 40px;
+    height: 40px;
+    vertical-align: middle;
+    display: inline-block;
+    float: right;
+    padding-right: 15px;
+    color: #535353;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+html {
+    background-color:white;
+}
+
+.login_box{
+    border-left: 1px solid #e8e6e6;
+    border-right: 1px solid #e8e6e6;
+    padding-bottom: 55px;
+}
+
+.login_title {
+    color: #5585e6;
+}
+
+.form_title {
+    margin-top: 10px;
+    color: #727272;
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 800;
+}
+
+.form_input {
+    padding:12px;
+    background-color: #e8e6e6;
+    border: 1px solid #cacaca;
+    transition:border 150ms;
+    color: black;
+    width: calc(100% - 12px - 12px);
+    display:block;
+    border-radius: 5px;
+}
+
+.form_input:focus{
+    outline: none;
+    border:1px solid #5585e6;
+}
+
+.img_picker {
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    left: 10px;
+    border-radius: 100%;
+    background-color: #e8e6e6;
+    border: 1px solid #cacaca;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #727272;
+    font-size: 13px;
+    text-align: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    top: 10px;
+}
+
+.img_picker_noimg {
+    -webkit-box-shadow: inset 0px 0px 15px 0px rgba(0,0,0,0.29);
+    -moz-box-shadow: inset 0px 0px 15px 0px rgba(0,0,0,0.29);
+    box-shadow: inset 0px 0px 15px 0px rgba(0,0,0,0.29);
+}
+
+.img_picker_area {
+    position: relative;
+    height:74px;
+}
+
+.img_picker_input {
+    position: absolute;
+    left: 175px;
+    right:0;
+}
+
+.basic_uploader {
+    position: absolute;
+    width: 165px;
+}
+
+.form_file {display: none;}
+
+.form_filebtn {
+    width:100%;
+    cursor:pointer;
+}
+
+.hidden {
+    display:none;
+}
+
+.form_err {
+    color:#f28686;
+    font-weight: 500;
+}

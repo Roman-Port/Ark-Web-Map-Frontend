@@ -74,11 +74,18 @@ pform.t_input = function(attrib, area, f) {
     i.id = attrib.id;
 }
 
+pform.t_biginput = function(attrib, area, f) {
+    ark.createDom("div", "pform_input_title", area).innerText = attrib.name;
+    var i = ark.createDom("textarea", "pform_bigtextinput", area);
+    i.id = attrib.id;
+}
+
 pform.t_bottomsub = function(attrib, area, f) {
     ark.createDom("div", "pform_bottomsubtext", area).innerText = attrib.text;
 }
 
 pform.typeMap = {
     "input":pform.t_input,
+    "textarea":pform.t_biginput,
     "bottom":pform.t_bottomsub
 }

@@ -23,7 +23,7 @@
         if(window.location.hash.length < 10) {
             window.location = "/login/"; //Failed
         }
-        xmlhttp.open("GET", "https://ark.romanport.com/api/auth/validate_preflight_token?id="+window.location.hash.substr(1), true);
+        xmlhttp.open("GET", "https://deltamap.net/api/auth/validate_preflight_token?id="+window.location.hash.substr(1), true);
         xmlhttp.send();
     }
 

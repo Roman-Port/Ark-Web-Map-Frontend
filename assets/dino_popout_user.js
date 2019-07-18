@@ -48,7 +48,7 @@ dinopop.show = function(x, y, data) {
     //Add icon
     var icon = ark.createDom("img", "popout_icon", e);
     icon.src = "/assets/images/blank_50px.png";
-    map.createBackground(icon, data.dino_entry.thumb_icon_url);
+    map.createBackground(icon, data.dino_entry.icon.image_thumb_url);
 
     //Create name
     var ce = ark.createDom("div", "popout_name", e);

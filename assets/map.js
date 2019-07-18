@@ -314,6 +314,7 @@ map.createBackground = function(e, imgUrl) {
     e.style.backgroundPositionY = "center";
     e.style.border = "2px solid black";
     e.style.borderRadius = "40px";
+    e.style.backgroundSize = "30px";
 }
 
 map.onDinoClicked = function(e) {
@@ -663,7 +664,7 @@ draw_map.onDeinitCurrentServer = function() {
 
 draw_map.onDoneSwitchServer = function() {
     //Fetch new maps
-    ark.serverRequest("https://ark.romanport.com/api/servers/"+ark.currentServerId+"/maps", {}, function(c) {
+    ark.serverRequest("https://deltamap.net/api/servers/"+ark.currentServerId+"/maps", {}, function(c) {
         //If there is a map, choose the first one on the list
         if(c.maps.length >= 1) {
             var m = c.maps[0];
@@ -794,7 +795,7 @@ draw_map.onChooseCreateMap = function() {
         var body = {
             "name":name
         };
-        ark.serverRequest("https://ark.romanport.com/api/servers/"+ark.currentServerId+"/maps", {
+        ark.serverRequest("https://deltamap.net/api/servers/"+ark.currentServerId+"/maps", {
             "type":"post",
             "body":JSON.stringify(body)
         }, function(c) {
@@ -846,7 +847,7 @@ draw_map.onRemoteCreate = function(id, name) {
     var entry = {
         "name":name,
         "id":id,
-        "url":"https://ark.romanport.com/api/servers/"+ark.currentServerId+"/maps/"+id
+        "url":"https://deltamap.net/api/servers/"+ark.currentServerId+"/maps/"+id
     };
     draw_map.latestMaps.push(entry);
     draw_map.setMapPicker(draw_map.latestMaps);

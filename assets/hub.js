@@ -2,7 +2,7 @@ var hub = {};
 
 hub.fetchData = function(callback) {
     //Request the main hub
-    ark.serverRequest("https://ark.romanport.com/api/users/@me/hub", {}, function(data) {
+    ark.serverRequest("https://deltamap.net/api/users/@me/hub", {}, function(data) {
         //Request each sub-server and add it's data
         var loadedSubServerData = 0;
 
@@ -380,7 +380,7 @@ hub.events.eventTypes[0] = function(evt, profiles, server, container) { //Player
 
     var icons = ark.createDom("div", "hub_events_evt_icons", e);
     icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.tamedTarget));
-    icons.appendChild(hub.events.createIcon("https://ark.romanport.com/resources/ui/events/Condition_Befriended_Icon.png"));
+    icons.appendChild(hub.events.createIcon("https://deltamap.net/resources/ui/events/Condition_Befriended_Icon.png"));
     icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.tribePlayerTarget, profiles));
 
     hub.events.addText([
@@ -396,7 +396,7 @@ hub.events.eventTypes[1] = function(evt, profiles, server, container) { //Target
 
     var icons = ark.createDom("div", "hub_events_evt_icons", e);
     icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.killer, profiles));
-    icons.appendChild(hub.events.createIcon("https://ark.romanport.com/resources/ui/events/Sword_Icon.png"));
+    icons.appendChild(hub.events.createIcon("https://deltamap.net/resources/ui/events/Sword_Icon.png"));
     icons.appendChild(hub.events.createPlayerOrDinoIcon(evt.targets.victim, profiles));
 
     hub.events.addText([

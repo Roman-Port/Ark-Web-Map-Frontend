@@ -8,26 +8,46 @@
     background-color: #252629; 
 }
 
+.top_nav_server_icon {
+    background-image: url(https://ark.romanport.com/resources/placeholder_server_images/Tc.png);
+    background-position: 50%;
+    background-size: 100%;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    transition: all 120ms;
+}
+
 .top_nav_title_area {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 170px;
+    left: 8px;
     height: 40px;
-    padding: 10px 16px;
+    padding: 10px 0px;
     width: 300px;
+    position: relative;
+}
+
+.top_nav_title_text_area {
+    position: absolute;
+    left: 52px;
+    right:0;
+    top: 13px;
 }
 
 .top_nav_title_name {
     color:white;
-    font-size:20px;
-    line-height: 23px;
+    font-size: 17px;
+    line-height: 20px;
 }
 
 .top_nav_title_sub {
     color:gray;
-    line-height:17px;
-    font-size:14px;
+    line-height: 15px;
+    font-size: 13px;
 }
 
 .top_nav_search {
@@ -179,26 +199,34 @@
 
 /* BOTTOM NAV */
 .bottom_nav {
-    /* Fade behind this */
-    background: rgb(37,38,41);
-    background: -moz-linear-gradient(0deg, rgba(37,38,41,0.8547794117647058) 0%, rgba(37,38,41,0) 87%);
-    background: -webkit-linear-gradient(0deg, rgba(37,38,41,0.8547794117647058) 0%, rgba(37,38,41,0) 87%);
-    background: linear-gradient(0deg, rgba(37,38,41,0.8547794117647058) 0%, rgba(37,38,41,0) 87%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#252629",endColorstr="#252629",GradientType=1);
-
     /* Configure */
     z-index:2;
     position: absolute;
-    bottom:-40px;
+    bottom:0px;
     left:0;
     right:360px;
-    height:70px;
-    transition:all 150ms;
-    transition-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
+    height:26px;
+    line-height: 26px;
+    background-color: #33363c;
+    color:gray;
+    padding-left:8px;
+    padding-right:8px;
+    font-size: 13px;
+    font-family: 'Roboto', sans-serif;
 }
 
-.bottom_nav {
-    bottom:0;
+.bottom_nav_name_upper {
+    font-weight: 600;
+}
+
+.bottom_nav_name_lower {
+    font-weight: 100;
+}
+
+.bottom_nav_link {
+    color:gray;
+    float:right;
+    margin-left: 5px;
 }
 
 .bottom_nav_servers {

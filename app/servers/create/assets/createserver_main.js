@@ -19,7 +19,7 @@ cs.init = function() {
     //Try and authenticate us just to check if we're logged in
     ark_users.refreshUserData(function(e) {
         //Load config
-        ark_users.serverRequest("https://ark.romanport.com/config/games/0/client_config.json", {}, function(c) {
+        ark_users.serverRequest("https://config.deltamap.net/prod/games/0/client_config.json", {"nocreds":true}, function(c) {
             config = c;
 
             //Fill the map selection form
@@ -31,7 +31,7 @@ cs.init = function() {
         });
     }, function() {
         //Go to login
-        window.location = "https://ark.romanport.com/login/?callback="+encodeURIComponent(window.location);
+        window.location = "https://deltamap.net/login/?callback="+encodeURIComponent(window.location);
     });
 }
 

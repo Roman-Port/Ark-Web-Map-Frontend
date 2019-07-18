@@ -7,6 +7,10 @@
     height:100vh;
 }
 
+.leaflet-control-zoom {
+    display:none;
+}
+
 .map_btns {
     position: absolute;
     top:8px;

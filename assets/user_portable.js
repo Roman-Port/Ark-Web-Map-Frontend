@@ -55,7 +55,7 @@ ark_users.onNetError = function(err, args) {
 ark_users.me = null;
 
 ark_users.refreshUserData = function(callback, onError) {
-    ark_users.serverRequest("https://ark.romanport.com/api/users/@me/", {"onError":onError}, function(e) {
+    ark_users.serverRequest("https://deltamap.net/api/users/@me/", {"onError":onError}, function(e) {
         ark_users.me = e;
         callback(e);
     });

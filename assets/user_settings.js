@@ -88,7 +88,7 @@ usett.unhideServer = function(context) {
     usett.isRemovalBusy = true;
 
     //Send request to remove this server from the ignore list.
-    ark.serverRequest("https://ark.romanport.com/api/users/@me/servers/remove_ignore/?id="+id, {}, function() {
+    ark.serverRequest("https://deltamap.net/api/users/@me/servers/remove_ignore/?id="+id, {}, function() {
         //Find this in server in our info and remove the tag
         for(var i = 0; i<ark_users.me.servers.length; i+=1) { 
             if(ark_users.me.servers[i].id == id) {
@@ -120,7 +120,7 @@ usett.hide = function() {
 }
 
 usett.signOut = function(type) {
-    ark.serverRequest("https://ark.romanport.com/api/users/@me/tokens/"+type+"/devalidate", {"type":"post"}, function(c) {
+    ark.serverRequest("https://deltamap.net/api/users/@me/tokens/"+type+"/devalidate", {"type":"post"}, function(c) {
         //Destroy view.
         //ark.destroyAllWithMsg("You signed out. Refresh the page to sign in again.");
         window.location = "/";
@@ -153,7 +153,7 @@ usett.submitNewSettings = function() {
     ark_users.me.user_settings.custom_vulgar_words = badWords;
 
     //Submit
-    ark.serverRequest("https://ark.romanport.com/api/users/@me/user_settings", {"type":"post", "body":JSON.stringify(ark_users.me.user_settings)}, function(c) {
+    ark.serverRequest("https://deltamap.net/api/users/@me/user_settings", {"type":"post", "body":JSON.stringify(ark_users.me.user_settings)}, function(c) {
         console.log("User settings update OK.");
     });
 }

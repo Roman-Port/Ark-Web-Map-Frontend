@@ -45,7 +45,7 @@ gateway.getConfig = function(callback) {
     }
 
     //Grab the config
-    ark.serverRequest("https://ark.romanport.com/config/gateway_config.json", {nocreds:true}, function(e) {
+    ark.serverRequest("https://config.deltamap.net/prod/gateway_config.json", {nocreds:true}, function(e) {
         gateway.config = e;
         callback(e);
     });

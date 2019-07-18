@@ -7,37 +7,37 @@ ark.session_start_time = null;
 
 ark.statusEntries = {
     "water": {
-        "icon":"/resources/ui/status/water.png",
+        "icon":"/assets/ui/status/water.png",
         "name":"Water",
         "formatString":function(value) {return value;}
     },
     "unknown3": {
-        "icon":"/resources/ui/status/unknown3.png",
+        "icon":"/assets/ui/status/unknown3.png",
         "name":"UNKNOWN 3",
         "formatString":function(value) {return value;}
     },
     "unknown2": {
-        "icon":"/resources/ui/status/unknown2.png",
+        "icon":"/assets/ui/status/unknown2.png",
         "name":"UNKNOWN 2",
         "formatString":function(value) {return value;}
     },
     "unknown1": {
-        "icon":"/resources/ui/status/unknown1.png",
+        "icon":"/assets/ui/status/unknown1.png",
         "name":"UNKNOWN 1",
         "formatString":function(value) {return value;}
     },
     "stamina": {
-        "icon":"/resources/ui/status/stamina.png",
+        "icon":"/assets/ui/status/stamina.png",
         "name":"Stamina",
         "formatString":function(value) {return value;}
     },
     "oxygen": {
-        "icon":"/resources/ui/status/oxygen.png",
+        "icon":"/assets/ui/status/oxygen.png",
         "name":"Oxygen",
         "formatString":function(value) {return value;}
     },
     "movementSpeedMult": {
-        "icon":"/resources/ui/status/movementSpeedMult.png",
+        "icon":"/assets/ui/status/movementSpeedMult.png",
         "name":"Movement Speed",
         "formatString":function(value) {
             var v = Math.round((value + 1) * 100);
@@ -45,7 +45,7 @@ ark.statusEntries = {
         }
     },
     "meleeDamageMult": {
-        "icon":"/resources/ui/status/meleeDamageMult.png",
+        "icon":"/assets/ui/status/meleeDamageMult.png",
         "name":"Melee Damage",
         "formatString":function(value) {
             var v = Math.round((value + 1) * 100);
@@ -53,17 +53,17 @@ ark.statusEntries = {
         }
     },
     "inventoryWeight": {
-        "icon":"/resources/ui/status/inventoryWeight.png",
+        "icon":"/assets/ui/status/inventoryWeight.png",
         "name":"Weight",
         "formatString":function(value) {return value;}
     },
     "health": {
-        "icon":"/resources/ui/status/health.png",
+        "icon":"/assets/ui/status/health.png",
         "name":"Health",
         "formatString":function(value) {return value;}
     },
     "food": {
-        "icon":"/resources/ui/status/food.png",
+        "icon":"/assets/ui/status/food.png",
         "name":"Food",
         "formatString":function(value) {return value;}
     },
@@ -322,7 +322,7 @@ ark.openTopBtnDialog = function(btnContext, dom) {
 }
 
 ark.fetchOfflineData = function(callback) {
-    var url = "https://ark.romanport.com/api/servers/"+ark.currentServerId+"/offline_data";
+    var url = "https://deltamap.net/api/servers/"+ark.currentServerId+"/offline_data";
     console.log("Fetching offline server info from "+url);
     ark.serverRequest(url, {"customErrorText":"Failed to grab offline server data."}, function(d) {
         ark.currentServerOfflineData = d;
@@ -382,6 +382,9 @@ ark.switchServer = function(serverDataInput) {
         confirm.log("Couldn't find server in master server list.");
         return;
     }
+
+    //Set latest server
+    localStorage.setItem("latest_server", serverData.id);
 
     //Ignore if we're still loading a server
     if(ark.loadingStatus != 0) {
@@ -619,19 +622,37 @@ ark.init = function() {
         //Set the icon image
         document.getElementById('my_badge').style.backgroundImage = "url("+user.profile_image_url+")";
         document.getElementById('me_badge_title').innerText = user.screen_name;
+
+        //Open the hub
+        //hub.show();
+        ark.skipHub();
     });
 
     //Create template view
     ark.createTemplateView();
-
-    //Open the hub
-    hub.show();
 
     //Connect to GATEWAY
     gateway.connect(function() {
         ark.gatewayWasConnected = true;
         ark.onInitStepComplete();
     }, ark.onGatewayDisconnect);
+}
+
+ark.skipHub = function() {
+    //Skips the hub, as it might be scrapped
+    //Find the last server opened, if it exists
+    var latestId = localStorage.getItem("latest_server");
+    for(var i = 0; i<ark_users.me.servers.length; i+=1) {
+        if(ark_users.me.servers[i].id == latestId) {
+            ark.switchServer(ark_users.me.servers[i]);
+            ark.onInitStepComplete();
+            return;
+        }
+    }
+
+    //Load the first server we have, if we have one.
+    ark.switchServer(ark_users.me.servers[0]);
+    ark.onInitStepComplete();
 }
 
 ark.onGatewayDisconnect = function() {
@@ -674,7 +695,7 @@ ark.showHiddenServers = function() {
     ark.createDom("div", "nb_title nb_big_padding_bottom", p).innerText = "Hidden Servers";
     ark.createDom("div", "np_sub_title nb_big_padding_bottom", p).innerText = "This list shows servers you've hidden from the main list. Any server running ArkWebMap that you have joined will appear here.";
     ark.createDom("div", "window_close_btn", p).addEventListener('click', function() {
-        ark.serverRequest("https://ark.romanport.com/api/users/@me/servers/remove_ignore_mass/?ids="+ark.hiddenServersToUnhide, {}, function() {
+        ark.serverRequest("https://deltamap.net/api/users/@me/servers/remove_ignore_mass/?ids="+ark.hiddenServersToUnhide, {}, function() {
             //Refresh
             ark.refreshServers(function() {
                 //Hide menu
@@ -1045,7 +1066,7 @@ ark.onHideServerButtonClick = function() {
     var bf = ark.createDom("div", "nb_button_blue nb_button_forward", d);
     bf.innerText = "Hide Server";
     bf.addEventListener('click', function() {
-        ark.serverRequest("https://ark.romanport.com/api/users/@me/servers/add_ignore/?id="+ark.currentServerId, {}, function() {
+        ark.serverRequest("https://deltamap.net/api/users/@me/servers/add_ignore/?id="+ark.currentServerId, {}, function() {
             document.getElementById('server_badge_'+ark.currentServerId).remove();
             ark.hideCustomArea();
             ark.deinitCurrentServer();
@@ -1187,7 +1208,7 @@ ark.logoutBtnPressed = function() {
     var bf = ark.createDom("div", "nb_button_blue nb_button_forward", d);
     bf.innerText = "Logout";
     bf.addEventListener('click', function() {
-        ark.serverRequest("https://ark.romanport.com/api/users/@me/servers/logout", {}, function() {
+        ark.serverRequest("https://deltamap.net/api/users/@me/servers/logout", {}, function() {
             window.location.reload();
         });
     });
@@ -1232,7 +1253,7 @@ ark.promptDeleteServer = function(serverId) {
     var bf = ark.createDom("div", "nb_button_blue nb_button_forward nb_button_red_color", d);
     bf.innerText = "Confirm Deletion";
     bf.addEventListener('click', function() {
-        ark.serverRequest("https://ark.romanport.com/api/servers/"+serverId+"/delete", {"type":"post"}, function(d) {
+        ark.serverRequest("https://deltamap.net/api/servers/"+serverId+"/delete", {"type":"post"}, function(d) {
             //Reload
             window.location.reload();
         });
@@ -1323,11 +1344,6 @@ ark.updateLastEditedUi = function() {
     //Set in UI
     //document.getElementById('map_sub_title').innerText = stringName;
     //No longer used. Replace later?
-}
-
-ark.openDemoServer = function() {
-    var demoServerId = "EzUn7Rab7e4BSM9JFrOsPpn0";
-    ark.forceJoinServer("https://ark.romanport.com/api/servers/"+demoServerId+"/create_session", demoServerId, "ArkWebMap Demo","Z6O9vFPiDNGSfSfURZyV2ZcS");
 }
 
 ark.inflateMainMenu = function(data) {

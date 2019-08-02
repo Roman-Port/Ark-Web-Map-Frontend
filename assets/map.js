@@ -1,5 +1,7 @@
 var map = {};
 map.map = null;
+map.game_map = null; //The current map itself
+map.game_map_data = null; //Data about the current map
 map.layerList = {};
 map.onClickQueue = []; //List of events fired when a click is down. Only called once. Format: {"callback":function(ok, pos, context), "context":context}
 
@@ -86,11 +88,12 @@ map.resetPopulationMap = function(isOn, filteredClassname) {
     }
 }
 
-map.addGameMapLayer = function() {
+map.addGameMapLayer = function(data) {
     //Create main tile layer
-    L.tileLayer(ark.session.endpoint_game_map, {
+    map.game_map_data = data;
+    map.game_map = L.tileLayer(data.url, {
         attribution: 'Studio Wildcard',
-        maxNativeZoom: 5,
+        maxNativeZoom: data.maximumZoom,
         maxZoom:12,
         id: 'ark_map',
         opacity: 1,
@@ -166,75 +169,135 @@ map.onEnableTribeDinos = function(callback) {
         for(var i = 0; i<d.player_characters.length; i+=1) {
             var player = d.player_characters[i];
             var pos = map.convertFromNormalizedToMapPos(player.adjusted_map_pos);
-            map.addMapIcon(1, player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true );
+            var imgOverlay = null;
+            if(!player.is_alive) {
+                //Set death overlay
+                imgOverlay = "//icon-assets.deltamap.net/legacy/player_death_cache.png";
+            }
+            map.addMapIcon(1, player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
         }
 
         //Add structures
-        map.enableStructuresLayer(d.structures, ark.session.mapData.sourceImageSize * ark.session.mapData.pixelsPerMeter);
+        var mad = ark.session.mapData.maps[0];
+        map.enableStructuresLayer(d, d.structures);
 
         //Start rendering map layer. We waited to save bandwidth.
-        map.addGameMapLayer();
+        map.addGameMapLayer(mad);
 
         //Callback
         callback();
     });
 }
 
-map.structuresScale = {
-    "TheCenter":800,
-    "Extinction":2000
-}
-
-map.enableStructuresLayer = function(structures, mapSize) {
-    var CanvasLayer = L.GridLayer.extend({
-        createTile: function(coords){
+map.enableStructuresLayer = function(data, structures) {
+    var StructureLayer = L.GridLayer.extend({
+        options: {
+            x_list: [],
+            x_show_list: false
+        },
+        createTile: function(coords, done){
             // create a <canvas> element for drawing
-            var tile = L.DomUtil.create('div', 'leaflet-tile structures_layer');
-            console.log("warning: recreating tiles");
+            var tile = L.DomUtil.create('div', 'leaflet-tile');
+            if(this.options.x_show_list) {
+                tile.classList.add("structure_layer_hp");
+            } else {
+                tile.classList.add("structure_layer_lp");
+            }
 
             // setup tile width and height according to the options
             var size = this.getTileSize();
-            /*ft.style.width = size.x;
-            ft.style.height = size.y;
-
-            //Create tile where things will be placed
-            var tile = ark.createDom("div", "structures_layer", ft);*/
             tile.style.width = size.x;
             tile.style.height = size.y;
+
+            //Find range in this tile
+            var min = map.convertZCoordsToGameUnits(coords.x, coords.y, coords.z);
+            var max = map.convertZCoordsToGameUnits(coords.x + 1, coords.y + 1, coords.z);
+            var unitsPerTile = map.getUnitsPerTile(coords.z);
+            var tilePpm = 256 / unitsPerTile;
             
-            //Add structures
+            //Get structures in this range
+            var count = 0;
             for(var i = 0; i<structures.length; i+=1) {
-                var s = structures[i];
-                if(s.priority != 1 && s.priority != 10 && s.priority != 11) {
+                if(structures[i].map_pos.x > max.x || structures[i].map_pos.x < min.x || structures[i].map_pos.y > max.y || structures[i].map_pos.y < min.y) {continue;}
+                var st = structures[i];
+                count+=1;
+
+                //Check if we should add this
+                var onList = this.options.x_list.includes(st.stype);
+                if(onList != this.options.x_show_list) {
                     continue;
                 }
-                var t = ark.createDom("div", "structures_item", tile);
-                t.style.left = (s.map_pos.x - 4).toString() + "%";
-                t.style.top = (s.map_pos.y - 4).toString() + "%";
-                t.style.backgroundImage = "url('"+s.imgUrl+"')";
-                t.style.transform = "scale("+(s.ppm/map.structuresScale[ark.session.mapName]).toString()+") rotate("+s.rot.toString()+"deg)";
-                t.style.zIndex = (s.priority+100).toString();
-            }
 
-            //This is such an ugly hack.
-            window.setTimeout(function() {
-                //This is called AFTER the transform is applied, so we can apply our own. Ew.
-                var scale = 256 / mapSize;
-                tile.style.transform+=" scale("+scale.toString()+")"; //I hate myself for writing this line
-            }, 50);
+                //Find position inside of the structure inside of this tile
+                var adjusted = {"x":((st.map_pos.x - min.x) / unitsPerTile), "y":((st.map_pos.y - min.y) / unitsPerTile)};
+                adjusted.x -= 0.5;
+                adjusted.y -= 0.5;
+
+                //Scale
+                var ppmDiff = tilePpm / st.ppm;
+
+                //Get z
+                var z = st.z - data.min_structure_z;
+                z = 20;
+                if(st.dtype == 1) {
+                    z = 21;
+                }
+
+                //Place structure
+                var sd = ark.createDom("div", "structure_img", tile);
+                sd.style.backgroundImage = "url('"+data.structure_images[st.img]+"')";
+                sd.style.transform = "scale("+(ppmDiff).toString()+") rotate("+st.rot.toString()+"deg)";
+                sd.style.top = ((adjusted.y * 256) - 1152).toString()+"px";
+                sd.style.left = ((adjusted.x * 256) - 1152).toString()+"px";
+                sd.style.zIndex = z.toString();
+            }
+            
+            //Set
+            tile.style.visibility = "visible";
+
+            // return the tile so it can be rendered on screen
             return tile;
         }
     });
-    var l = new CanvasLayer({
-        maxNativeZoom: 0,
-        maxZoom:12,
-        id: 'structure_map',
+
+    var specialList = [3, 4]; //This specifies classes that should always be on top
+
+    var lo = new StructureLayer({
+        id: 'structure_map_hp',
+        opacity: 1,
+        zIndex: 3,
+        x_list: specialList,
+        x_show_list: true,
+        updateWhenZooming: false,
+        keepBuffer: 4,
+    });
+    lo.addTo(map.map);
+
+    var lt = new StructureLayer({
+        id: 'structure_map_lp',
         opacity: 1,
         zIndex: 2,
-        tileSize:mapSize,
-        bounds:map.getBounds()
+        x_list: specialList,
+        x_show_list: false,
+        updateWhenZooming: false,
+        keepBuffer: 4,
     });
-    l.addTo(map.map);
+    lt.addTo(map.map);
+}
+
+map.getUnitsPerTile = function(z) {
+    var tilesInAxis = Math.pow(2, z);
+    var unitsPerTile = ark.session.mapData.captureSize / tilesInAxis;
+    return unitsPerTile;
+}
+
+map.convertZCoordsToGameUnits = function(x, y, z) {
+    //Find number of game units in this zoom level
+    var unitsPerTile = map.getUnitsPerTile(z);
+    return {
+        "x":(x * unitsPerTile),
+        "y":(y * unitsPerTile)
+    }
 }
 
 map.addDinoMarker = function(dino) {
@@ -248,8 +311,9 @@ map.layer_list = [
 ]
 
 map.marker_name_map = {}; //Maps marker names to their layer IDs and layer indexes
+map.marker_name_jump_map = {}; //Maps marker names to their layer IDs and layer indexes
 
-map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseover, onmouseout, doCrop ) {
+map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseover, onmouseout, doCrop, imgOverlay ) {
     var icon_size = 40;
     var icon = L.icon({
         iconUrl: "/assets/images/blank_50px.png",
@@ -291,24 +355,46 @@ map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseove
         "name":markerId,
         "internalIndex":innerIndex
     };
+    map.marker_name_jump_map[markerId] = mapped_name;
     
     //Set real image
-    map.createBackground(dino_icon._icon, img);
+    if(imgOverlay == null) {
+        map.createBackground(dino_icon._icon, img);
+    } else {
+        map.createBackgroundMultiple(dino_icon._icon, imgOverlay, img);
+    }
     if(doCrop) {
         dino_icon._icon.style.backgroundSize = "40px";
     }
 }
 
+map.getMarkerByName = function(id) {
+    var pinIndex = map.marker_name_map[map.marker_name_jump_map[id]];
+    var pin = map.layer_list[pinIndex.layerId][pinIndex.internalIndex];
+    return pin;
+}
+
 map.removeMarkerById = function(layerId, id) {
     if(map.layer_list[layerId][id] != null) {
         map.layer_list[layerId][id].removeFrom(map.map); //Remove from map
-        delete map.marker_name_map[ map.layer_list[layerId][id].x_mapped_name ];
+        var e = map.marker_name_map[ map.layer_list[layerId][id].x_mapped_name ];
         delete map.layer_list[layerId][id]; //Remove from list
+        delete map.marker_name_jump_map[e.name];
+        delete map.marker_name_map[ map.layer_list[layerId][id].x_mapped_name ];
     }
 }
 
 map.createBackground = function(e, imgUrl) {
     e.style.background = "url('"+imgUrl+"'), white";
+    map.baseCreateBackground(e);
+}
+
+map.createBackgroundMultiple = function(e, img1, img2) {
+    e.style.background = "url('"+img1+"'), url('"+img2+"'), white";
+    map.baseCreateBackground(e);
+}
+
+map.baseCreateBackground = function(e) {
     e.style.backgroundRepeat = "no-repeat";
     e.style.backgroundPositionX = "center";
     e.style.backgroundPositionY = "center";
@@ -321,8 +407,17 @@ map.onDinoClicked = function(e) {
     //If the system is currently offline, stop this
     if(!ark.isCurrentServerOnline) {
         ark.onClickOnlineFeatureOffline();
+        analytics.action("map-dino-click-offline", "web-main", {
+            "dino_id":this.x_data.id,
+            "dino_classname":this.x_data.classname
+        });
         return;
     }
+
+    analytics.action("map-dino-click-online", "web-main", {
+        "dino_id":this.x_data.id,
+        "dino_classname":this.x_data.classname
+    });
 
     var url = this.x_data.apiUrl;
 
@@ -346,6 +441,11 @@ map.onHoverDino = function() {
     var pos = ele.getBoundingClientRect();
     var data = this.x_data;
     this.x_has_hovered_ended = false;
+
+    //Stop if we're currently moving the map
+    if(draw_map.isDown) {
+        return;
+    }
 
     //Check if we only need to interrupt a fadeout
     if(this.x_modal_removeanim != null) {
@@ -485,10 +585,23 @@ draw_map.onResize = function() {
     draw_map.e.width = map.clientWidth;
     draw_map.e.height = map.clientHeight;
 
+    //Log
+    if(draw_map.redraw_logger_timeout == null) {
+        draw_map.redraw_logger_timeout = window.setTimeout(function() {
+            draw_map.redraw_logger_timeout = null;
+            analytics.action("map-drawable-resize", "web-main", {
+                "width":map.clientWidth.toString(),
+                "height":map.clientHeight.toString()
+            });
+        }, 2000);
+    }
+
     //Redraw
     draw_map.redraw();
 }
 window.addEventListener("resize", draw_map.onResize);
+
+draw_map.redraw_logger_timeout = null;
 
 draw_map.redraw = function() {
     draw_map.c.clearRect(0, 0, draw_map.c.canvas.width, draw_map.c.canvas.height);
@@ -535,6 +648,11 @@ draw_map.onDrawEnd = function() {
 
     //Flush the latest buffer to the gateway
     draw_map.flushTx();
+
+    //Log
+    analytics.action("map-drawable-drawend", "web-main", {
+        "point_count":draw_map.rxBuffer.length.toString()
+    });
 
     //Flush the rx buffer into the standard buffer
     for(var i = 0; i<draw_map.rxBuffer.length; i+=1) {
@@ -634,6 +752,11 @@ draw_map.onRx = function(msg) {
     if(draw_map.activeMapId == msg.mapId && msg.senderSessionId != gateway.sessionId) {
         //This was not sent by us and it is for this targetted map ID
         draw_map.injectLines(msg.points);
+
+        //Log
+        analytics.action("map-drawable-rx", "web-main", {
+            "point_count":msg.points.length.toString()
+        });
     }
 }
 
@@ -657,9 +780,27 @@ draw_map.roundNetwork = function(e) {
     return Math.round(e * 100) / 100;
 }
 
+draw_map.isShowingMenuAllowed = false;
+draw_map.setAllowShowMenu = function(allow) {
+    draw_map.isShowingMenuAllowed = allow;
+    if(!allow) {
+        //Close in case it is open
+        document.getElementById('nav_btn_map').classList.remove('map_layer_select_active');
+    }
+}
+
+draw_map.toggleMenu = function() {
+    if(draw_map.isShowingMenuAllowed) {
+        document.getElementById('nav_btn_map').classList.toggle('map_layer_select_active');
+    }
+}
+
 draw_map.onDeinitCurrentServer = function() {
     //Clear the map
     draw_map.reset();
+    draw_map.activeMapId = -1;
+    draw_map.changeTitleName("Tribe Maps");
+    draw_map.setAllowShowMenu(false);
 }
 
 draw_map.onDoneSwitchServer = function() {
@@ -673,6 +814,7 @@ draw_map.onDoneSwitchServer = function() {
 
         //Set picker
         draw_map.setMapPicker(c.maps);
+        draw_map.setAllowShowMenu(true);
     });
 }
 
@@ -707,12 +849,15 @@ draw_map.setMapPicker = function(data) {
     ark.createDom("div", "map_layer_select_item_bottom", e).innerText = "Draw on the map by holding right click. Drawings are synced in realtime with tribemates.";
 
     //Show
-    document.getElementById('map_btn_layers').classList.remove("top_nav_btn_hidden");
+    document.getElementById('nav_btn_map').classList.remove("top_nav_btn_hidden");
 }
 
 draw_map.onChooseNewMap = function() {
     console.log("Switching to map ID "+this.x_id);
     draw_map.chooseMap(this.x_name, this.x_url, this.x_id);
+    analytics.action("map-drawable-mapchange", "web-main", {
+        "map_id":this.x_id
+    });
 }
 
 draw_map.chooseMap = function(name, url, id) {
@@ -804,6 +949,11 @@ draw_map.onChooseCreateMap = function() {
             draw_map.changeTitleName(name);
 
             //Adding is now handled from the gateway.
+
+            //Log
+            analytics.action("map-drawable-addmap", "web-main", {
+                "map_id":c.id
+            });
         });
 
     }, function(){});
@@ -838,7 +988,7 @@ draw_map.onRemoteDelete = function(id, name) {
     if(draw_map.activeMapId == id) {
         draw_map.reset();
         draw_map.activeMapId = -1;
-        draw_map.changeTitleName("Add Layer...");
+        draw_map.changeTitleName("Tribe Maps");
     }
 }
 

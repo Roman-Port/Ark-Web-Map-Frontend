@@ -1,0 +1,260 @@
+@font-face {
+    font-family: 'Rubik';
+    font-style: normal;
+    font-weight: 500;
+    src: url(/assets/fonts/rubik/rubik-500.woff2);
+}
+
+@font-face {
+    font-family: 'Rubik';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/fonts/rubik/Rubik-Regular.ttf);
+}
+
+@font-face {
+    font-family: 'Rubik';
+    font-style: normal;
+    font-weight: 300;
+    src: url(/assets/fonts/rubik/Rubik-Medium.ttf);
+}
+
+.browser {
+    background-color: #3c3c3c;
+    position: absolute;
+    top: 60%;
+    bottom: -22%;
+    right: 10%;
+    left: 10%;
+    border-radius: 5px;
+    pointer-events: none;
+}
+
+.browser_tab {
+    position: absolute;
+    top: 0px;
+    left: 15px;
+    height: 40px;
+    background-color: #595959;
+    padding-left: 15px;
+    padding-right: 55px;
+    color: white;
+    line-height: 40px;
+    display: inline-block;
+    font-size: 13px;
+    width: 150px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    overflow: hidden;
+}
+
+.browser_tab_rcover {
+    background-color: #595959;
+    width: 15px;
+    left: -15px;
+    height: 100%;
+    position: absolute;
+}
+
+.browser_tab_rcover .c {
+    background-color: #3c3c3c;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.browser_nav {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background-color: #595959;
+}
+
+.browser_nav_placeholder {
+    margin-top: 10px;
+    margin-left: 6px;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background-color: #737373;
+    border-radius: 50%;
+}
+
+.browser_nav_bar {
+    top: 10px;
+    position: absolute;
+    right: 8px;
+    left: 92px;
+    margin-left: 6px;
+    height: 20px;
+    display: inline-block;
+    background-color: #737373;
+    border-radius: 20px;
+}
+
+.browser_content {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.browser_iframe {
+    background-color: #3c3c3c;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    overflow: hidden;
+}
+
+body, html {
+    background-color: #fafafa;
+    margin:0;
+    padding:0;
+}
+
+.frontpage_top {
+    position: relative;
+    height:100vh;
+}
+
+.frontpage_content {
+    position: fixed;
+    top:0;
+    bottom:0;
+    right:0;
+    left:0;
+    overflow:auto;
+}
+
+.frontpage_content_scroll {
+
+}
+
+.frontpage_top_area {
+    position: absolute;
+    top:0;
+    bottom:40%;
+    left:0;
+    right:0;
+}
+
+.frontpage_top_header {
+    font-size:50px;
+    font-weight: 800;
+    font-family:'Rubik', sans-serif;
+    color:rgb(58, 65, 111);
+}
+
+.frontpage_top_footer {
+    font-size:20px;
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+    color:rgb(72, 78, 121);
+    margin-top:5px;
+}
+
+.frontpage_top_btn_area {
+    margin-top:40px;
+}
+
+.frontpage_top_blue_btn {
+    background-color: #5585e6;
+    border-radius: 5px;
+    color: white;
+    padding: 4px 20px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    margin-bottom: 5px;
+    display: inline-block;
+    border: 1px solid #5585e6;
+    text-align: center;
+    width: 200px;
+    cursor: pointer;
+    line-height: 40px;
+    -webkit-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
+    -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
+    box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
+}
+
+.frontpage_top_small_btn {
+    margin-top:2px;
+    color:#565656;
+    font-size:13px;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.frontpage_top_small_btn a {
+    color:#5585e6;
+}
+
+.frontpage_top_scroll {
+    position: absolute;
+    height:20px;
+    font-size:15px;
+    color:#5585e6;
+    top:-30px;
+    left:0;
+    right:0;
+    text-align: center;
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.frontpage_top_scroll_small {
+    display:none;
+}
+
+@media only screen 
+and (max-width : 900px) {
+    .browser {
+        left:2%;
+        right:2%;
+    }
+}
+
+@media only screen 
+and (max-width : 550px) {
+    .browser {
+        display:none;
+    }
+
+    .frontpage_top_scroll_small {
+        display:block;
+        bottom:10px;
+        top:unset;
+    }
+
+    .frontpage_top_header {
+        font-size:33px;
+    }
+
+    .frontpage_top_footer {
+        font-size:18px;
+        margin-top:20px;
+    }
+
+    .frontpage_top_btn_area {
+        margin-top:20px;
+    }
+
+    .frontpage_top_area {
+        bottom:0;
+    }
+
+    .feature_area {
+        padding-top: 10px;
+    }
+}
+
+.feature_area {
+    padding-top:130px;
+    max-width:800px;
+    width:calc(100% - 20px - 20px);
+    margin:auto;
+}

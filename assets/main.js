@@ -1,4 +1,5 @@
 var CLIENT_VERSION = 1;
+var MIN_DATA_VERSION = 2;
 
 var ark = {};
 ark.session = null;
@@ -344,6 +345,7 @@ ark.onActiveServerDown = function() {
     ark.isCurrentServerOnline = false;
     //Called when the current server goes offline
     console.log("Active server just went down.");
+    analytics.action("server-status-down", "web-main", {});
 
     //Show warning
     //bottom_modal.showBottomModal("This server is offline. Some features may be unavailable.", function(){}, "bottom_modal_error", 0);
@@ -355,6 +357,7 @@ ark.onActiveServerUp = function(doReload) {
     ark.isCurrentServerOnline = true;
     //Called when the current server goes online
     console.log("Active server just went up.");
+    analytics.action("server-status-up", "web-main", {});
 
     //Hide warning
     ark.removeAlert("server-offline");
@@ -370,25 +373,55 @@ ark.isCurrentServerOnline = false;
 ark.currentServerOfflineData = null;
 
 ark.switchServer = function(serverDataInput) {
+    //Depreciated. We just use the ID of this server
+    ark.switchServerById(serverDataInput.id);
+}
+
+ark.switchServerById = function(id) {
     //Get this from the master server list
     var serverData = null;
     for(var i = 0; i<ark_users.me.servers.length; i+=1) {
-        if(ark_users.me.servers[i].id == serverDataInput.id) {
+        if(ark_users.me.servers[i].id == id) {
             serverData = ark_users.me.servers[i];
             break;
         }
     }
     if(serverData == null) {
-        confirm.log("Couldn't find server in master server list.");
+        console.error("Couldn't find server in master server list.");
+        return;
+    }
+
+    //Check
+    if(!ark.checkVersion(serverData, false)) {
+        analytics.action("server-switch-stop-outdated", "web-main", {
+            "server_id":serverData.id,
+            "server_up":(serverData.is_online ? "true" : "false"),
+            "server_map":serverData.map_id,
+            "server_tribe":serverData.tribeId.toString()
+        });
         return;
     }
 
     //Set latest server
     localStorage.setItem("latest_server", serverData.id);
 
+    //Log
+    analytics.action("server-switch-go", "web-main", {
+        "server_id":serverData.id,
+        "server_up":(serverData.is_online ? "true" : "false"),
+        "server_map":serverData.map_id,
+        "server_tribe":serverData.tribeId.toString()
+    });
+
     //Ignore if we're still loading a server
     if(ark.loadingStatus != 0) {
         console.log("Will not switch server; A server is already loading!");
+        analytics.action("server-switch-stop-loading", "web-main", {
+            "server_id":serverData.id,
+            "server_up":(serverData.is_online ? "true" : "false"),
+            "server_map":serverData.map_id,
+            "server_tribe":serverData.tribeId.toString()
+        });
         return;
     }
 
@@ -412,7 +445,6 @@ ark.switchServer = function(serverDataInput) {
     //First, open a session.
     ark.currentServer = serverData;
     ark.forceJoinServer(serverData.endpoint_createsession, serverData.id, serverData.display_name, serverData.owner_uid, serverData);
-    
 }
 
 ark.loadingStatus = 0; //Counts down as items are loaded
@@ -438,13 +470,16 @@ ark.forceJoinServer = function(url, id, name, ownerId, serverInfo) {
     //Fill UI
     document.getElementById('map_title').innerText = name;
     document.getElementById('map_sub_title').innerText = serverInfo.map_name;
+    document.getElementById('map_icon').style.backgroundImage = "url('"+serverInfo.image_url+"')";
 
     //Show buttons on the top
     var isOwner = serverInfo.owner_uid == ark_users.me.id;
-    ark.setNavBtnVis("edit", isOwner);
+    //ark.setNavBtnVis("edit", isOwner);
     ark.setNavBtnVis("leave", !isOwner);
-    ark.setNavBtnVis("public", serverInfo.is_public);
-    ark.setNavBtnVis("private", !serverInfo.is_public);
+    //ark.setNavBtnVis("tribe", true);
+    ark.setNavBtnVis("map", true);
+    //ark.setNavBtnVis("public", serverInfo.is_public);
+    //ark.setNavBtnVis("private", !serverInfo.is_public);
 
     //Clear alerts
     ark.removeAllChildren(document.getElementById('alerts_area'));
@@ -613,6 +648,9 @@ ark.onFinishPing = function(ping){
     }
 }
 
+ark.keepAliveToken = null;
+ark.keepAliveLoop = null;
+
 ark.init = function() {
     //Update user content
     ark.refreshServers(function(user) {
@@ -631,9 +669,21 @@ ark.init = function() {
     //Create template view
     ark.createTemplateView();
 
+    //Log
+    analytics.action("app-start", "web-main", {}, function(e) {
+        //We're going to send a keep-alive every 30 seconds
+        ark.keepAliveToken = e.id;
+        ark.keepAliveLoop = window.setInterval(function() {
+            analytics.action("app-alive", "web-main", {
+                "token":ark.keepAliveToken
+            });
+        }, 20 * 1000);
+    });
+
     //Connect to GATEWAY
     gateway.connect(function() {
         ark.gatewayWasConnected = true;
+        analytics.action("gateway-connected", "web-main", {});
         ark.onInitStepComplete();
     }, ark.onGatewayDisconnect);
 }
@@ -644,6 +694,9 @@ ark.skipHub = function() {
     var latestId = localStorage.getItem("latest_server");
     for(var i = 0; i<ark_users.me.servers.length; i+=1) {
         if(ark_users.me.servers[i].id == latestId) {
+            if(!ark.checkVersion(ark_users.me.servers[i], true)) {
+                break;
+            }
             ark.switchServer(ark_users.me.servers[i]);
             ark.onInitStepComplete();
             return;
@@ -651,8 +704,65 @@ ark.skipHub = function() {
     }
 
     //Load the first server we have, if we have one.
-    ark.switchServer(ark_users.me.servers[0]);
+    for(var i = 0; i<ark_users.me.servers.length; i+=1) {
+        if(ark_users.me.servers[i].id == latestId) {
+            if(ark.checkVersionNoPrompt(ark_users.me.servers[i], true)) {
+                ark.switchServer(ark_users.me.servers[i]);
+                ark.onInitStepComplete();
+                return;
+            }
+        }
+    }
+    
+    //Hm... no valid servers
+    //TODO: HANDLE IF THERE ARE NO SERVERS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ark.onInitStepComplete();
+}
+
+ark.checkVersionNoPrompt = function(serverData) {
+    return (MIN_DATA_VERSION <= serverData.offline_data_version) && (MIN_DATA_VERSION <= serverData.report_data_version);
+}
+
+ark.checkVersion = function(serverData, isInitialLoad) {
+    //Returns true if we can load, false if not. Also shows an error if the versions are out of date. isInitialLoad is called if we're using the last map
+    var isOk = ark.checkVersionNoPrompt(serverData);
+    var isOwner = serverData.owner_uid == ark_users.me.id;
+    if(!isOk) {
+        if(isInitialLoad) {
+            if(isOwner) {
+                pform.show([
+                    {
+                        "type":"bottom",
+                        "text":"The last server you used hasn't been started in a while and is out of date. You need to update and start the Delta Web Map service. The next usable server will be loaded."
+                    }
+                ], "Last Server Outdated", "Help", function(){window.location = "/support";}, function(){});
+            } else {
+                pform.show([
+                    {
+                        "type":"bottom",
+                        "text":"The last server you used hasn't been started in a while and is out of date. Try again later, or ask your server owner to update the Delta Web Map service. The next usable server will be loaded."
+                    }
+                ], "Last Server Outdated", "Cancel", function(){}, null);
+            }
+        } else {
+            if(isOwner) {
+                pform.show([
+                    {
+                        "type":"bottom",
+                        "text":"This server hasn't been started in a while and is out of date. You need to update and start the Delta Web Map service."
+                    }
+                ], "Can't Use This Server", "Help", function(){window.location = "/support";}, function(){});
+            } else {
+                pform.show([
+                    {
+                        "type":"bottom",
+                        "text":"This server hasn't been started in a while and is out of date. Try again later, or ask your server owner to update the Delta Web Map service."
+                    }
+                ], "Can't Use This Server", "Cancel", function(){}, null);
+            }
+        }
+    }
+    return isOk;
 }
 
 ark.onGatewayDisconnect = function() {
@@ -746,7 +856,7 @@ ark.createDinoClassEntry = function(dinoData) {
     e.className = "dino_entry";
 
     var img = document.createElement('img');
-    img.src = dinoData.icon_url;
+    img.src = dinoData.image_url;
     e.appendChild(img);
 
     var title = document.createElement('div');
@@ -777,6 +887,7 @@ ark.searchDinoPicker = function(search, callback) {
         if(d.query != ark.latestDinoPickerSearch) {
             return;
         }
+
         //Recreate results
         box.innerHTML = "";
         for(var i = 0; i<d.results.length; i+=1) {
@@ -788,8 +899,17 @@ ark.searchDinoPicker = function(search, callback) {
             });
             box.appendChild(e);
         }
+
         //Validate results box
         box.classList.remove("dino_search_content_load");
+
+        //Log
+        analytics.action("server-item-search", "web-main", {
+            "query":d.query,
+            "total_result_count":d.total_item_count.toString(),
+            "dino_inventory_count":d.owner_inventory_dino.length.toString(),
+            "item_stack_count":d.items.length.toString()
+        });
     });
 }
 
@@ -933,10 +1053,22 @@ ark.appendToDinoItemSearch = function(query, page, doClear) {
             //Add all of the dinos.
             for(var j = 0; j< r.owner_inventories.length; j+=1) {
                 var inventory = r.owner_inventories[j];
-                var dino = d.owner_inventory_dino[inventory.id];
+
+                //Get data based on the type
+                var inventoryParent = d.inventories[inventory.type.toString()][inventory.id];
                 
-                var e_dom = (ark.createCustomDinoEntry(dino.img, dino.displayName, dino.displayClassName + " - x"+ark.createNumberWithCommas(inventory.count), "dino_entry_offset"));
-                e_dom.x_dino_id = dino.id;
+                var e_dom = null;
+                if(inventory.type == 0) {
+                    //Dino
+                    e_dom = (ark.createCustomDinoEntry(inventoryParent.img, "", inventoryParent.displayName + " (x"+ark.createNumberWithCommas(inventory.count)+")", "dino_entry_offset dino_entry_mini"));
+                    e_dom.x_dino_id = inventoryParent.id;
+                } else {
+                    //Character
+                    e_dom = (ark.createCustomDinoEntry(inventoryParent.icon, "", inventoryParent.name + " (x"+ark.createNumberWithCommas(inventory.count)+")", "dino_entry_offset dino_entry_mini dino_entry_no_invert"));
+                    e_dom.x_dino_id = inventoryParent.id;
+                }
+                e_dom.x_dino_type = inventory.type;
+
                 e_dom.addEventListener('click', function() {
                     ark.locateDinoById(this.x_dino_id);
                 });
@@ -966,8 +1098,7 @@ ark.appendToDinoItemSearch = function(query, page, doClear) {
 
 ark.locateDinoById = function(id) {
     //Locate on map.
-    var mapPointer = map.dino_marker_list[id];
-    var pin = mapPointer.map_icons[0];
+    var pin = map.getMarkerByName(id);
     pin._map.flyTo(pin._latlng, 9, {
         "animate":true,
         "duration":0.5,
@@ -1035,12 +1166,13 @@ ark.deinitCurrentServer = function() {
     bottom_modal.forceHideBottomModalNoArgs();
 
     //Set tribe name back
-    ark.setTribeName("Hub");
+    ark.setTribeName("");
 
     //Show the template view
     ark.createTemplateView();
 
-    
+    //Log
+    analytics.action("server-deinit", "web-main", {});
 }
 
 ark.setMainContentVis = function(active) {

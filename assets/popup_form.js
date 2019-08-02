@@ -9,9 +9,7 @@ pform.show = function(items, title, okText, okCallback, cancelCallback) {
 
     //Create bottom
     var okBtn = ark.createDom("div", "master_btn master_btn_blue master_btn_rtl pform_bottom_btn_ok", bottom);
-    var noBtn = ark.createDom("div", "pform_bottom_btn_cancel", bottom);
     okBtn.innerText = okText;
-    noBtn.innerText = "Cancel";
     okBtn.addEventListener("click", function() {
         var result = okCallback(e);
         //If the result is null, close. If not, there is a problem.
@@ -29,10 +27,14 @@ pform.show = function(items, title, okText, okCallback, cancelCallback) {
             }
         }
     });
-    noBtn.addEventListener("click", function() {
-        cancelCallback(e);
-        pform.dismiss();
-    });
+    if(cancelCallback != null) {
+        var noBtn = ark.createDom("div", "pform_bottom_btn_cancel", bottom);
+        noBtn.innerText = "Cancel";
+        noBtn.addEventListener("click", function() {
+            cancelCallback(e);
+            pform.dismiss();
+        });
+    }
 
     //Add elements
     for(var i = 0; i<items.length; i+=1) {

@@ -1,6 +1,6 @@
 var itemsearch = {};
 
-itemsearch.MAX_DINOS_PER_ITEM = 4;
+itemsearch.MAX_DINOS_PER_ITEM = 40000;
 
 itemsearch.fetchResultsCreateDom = function(query, page, callback, callbackArgs) {
     //Create DOM
@@ -32,10 +32,23 @@ itemsearch.fetchResultsCreateDom = function(query, page, callback, callbackArgs)
             e.x_hasOverflow = false;
             for(var j = 0; j< r.owner_inventories.length; j+=1) {
                 var inventory = r.owner_inventories[j];
-                var dino = d.owner_inventory_dino[inventory.id];
+
+                //Get data based on the type
+                var inventoryParent = d.inventories[inventory.type.toString()][inventory.id];
                 
-                var e_dom = (ark.createCustomDinoEntry(dino.img, "", dino.displayName + " (x"+ark.createNumberWithCommas(inventory.count)+")", "dino_entry_offset dino_entry_mini"));
-                e_dom.x_dino_id = dino.id;
+                var e_dom = null;
+
+                if(inventory.type == 0) {
+                    //Dino
+                    e_dom = (ark.createCustomDinoEntry(inventoryParent.img, "", inventoryParent.displayName + " (x"+ark.createNumberWithCommas(inventory.count)+")", "dino_entry_offset dino_entry_mini"));
+                    e_dom.x_dino_id = inventoryParent.id;
+                } else {
+                    //Character
+                    e_dom = (ark.createCustomDinoEntry(inventoryParent.icon, "", inventoryParent.name + " (x"+ark.createNumberWithCommas(inventory.count)+")", "dino_entry_offset dino_entry_mini dino_entry_no_invert"));
+                    e_dom.x_dino_id = inventoryParent.id;
+                }
+
+                e_dom.x_dino_type = inventory.type;
                 e_dom.addEventListener('click', function() {
                     ark.locateDinoById(this.x_dino_id);
                 });

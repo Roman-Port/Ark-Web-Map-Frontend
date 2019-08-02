@@ -26,7 +26,7 @@
     left:0;
     z-index:99999;
     background-color:#252629;
-    transition: all 200ms;
+    transition: opacity 200ms;
     animation-timing-function: cubic-bezier(0.61, 0.4, 0.29, 0.99);
 }
 
@@ -59,7 +59,7 @@
     font-size:15px;
     font-family: 'Roboto', sans-serif;
     z-index: 99999;
-    transition:all 200ms;
+    transition:top 200ms;
     animation-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
 }
 
@@ -405,6 +405,10 @@
     width:30px;
     /* 50 pixels in width */
     filter: invert(100%);
+}
+
+.dino_entry_no_invert img {
+    filter: none;
 }
 
 .dino_entry .dino_entry_title {
@@ -1705,9 +1709,9 @@ a {
 
 .map_layer_select_content {
     position: absolute;
-    top: 38px;
-    left: 0;
-    right: 0;
+    top: 37px;
+    left: -1px;
+    right: -1px;
     background-color: #252629;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
@@ -1718,6 +1722,12 @@ a {
 
 .map_layer_select_active .map_layer_select_content {
     display: block;
+    z-index: 100;
+}
+
+.top_nav_btn_map_layer_select {
+    min-width: 130px;
+    position: relative;
 }
 
 .map_layer_select_item {
@@ -1797,4 +1807,12 @@ a {
 .server_setup_frame_disabled {
     opacity: 0;
     pointer-events: none;
+}
+
+.structure_img {
+    width:2560;
+    position:absolute;
+    height:2560;
+    background-repeat:no-repeat;
+    background-position: center;
 }

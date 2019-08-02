@@ -1,7 +1,7 @@
 <html id="html">
     <head>
         <meta charset="UTF-8">
-        <title>Ark Web Map</title>
+        <title>Delta Web Map</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link rel="stylesheet" href="/assets/view.css">
         <link rel="stylesheet" href="/assets/top_nav.css">
@@ -44,7 +44,7 @@
         </script>
         <style>
             .leaflet-marker-icon {
-                transition:transform 200ms;
+                /*transition:transform 200ms;*/
             }
         </style>
     </head>
@@ -80,8 +80,8 @@
         <div id="main_view" class="main_view">
             <!-- Top nav -->
             <div class="top_nav">
-                <div class="top_nav_title_area">
-                    <div class="top_nav_server_icon"></div>
+                <div class="top_nav_title_area" onclick="uinav.toggleMenu();">
+                    <div class="top_nav_server_icon" id="map_icon"></div>
                     <div class="top_nav_title_text_area">
                         <div class="top_nav_title_name" id="map_title"><!-- Server name --></div>
                         <div class="top_nav_title_sub" id="map_sub_title"><!-- Last updated --></div>
@@ -102,12 +102,19 @@
 
                     </div>
                     <div class="top_nav_btn_area_sectioner" id="alerts_area_s" style="display:none;"></div>
-                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_edit">Edit</div>
+                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_tribe">Tribe</div>
+                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_edit">Edit Server</div>
                     <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-exit_to_app-24px.svg);" id="nav_btn_leave">Leave</div>
                     <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-lock-24px.svg);" id="nav_btn_private">Private</div>
                     <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-public-24px.svg);" id="nav_btn_public">Public</div>
+                    <div class="top_nav_btn top_nav_btn_hidden top_nav_btn_map_layer_select" onclick="draw_map.toggleMenu();" style="background-image: url(/assets/icons/baseline-layers-24px.svg);" id="nav_btn_map"><span id="map_btn_layers_title">Tribe Maps</span><div id="map_btn_layers_content" class="map_layer_select_content"></div></div>
                     <div class="top_nav_btn_area_sectioner"></div>
                 </div>
+            </div>
+
+            <!-- Server picker -->
+            <div class="server_picker_sidebar" id="server_picker_sidebar">
+
             </div>
 
             <!-- Rpws bottom modal I stole from my appstore -->
@@ -140,9 +147,6 @@
             <div class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" id="map_part" style="background-color:#1c1d21;">
                 <!-- Actual map -->
                 <canvas class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" style=" z-index: 999; background: transparent; pointer-events: none; " id="map_draw_part"></canvas>
-                <div class="map_btns">
-                    <div class="top_nav_btn top_nav_btn_hidden" onclick="this.classList.toggle('map_layer_select_active');" style="background-image: url(/assets/icons/baseline-layers-24px.svg); min-width:150px;" id="map_btn_layers"><span id="map_btn_layers_title">Add Layer...</span><div id="map_btn_layers_content" class="map_layer_select_content"></div></div>
-                </div>
 
             </div>
             <!-- Sidebar dino list -->
@@ -188,8 +192,8 @@
             </div>
         </div>
 
-        <!-- Create server dialog -->
-        <iframe src="/app/servers/create/" id="server_setup" class="server_setup_frame server_setup_frame_disabled"></iframe>
+        <!-- Create server dialog 
+        <iframe src="/app/servers/create/" id="server_setup" class="server_setup_frame server_setup_frame_disabled"></iframe>-->
 
         <!-- New custom menu -->
         <table class="new_custom_area new_custom_area_inactive" id="new_custom_area">
@@ -255,6 +259,7 @@
     </body>
 
     <!-- Scripts -->
+    <script src="/assets/analytics.js"></script>
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
     <script src="/assets/map.js"></script>
     <script src="/assets/map_modal.js"></script>

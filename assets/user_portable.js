@@ -8,12 +8,11 @@ ark_users.serverRequest = function(url, args, callback) {
         } else if (this.readyState == 4 && this.status == 500) {
             //Known server error.
             var err = JSON.parse(this.responseText);
-            if(err.error_code == 5) {
-                //Jump to signin
-                window.location = "/login/?callback="+encodeURIComponent(window.location);
-                return;
-            }
             ark_users.onNetError(err);
+        } else if (this.readyState == 4 && this.status == 401) {
+            //Jump to signin
+            window.location = "/login/?callback="+encodeURIComponent(window.location);
+            return;
         } else if (this.readyState == 4) {
             //Parse the response and display the error
             if(args.customErrorCallback == null) {

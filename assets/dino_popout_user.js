@@ -150,7 +150,7 @@ dinopop.createItemsBox = function(data, parent) {
             ark.createDom("div", "popout_stats_item_text popout_stats_item_text_topleft", entry).innerText = "x"+item.stackSize.toString();
             ark.createDom("div", "popout_stats_item_text popout_stats_item_text_bottomright", entry).innerText = "Missing Item Data";
         } else {
-            entry.style.backgroundImage = "url('"+itemClass.icon.icon_url+"')";
+            entry.style.backgroundImage = "url('"+itemClass.icon.image_url+"')";
 
             var stackWeightRounded = Math.round(itemClass.baseItemWeight * item.stackSize * 10) / 10;
             var name = stackWeightRounded.toString();

@@ -78,7 +78,7 @@ map_menu.show = function(url) {
             bottomModal.appendChild(map_menu.setColorArea());
             
             //Set image
-            document.getElementById('bottom_modal_dino_icon').src = map_menu.dino_entry.icon_url;
+            document.getElementById('bottom_modal_dino_icon').src = map_menu.dino_entry.image_url;
 
             //Add statuses
             var statusesToUse = [
@@ -202,7 +202,7 @@ map_menu.createItemDom = function(itemData) {
         weight.innerText = "Missing Entry";
     } else {
         //Fill data
-        icon.src = itemEntry.icon.icon_url;
+        icon.src = itemEntry.icon.image_url;
         popup_content.innerText = itemEntry.name;
         amount.innerText = "x"+itemData.stackSize.toString();
         var stackWeightRounded = Math.round(itemEntry.baseItemWeight * itemData.stackSize * 10) / 10;

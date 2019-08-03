@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="/assets/user_settings.css">
         <link rel="stylesheet" href="/assets/dino_popout_user.css">
         <link rel="stylesheet" href="/assets/popup_form.css">
+        <link rel="stylesheet" href="/assets/app/form.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
         <style>
             .leaflet-left {
@@ -77,6 +78,12 @@
                 </tr>
             </table>
         </div>
+
+        <!-- Form area -->
+        <div id="xform_area" class="xform_area">
+
+        </div>
+
         <div id="main_view" class="main_view">
             <!-- Top nav -->
             <div class="top_nav">
@@ -88,9 +95,9 @@
                     </div>
                 </div>
                 <div class="top_nav_search">
-                    <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" onfocus="uinav.onSearchFocus()" onblur="uinav.onSearchBlur()" oninput="uinav.onSearchInput();">
-                    <select class="top_nav_search_select" onchange="uinav.onSearchTypeChange(this);">
-                        <option value="0">All</option>
+                    <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
+                    <select class="top_nav_search_select" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
+                        <option value="-1">All</option>
                         <option value="1">Tribemembers</option>
                         <option value="2">Items</option>
                         <option value="3">Dinos</option>
@@ -147,7 +154,7 @@
             <div class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" id="map_part" style="background-color:#1c1d21;">
                 <!-- Actual map -->
                 <canvas class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" style=" z-index: 999; background: transparent; pointer-events: none; " id="map_draw_part"></canvas>
-
+                <div class="hud_bar_container"><div class="hud_bar" id="hud_bar"></div></div>
             </div>
             <!-- Sidebar dino list -->
             <div class="dino_sidebar smooth_anim dino_sidebar_open" id="dino_sidebar_container">
@@ -176,20 +183,6 @@
     
             <!-- Custom -->
             <div class="dino_selector" id="custom_view"></div>
-    
-            <!-- Dino search window -->
-            <div class="dino_search_window dino_search_window_disabled" id="dino_search_window">
-                <input type="text" id="dino_search_window_input" oninput="ark.onStartSearchTyping(this.value);">
-                <div class="dino_search_window_close" onclick="ark.hideSearchWindow();"><img src="/assets/icons/baseline-close-24px.svg"></div>
-                <div class="dino_search_window_content" id="dino_search_window_content">
-    
-                </div>
-            </div>
-    
-            <!-- Dino notifications cards -->
-            <div class="dino_n_card_holder" id="dino_n_card_holder">
-                
-            </div>
         </div>
 
         <!-- Create server dialog 
@@ -243,7 +236,7 @@
                 <div class="usersett_area">
                     <div class="usersett_sectionheader">About ArkWebMap</div>
                     <div class="usersett_contentbox">
-                        ArkWebMap © 2019 <a target="_blank" href="https://romanport.com/">RomanPort</a><br>
+                        DeltaWebMap © 2019 <a target="_blank" href="https://romanport.com/">RomanPort</a><br>
                         <a href="https://github.com/Roman-Port/Ark-Web-Map" target="_blank">Open Source</a><br>
                         Game content is believed to be used under Fair Use. ArkWebMap is not affiliated with the game publisher.
                     </div>
@@ -259,27 +252,18 @@
     </body>
 
     <!-- Scripts -->
-    <script src="/assets/analytics.js"></script>
+    <script src="/assets/app/analytics.js"></script>
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
-    <script src="/assets/map.js"></script>
-    <script src="/assets/map_modal.js"></script>
-    <script src="/assets/baby_manager.js"></script>
-    <script src="/assets/user_portable.js"></script>
-    <script src="/assets/bottom_modal.js"></script>
-    <script src="/assets/permissions.js"></script>
-    <script src="/assets/collapsible.js"></script>
-    <script src="/assets/dino_list_sidebar.js"></script>
-    <script src="/assets/hub.js"></script>
-    <script src="/assets/item_search.js"></script>
-    <script src="/assets/user_settings.js"></script>
-    <script src="/assets/blocked_words.js"></script>
-    <script src="/assets/dino_popout_user.js"></script>
-    <script src="/assets/top_nav.js"></script>
-    <script src="/assets/gateway.js"></script>
-    <script src="/assets/popup_form.js"></script>
-    <script src="/assets/main.js"></script>
+    <script src="/assets/app/gateway.js"></script>
+    <script src="/assets/app/form.js"></script>
+    <script src="/assets/app/frontend.js"></script>
+    <script src="/assets/app/dinosidebar.js"></script>
+    <script src="/assets/app/map.js"></script>
+
+    <script src="/assets/app/ark.js"></script>
+    <script src="/assets/app/app.js"></script>
 
     <script>
-        ark.init();
+        main.init();
     </script>
 </html>

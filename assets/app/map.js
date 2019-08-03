@@ -152,41 +152,32 @@ map.dino_marker_list = {};
 map.dino_marker_list_index = 0;
 
 /* Tribe dinos */
-map.onEnableTribeDinos = function(callback) {
-    //Query tribe dinos
-    ark.serverRequestWithOfflineFallback(ark.session.endpoint_tribes, "tribe", {}, function(d) {
-        //Add dinos
-        for(var i = 0; i<d.dinos.length; i+=1) {
-            var dino = d.dinos[i];
-            if(dino == null) {
-                console.warn("Warning: Dino ID "+dino_id+" was not found, but was referenced.");
-            }
-            //Create marker
-            map.addDinoMarker(dino);
+map.onEnableTribeDinos = function(d) {
+    //Add dinos
+    for(var i = 0; i<d.dinos.length; i+=1) {
+        var dino = d.dinos[i];
+        if(dino == null) {
+            console.warn("Warning: Dino ID "+dino_id+" was not found, but was referenced.");
         }
+        //Create marker
+        map.addDinoMarker(dino);
+    }
 
-        //Add tribemates
-        for(var i = 0; i<d.player_characters.length; i+=1) {
-            var player = d.player_characters[i];
-            var pos = map.convertFromNormalizedToMapPos(player.adjusted_map_pos);
-            var imgOverlay = null;
-            if(!player.is_alive) {
-                //Set death overlay
-                imgOverlay = "//icon-assets.deltamap.net/legacy/player_death_cache.png";
-            }
-            map.addMapIcon(1, player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
+    //Add tribemates
+    for(var i = 0; i<d.player_characters.length; i+=1) {
+        var player = d.player_characters[i];
+        var pos = map.convertFromNormalizedToMapPos(player.adjusted_map_pos);
+        var imgOverlay = null;
+        if(!player.is_alive) {
+            //Set death overlay
+            imgOverlay = "//icon-assets.deltamap.net/legacy/player_death_cache.png";
         }
+        map.addMapIcon(1, player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
+    }
 
-        //Add structures
-        var mad = ark.session.mapData.maps[0];
-        map.enableStructuresLayer(d, d.structures);
-
-        //Start rendering map layer. We waited to save bandwidth.
-        map.addGameMapLayer(mad);
-
-        //Callback
-        callback();
-    });
+    //Add structures
+    var mad = ark.session.mapData.maps[0];
+    map.enableStructuresLayer(d, d.structures);
 }
 
 map.enableStructuresLayer = function(data, structures) {
@@ -244,7 +235,7 @@ map.enableStructuresLayer = function(data, structures) {
                 }
 
                 //Place structure
-                var sd = ark.createDom("div", "structure_img", tile);
+                var sd = main.createDom("div", "structure_img", tile);
                 sd.style.backgroundImage = "url('"+data.structure_images[st.img]+"')";
                 sd.style.transform = "scale("+(ppmDiff).toString()+") rotate("+st.rot.toString()+"deg)";
                 sd.style.top = ((adjusted.y * 256) - 1152).toString()+"px";
@@ -405,8 +396,7 @@ map.baseCreateBackground = function(e) {
 
 map.onDinoClicked = function(e) {
     //If the system is currently offline, stop this
-    if(!ark.isCurrentServerOnline) {
-        ark.onClickOnlineFeatureOffline();
+    if(!main.currentServerOnline) {
         analytics.action("map-dino-click-offline", "web-main", {
             "dino_id":this.x_data.id,
             "dino_classname":this.x_data.classname
@@ -461,21 +451,21 @@ map.onHoverDino = function() {
     }
     
     //Create element
-    var e = ark.createDom("div", "mini_modal mini_modal_anim");
+    var e = main.createDom("div", "mini_modal mini_modal_anim");
 
     //Set position
     e.style.top = pos.top - 10;
     e.style.left = pos.left - 14;
 
     //Add icon
-    var icon = ark.createDom("img", "mini_modal_icon", e);
+    var icon = main.createDom("img", "mini_modal_icon", e);
     icon.src = "/assets/images/blank_50px.png";
     map.createBackground(icon, data.imgUrl);
 
     //Create content
-    var ce = ark.createDom("div", "mini_modal_content", e);
-    ark.createDom("div", "mini_modal_title", ce).innerText = data.tamedName;
-    ark.createDom("div", "mini_modal_sub", ce).innerText = data.displayClassname+" - Lvl "+data.level;;
+    var ce = main.createDom("div", "mini_modal_content", e);
+    main.createDom("div", "mini_modal_title", ce).innerText = data.tamedName;
+    main.createDom("div", "mini_modal_sub", ce).innerText = data.displayClassname+" - Lvl "+data.level;;
 
     //Add to body and set ref on it
     this.x_modal = e;
@@ -805,7 +795,7 @@ draw_map.onDeinitCurrentServer = function() {
 
 draw_map.onDoneSwitchServer = function() {
     //Fetch new maps
-    ark.serverRequest("https://deltamap.net/api/servers/"+ark.currentServerId+"/maps", {}, function(c) {
+    main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {}, function(c) {
         //If there is a map, choose the first one on the list
         if(c.maps.length >= 1) {
             var m = c.maps[0];
@@ -822,18 +812,18 @@ draw_map.latestMaps = [];
 draw_map.setMapPicker = function(data) {
     draw_map.latestMaps = data;
     var e = document.getElementById('map_btn_layers_content');
-    ark.removeAllChildren(e);
+    main.removeAllChildren(e);
 
     //Add maps
     for(var i = 0; i<data.length; i+=1) {
         var m = data[i];
-        var c = ark.createDom("div", "map_layer_select_item", e);
+        var c = main.createDom("div", "map_layer_select_item", e);
         c.x_id = m.id;
         c.x_url = m.url;
         c.x_name = m.name;
         c.innerText = m.name;
         c.addEventListener("click", draw_map.onChooseNewMap);
-        var d = ark.createDom("div", "map_layer_select_item_delete", c);
+        var d = main.createDom("div", "map_layer_select_item_delete", c);
         d.addEventListener("click", draw_map.onChooseDeleteMap);
         if(m.isNextStepDelete) {
             d.classList.add("map_layer_select_item_delete_forever");
@@ -841,12 +831,12 @@ draw_map.setMapPicker = function(data) {
     }
 
     //Add the add button
-    var c = ark.createDom("div", "map_layer_select_item_add", e);
+    var c = main.createDom("div", "map_layer_select_item_add", e);
     c.innerText = "Add Map";
     c.addEventListener("click", draw_map.onChooseCreateMap);
 
     //Add bottom
-    ark.createDom("div", "map_layer_select_item_bottom", e).innerText = "Draw on the map by holding right click. Drawings are synced in realtime with tribemates.";
+    main.createDom("div", "map_layer_select_item_bottom", e).innerText = "Draw on the map by holding right click. Drawings are synced in realtime with tribemates.";
 
     //Show
     document.getElementById('nav_btn_map').classList.remove("top_nav_btn_hidden");
@@ -869,7 +859,7 @@ draw_map.chooseMap = function(name, url, id) {
     draw_map.changeTitleName(name);
 
     //Request from the server
-    ark.serverRequest(url, {}, function(c) {
+    main.serverRequest(url, {}, function(c) {
         draw_map.points = c.points;
         draw_map.redraw();
     });
@@ -901,12 +891,12 @@ draw_map.onChooseDeleteMap = function(evt) {
             "name":parentName,
             "doClear":true
         };
-        ark.serverRequest(parentUrl, {"type":"post", "body":JSON.stringify(body)}, function() {
+        main.serverRequest(parentUrl, {"type":"post", "body":JSON.stringify(body)}, function() {
             //Now handled from the gateway.
         });
     } else {
         //Delete
-        ark.serverRequest(parentUrl, {"type":"delete", "body":"{}"}, function() {
+        main.serverRequest(parentUrl, {"type":"delete", "body":"{}"}, function() {
             //Now handled from the gateway.
         });
     }
@@ -940,7 +930,7 @@ draw_map.onChooseCreateMap = function() {
         var body = {
             "name":name
         };
-        ark.serverRequest("https://deltamap.net/api/servers/"+ark.currentServerId+"/maps", {
+        main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {
             "type":"post",
             "body":JSON.stringify(body)
         }, function(c) {
@@ -997,7 +987,7 @@ draw_map.onRemoteCreate = function(id, name) {
     var entry = {
         "name":name,
         "id":id,
-        "url":"https://deltamap.net/api/servers/"+ark.currentServerId+"/maps/"+id
+        "url":"https://deltamap.net/api/servers/"+main.currentServerId+"/maps/"+id
     };
     draw_map.latestMaps.push(entry);
     draw_map.setMapPicker(draw_map.latestMaps);

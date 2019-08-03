@@ -9,13 +9,50 @@ gateway.CLIENT_VERSION_MINOR = 0;
 gateway.LIB_VERSION_MAJOR = 1;
 gateway.LIB_VERSION_MINOR = 0;
 
+gateway.isConnected = false;
+gateway.onConnect = null;
+gateway.onDisconnect = null;
+gateway.onChangeSingle = null; //Only run once
+
+gateway.create = function(callback, onDisconnect, onReconnect) {
+    //Set vars
+    gateway.onChangeSingle = callback;
+    gateway.onDisconnect = onDisconnect;
+    gateway.onConnect = onReconnect;
+
+    //Now, connect
+    gateway.connectDefault();
+}
+
+gateway.connectDefault = function() {
+    gateway.connect(function() {
+        //Connected
+        gateway.isConnected = true;
+        gateway.onConnect();
+        if(gateway.onChangeSingle != null) {
+            gateway.onChangeSingle(true);
+            gateway.onChangeSingle = null;
+        }
+    }, function() {
+        //Disconnected
+        gateway.isConnected = false;
+        gateway.onDisconnect();
+        if(gateway.onChangeSingle != null) {
+            gateway.onChangeSingle(false);
+            gateway.onChangeSingle = null;
+        }
+
+        //Try and reconnect
+        window.setTimeout(gateway.connect, gateway.config.reconnect_delay_seconds * 1000);
+    });
+}
+
 gateway.connect = function(callback, errorCallback) {
     //Get the token
     var token = gateway.getToken();
 
     //Grab the config
     gateway.getConfig(function(e) {
-
         //Create a URL to use.
         var url = e.gateway_proto+"://"+e.gateway_host+"/v"+gateway.ENDPOINT_VERSION+"/"+e.gateway_endpoints.frontend+"?clientName=js&clientNameExtra="+encodeURIComponent(navigator.userAgent)+"&clientVersionMajor="+gateway.CLIENT_VERSION_MAJOR+"&clientVersionMinor="+gateway.CLIENT_VERSION_MINOR+"&clientLibVersionMajor="+gateway.LIB_VERSION_MAJOR+"&clientLibVersionMinor="+gateway.LIB_VERSION_MINOR+"&auth_token="+token;
 
@@ -45,7 +82,7 @@ gateway.getConfig = function(callback) {
     }
 
     //Grab the config
-    ark.serverRequest("https://config.deltamap.net/prod/gateway_config.json", {nocreds:true}, function(e) {
+    main.serverRequest("https://config.deltamap.net/prod/gateway_config.json", {nocreds:true}, function(e) {
         gateway.config = e;
         callback(e);
     });
@@ -59,7 +96,7 @@ gateway.onMsg = function(evt) {
     var d = JSON.parse(evt.data);
     //If this is not the correct server ID, drop
     if(d.headers["server_id"] != null) {
-        if(d.headers["server_id"] != ark.currentServerId) {
+        if(d.headers["server_id"] != main.currentServerId) {
             gateway.log("DROPPED", "Dropping message for Ark server "+d.headers["server_id"]+" because it is not for the current server!");
         }
     }
@@ -68,17 +105,15 @@ gateway.onMsg = function(evt) {
     //https://docs.google.com/spreadsheets/d/1XvR03ie2ao5SkeaVDJlV5KY9Dv46XRBBQb1VhiAU-b8/edit#gid=0
     switch(d.opcode) {
         case 4: gateway.onSwitchSessionID(d.sessionId); break;
-        case 3: draw_map.onRx(d); break;
-        case 7: draw_map.onGatewayMapEvent(d); break;
-        case 8: map.remoteUpdateMultipleRealtime(d.updates); break;
         case 9: ark.onServerStateChanged(d.serverId, d.isUp); break;
+        
     }
 }
 
 gateway.sendMsg = function(opcode, m) {
     m.opcode = opcode;
     m.headers = {
-        "server_id":ark.currentServerId
+        "server_id":main.currentServerId
     };
 
     var s = JSON.stringify(m);

@@ -1816,3 +1816,44 @@ a {
     background-repeat:no-repeat;
     background-position: center;
 }
+
+.hud_bar {
+    padding:8px;
+    position: absolute;
+    left:0;
+    right: 0;
+    top:-50px;
+    opacity: 0;
+    transition: top 200ms;
+    animation-timing-function: cubic-bezier(0.61, 0.4, 0.29, 0.99);
+    color:white;
+    font-size:14px;
+    line-height:15px;
+    min-height:15px;
+    padding-left:31px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.hud_bar_container {
+    position: absolute;
+    left:0;
+    right: 0;
+    top:0;
+    pointer-events: none;
+    height:50px;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.hud_bar_active {
+    top:0;
+    opacity: 1;
+}
+
+.hub_bar_img {
+    position: absolute;
+    top:8px;
+    left:8px;
+    width:15px;
+    height:15px;
+}

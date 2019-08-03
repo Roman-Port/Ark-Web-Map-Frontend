@@ -1,0 +1,88 @@
+.xform_area {
+    position: absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:999999;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.xform_area_active {
+    pointer-events: all;
+}
+
+.xform_element {
+    position: absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.xform_element_box {
+    max-width:600px;
+    max-height:80vh;
+    width:calc(100% - 40px);
+    position: relative;
+    border-radius: 5px;
+    background-color:white;
+    border:1px solid #44474b;
+}
+
+.xform_element_nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 80px;
+    bottom: 0;
+}
+
+.xform_element_body {
+    margin-bottom:80px;
+    padding:5px;
+}
+
+.xform_element_shown {
+    transform:scale(1);
+    opacity: 1;
+    animation-name: xform_element_shown_animation;
+    animation-duration: 300ms;
+    animation-iteration-count: 1;
+    animation-timing-function: cubic-bezier(0.57, 1.08, 0.64, 1.06);
+}
+
+.xform_element_hidden {
+    transform:scale(0);
+    opacity: 0;
+    animation-name: xform_element_hidden_animation;
+    animation-duration: 300ms;
+    animation-iteration-count: 1;
+    animation-timing-function: cubic-bezier(0.57, 1.08, 0.64, 1.06);
+}
+
+@keyframes xform_element_shown_animation {
+    from {
+        transform:scale(0.4);
+        opacity: 0;
+    }
+    to {
+        transform:scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes xform_element_hidden_animation {
+    from {
+        transform:scale(1);
+        opacity: 1;
+    }
+    to {
+        transform:scale(0.4);
+        opacity: 0;
+    }
+}

@@ -308,7 +308,7 @@ cs.onCodeEdited = function(code) {
         cs.isCodeSubmitProcessing = true;
 
         //Try and check the code.
-        ark_users.serverRequest("https://ark.romanport.com/api/users/@me/server_wizard/start?session_id="+encodeURIComponent(code), {
+        ark_users.serverRequest("https://deltamap.net/api/users/@me/server_wizard/start?session_id="+encodeURIComponent(code), {
             "method":"post",
             "body":JSON.stringify(payload)
         }, function(f) {
@@ -390,7 +390,7 @@ cs.nct.onGetOpenReply = function(msg, msgType, fromIp) {
     }
 
     //Try to test the port
-    ark_users.serverRequest("https://ark.romanport.com/api/users/@me/server_wizard/test_tcp_connection?ip="+fromIp+"&port="+encodeURIComponent(document.getElementById('nct_port').value), {}, function(e) {
+    ark_users.serverRequest("https://deltamap.net/api/users/@me/server_wizard/test_tcp_connection?ip="+fromIp+"&port="+encodeURIComponent(document.getElementById('nct_port').value), {}, function(e) {
         if(e.ok) {
             //Ok!
             cs.current_settings.subserver_port = parseInt(document.getElementById('nct_port').value);
@@ -501,7 +501,7 @@ cs.generateFinalConfig = function() {
         "web_port":cs.current_settings.subserver_port,
         "debug_mode":false,
         "child_config":{
-            "resources_url":"https://ark.romanport.com/resources",
+            "resources_url":"https://deltamap.net/resources",
             "save_map":config.compatible_maps[cs.current_settings.map_index].internal_name,
             "save_location":cs.current_settings.save_path,
             "base_permissions":[  

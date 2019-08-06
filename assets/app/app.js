@@ -7,26 +7,86 @@ var main = {};
 main.currentServerId = null;
 main.currentServerOnline = true;
 main.me = null;
+main.sessionToken = 0; //Changed every time we load a new server
 main.HUDMessages = [];
 /* Tools */
 
 main.serverRequest = function(url, args, callback) {
     var xmlhttp = new XMLHttpRequest();
+    var startId = main.sessionToken;
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            var reply = JSON.parse(this.responseText);
+            //Get reply
+            var reply = this.responseText;
+            if(args.isJson == null || args.isJson == true) {
+                reply = JSON.parse(this.responseText);
+            }
+
+            //Check if we should cancel
+            if((args.enforceServer != null && args.enforceServer) && startId != main.sessionToken) {
+                main.log("server-request", 1, "Stopping reply because server changed when it was enforced.");
+                return;
+            }
+
+            //Callback
             callback(reply);
         } else if(this.readyState == 4) {
             if(args.failOverride != null) {
+                //Check if we should cancel
+                if((args.enforceServer != null && args.enforceServer) && startId != main.sessionToken) {
+                    main.log("server-request", 1, "Stopping reply because server changed when it was enforced.");
+                    return;
+                }
+                
                 args.failOverride(this);
             } else {
                 if (this.readyState == 4 && this.status == 502) {
                     //This is the error code when the subserver is offline.
                 } else if (this.readyState == 4 && this.status == 500) {
                     //Server error.
+                    form.add("Server Error", [
+                        {
+                            "type":"text",
+                            "text":"The server reported an error. Try again later."
+                        }
+                    ], [
+                        {
+                            "type":0,
+                            "name":"Okay",
+                            "callback":function() {
+                                
+                            }
+                    }], "xform_area_interrupt");
+                } else if (this.readyState == 4 && this.status == 503) {
+                    //Server is down
+                    form.add("Server Unavailable", [
+                        {
+                            "type":"text",
+                            "text":"The server is under high load and cannot be reached. Please try again later."
+                        }
+                    ], [
+                        {
+                            "type":0,
+                            "name":"Reload",
+                            "callback":function() {
+                                window.location.reload();
+                            }
+                    }], "xform_area_interrupt");
                 } else if (this.readyState == 4 && this.status == 401) {
                     //Not authenticated
-                    window.location = "/login";
+                    form.add("You've Been Signed Out", [
+                        {
+                            "type":"text",
+                            "text":"The account owner signed you out. Please sign in again."
+                        }
+                    ], [
+                        {
+                            "type":0,
+                            "name":"Sign In",
+                            "callback":function() {
+                                window.location = "/login/";
+                            }
+                    }], "xform_area_interrupt");
                 } else if (this.readyState == 4) {
                     //Other error
                 }
@@ -48,8 +108,18 @@ main.serverRequest = function(url, args, callback) {
     xmlhttp.send(args.body);
 }
 
+main.getAccessToken = function() {
+    return localStorage.getItem("access_token");
+}
+
 main.log = function(topic, level, msg) {
     console.log("["+topic+"] "+msg);
+}
+
+main.foreach = function(data, loop) {
+    for(var i = 0; i<data.length; i+=1) {
+        loop(data[i], i);
+    }
 }
 
 main.onGatewayDisconnect = function() {
@@ -183,6 +253,48 @@ main.removeHUDMessage = function(id) {
     main.refreshHUDMessages();
 }
 
+main.makeServerList = function(onClick) {
+    //Create elements
+    var body = main.createDom("div", "dino_sidebar_helper server_picker_helper");
+    for(var i = 0; i<main.me.servers.length; i+=1) {
+        var s = main.me.servers[i];
+        main.makeServerEntry(body, s.id, s.display_name, s.map_name, s.image_url, onClick);
+    }
+
+    return body;
+}
+
+main.makeServerEntry = function(body, id, name, sub, icon, onclick) {
+    var b = main.createDom("div", "dino_sidebar_item", body);
+    b.x_id = id;
+    main.createDom("img", "server_picker_img", b).src = icon;
+    main.createDom("div", "dino_sidebar_item_title", b).innerText = name;
+    main.createDom("div", "dino_sidebar_item_sub", b).innerText = sub;
+    b.addEventListener("click", onclick);
+}
+
+main.createSidebarServerList = function() {
+    var body = main.makeServerList(function() {
+        var id = this.x_id;
+        
+    });
+
+    //Add "create server" option
+    main.createDom("div", "dino_sidebar_section_header", body);
+    main.makeServerEntry(body, null, "Create Server", "Add your own server!", "/assets/icons/baseline-add-24px.svg", main.onClickServer);
+}
+
+main.createServer = function() {
+    window.location = "/app/servers/create/";
+}
+
+main.createLink = function(parent, text, url) {
+    var d = main.createDom("a", "", parent);
+    d.href = url;
+    d.target = "_blank";
+    d.innerText = text;
+}
+
 /* Init */
 
 main.init = function() {
@@ -199,5 +311,23 @@ main.init = function() {
         gateway.create(function() {
             main.log("Init", 0, "Gateway connected.");
         }, main.onGatewayDisconnect, main.onGatewayConnect);
+
+        //We'll load the last server
+        main.selectLastServer();
     });
+}
+
+main.selectLastServer = function() {
+    var lastServerId = localStorage.getItem("latest_server");
+    var d = null;
+    for(var i = 0; i<main.me.servers.length; i+=1) {
+        if(main.me.servers[i].id == lastServerId) {
+            d = main.me.servers[i];
+        }
+    }
+    if(d != null) {
+        ark.initAndVerify(d, true);
+    } else {
+        ark.showServerPicker();
+    }
 }

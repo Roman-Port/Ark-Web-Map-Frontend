@@ -1825,7 +1825,7 @@ a {
     top:-50px;
     opacity: 0;
     transition: top 200ms;
-    animation-timing-function: cubic-bezier(0.61, 0.4, 0.29, 0.99);
+    transition-timing-function: cubic-bezier(0.61, 0.4, 0.29, 0.99);
     color:white;
     font-size:14px;
     line-height:15px;

@@ -10,6 +10,7 @@ gateway.LIB_VERSION_MAJOR = 1;
 gateway.LIB_VERSION_MINOR = 0;
 
 gateway.isConnected = false;
+gateway.isFirstConnection = true;
 gateway.onConnect = null;
 gateway.onDisconnect = null;
 gateway.onChangeSingle = null; //Only run once
@@ -33,6 +34,27 @@ gateway.connectDefault = function() {
             gateway.onChangeSingle(true);
             gateway.onChangeSingle = null;
         }
+
+        //If this is not the first connection, refresh user data in case it is out of date
+        if(!gateway.isFirstConnection) {
+            main.serverRequest(ROOT_URL+"users/@me/", {}, function(d) {
+                main.log("Gateway-Connection", 2, "Reconnected to gateway. User data refreshed.");
+                main.me = d;
+        
+                //Set placeholders
+                frontend.setUserData(d);
+
+                //Update the server status
+                var s = ark.getServerData();
+                if(s != null) {
+                    if(s.is_online != main.currentServerOnline) {
+                        main.log("Gateway-Connection", 2, "Reconnected to gateway. User data refreshed, and server online status changed. Updating...");
+                        ark.onServerStateChanged(main.currentServerId, s.is_online);
+                    }
+                }
+            });
+        }
+        gateway.isFirstConnection = false;
     }, function() {
         //Disconnected
         gateway.isConnected = false;
@@ -43,7 +65,7 @@ gateway.connectDefault = function() {
         }
 
         //Try and reconnect
-        window.setTimeout(gateway.connect, gateway.config.reconnect_delay_seconds * 1000);
+        window.setTimeout(gateway.connectDefault, gateway.config.reconnect_delay_seconds * 1000);
     });
 }
 

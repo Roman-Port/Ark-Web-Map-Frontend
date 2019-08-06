@@ -11,7 +11,7 @@ dinosidebar.makeItemDoms = function(query, done) {
     main.serverRequest(ark.session.endpoint_tribes_itemsearch.replace("{query}", encodeURIComponent(query)), {"failOverride": function() {
         //Error. Make fake one to keep it happy
         done(main.createDom("div", ""), false);
-    }}, function(d) {
+    }, "enforceServer":true}, function(d) {
         //Loop through items
         var o = main.createDom("div", "");
         for(var i = 0; i<d.items.length; i+=1) {
@@ -114,6 +114,7 @@ dinosidebar.init = function() {
     ark.downloadData(ark.session.endpoint_tribes_overview, "overview", {}, function(d) {
         dinosidebar.data = d;
         dinosidebar.ready = true;
+        ark.loading_status += 1;
         main.log("Dino Sidebar", 0, "Dino sidebar data loaded.");
         dinosidebar.query("");
     }, ark.fatalError);

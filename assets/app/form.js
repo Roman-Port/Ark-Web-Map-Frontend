@@ -6,9 +6,14 @@ form.stack = [];
 
 form.area = document.getElementById('xform_area');
 
-form.add = function(title, bodyOptions, options, style) { //String, Array, Array, Object
-    //Ensure we have focus
-    form._show();
+form.add = function(title, bodyOptions, options, style, extra) { //String, Array, Array, Object
+    //Ensure we have focus. Style should either be xform_area_interrupt or xform_area_dim
+    form._show(style);
+
+    //Make sure extras is added
+    if(extra == null) {
+        extra = {};
+    }
 
     //Create a form element
     var container = main.createDom("div", "xform_element", form.area);
@@ -31,24 +36,52 @@ form.add = function(title, bodyOptions, options, style) { //String, Array, Array
     }
 
     //Add options
-    body.innerText = title;
+    main.createDom("div", "xform_e_title", body).innerText = title;
+    for(var i = 0; i<bodyOptions.length; i+=1) {
+        form._makeElement(body, bodyOptions[i]);
+    }
 
     //Now, push to stack
-    form._push(container);
+    if(extra.pop_under == true) {
+        //Push it under this one
+        form.stack.splice(form.stack.length - 1, 0, container);
+    } else {
+        //Go now
+        form._push(container);
+    }
+}
+
+form.pop = function() {
+    //Pops the latest element
+    //Hide
+    form._hideStackIndex(form.stack.length - 1);
+    form.stack.splice(form.stack.length - 1, 1);
+    
+    //Hide all
+    if(form.stack.length == 0) {
+        form._hide();
+    }
 }
 
 form._onBtnPressed = function() {
-    console.log("pressed");
+    form.pop();
+    this.x_callback();
 }
 
-form._show = function() {
+form._show = function(style) {
     //Shows the form area
+    main.setClass(form.area, "xform_area_interrupt", false);
+    main.setClass(form.area, "xform_area_dim", false);
+
     main.setClass(form.area, "xform_area_active", true);
+    main.setClass(form.area, style, true);
+    form.area.x_style = style;
 }
 
 form._hide = function() {
     //Hides the form area
     main.setClass(form.area, "xform_area_active", false);
+    
 }
 
 form._push = function(e) {
@@ -82,4 +115,54 @@ form._showStackIndex = function(index) {
     //Hides an element on the stack
     form.stack[index].classList.remove("xform_element_hidden");
     form.stack[index].classList.add("xform_element_shown");
+}
+
+form._e_text = function(e, options) {
+    //text: Text to be displayed
+    var a = main.createDom("div", "xform_e_text", e);
+    a.innerText = options.text;
+    return a;
+}
+
+form._e_server_list = function(e, options) {
+    //include_add: Should include add button? (Bool)
+    var onClick = function() {
+        var id = this.x_id;
+        form.pop();
+        var status = ark.initAndVerify(ark.getServerDataById(id), false, function() {
+            ark.showServerPicker();
+        });
+    };
+    var a = main.createDom("div", "xform_e_serverpicker", e);
+    var okServers = 0;
+    for(var i = 0; i<main.me.servers.length; i+=1) {
+        var s = main.me.servers[i];
+        if(ark.verify(s, false, false, null)) {
+            main.makeServerEntry(a, s.id, s.display_name, s.map_name, s.image_url, onClick);
+            okServers+=1;
+        }
+    }
+    if(main.me.servers.length == 0) {
+        main.createDom("div", "xform_e_serverpicker_none", a).innerText = "No servers on account. Join an Ark server!";
+    } else if (okServers == 0) {
+        //We have servers, but none of them are compatible
+        var msg = main.createDom("div", "xform_e_serverpicker_none", a);
+        msg.innerText = "No compatible, up to date, servers. ";
+        main.createLink(msg, "More info.", "/"); //TODO
+    }
+    if(options.include_add) {
+        var add = main.createDom("div", "xform_e_serverpicker_add", a);
+        add.innerText = "Add ARK Server";
+        add.addEventListener("click", main.createServer);
+    }
+    return a;
+}
+
+form._ELEMENTS = {
+    "text":form._e_text,
+    "server_list":form._e_server_list
+};
+
+form._makeElement = function(e, options) {
+    return form._ELEMENTS[options.type](e, options);
 }

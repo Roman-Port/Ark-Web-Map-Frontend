@@ -70,7 +70,31 @@ map.init = function() {
 
     //Show map list
     draw_map.onDoneSwitchServer();
+
+    //Add structures map
+    map.addDynamicMap("structures", function() {
+        ark.loading_status += 1;
+    });
 };
+
+map.deinit = function() {
+    //Clear all dynamic maps
+    main.foreach(map.dynamic_maps, function(m) {
+        clearInterval(m.heart);
+    });
+
+    //Clear dynamic map list
+    map.dynamic_maps = [];
+
+    //Remove the map
+    if(map.map != null) {
+        map.map.remove();
+        map.map = null;
+    }
+
+    //Remove map picker
+    document.getElementById('nav_btn_map').classList.add("top_nav_btn_hidden");
+}
 
 map.resetPopulationMap = function(isOn, filteredClassname) {
     //Remove layer if needed
@@ -100,6 +124,56 @@ map.addGameMapLayer = function(data) {
         zIndex: 1,
         bounds:map.getBounds()
     }).addTo(map.map);
+}
+
+map.dynamic_maps = []; //Dynamic maps we're using
+
+map.addDynamicMap = function(type, callback) {
+    //Request to begin a dynamic map
+    main.serverRequest("https://dynamic-tiles.deltamap.net/create/"+encodeURIComponent(main.currentServerId)+"/"+encodeURIComponent(type), {"enforceServer":true}, function(d) {
+        //We've created a session. Create an object to insert
+        var session = {
+            "token":d.token,
+            "heartbeat_url":d.url_heartbeat,
+            "map_url":d.url_map,
+            "expired":false,
+            "type":type
+        };
+
+        //Set a timer to heartbeat this
+        session.heart = window.setInterval(function() {
+            main.serverRequest(session.heartbeat_url, {"isJson":false, "enforceServer":true, "failOverride":function(t) {
+                if(t.status == 410) {
+                    //The resource no longer exists, as it expired. We'll recreate it
+                    main.log("dynamic-map", 3, "Session expired. Recreating dynamic map...");
+
+                    //Kill this session
+                    clearInterval(session.heart);
+                    session.expired = true;
+                    session.layer.remove();
+
+                    //Add a new one
+                    map.addDynamicMap(session.type, function(){});
+                }
+            }}, function() {});
+        }, d.heartbeat_policy_ms);
+
+        //Add map layer
+        session.layer = L.tileLayer(session.map_url, {
+            maxZoom:12,
+            id: 'dm_'+session.token,
+            opacity: 1,
+            zIndex: 1,
+            maxNativeZoom:10,
+            bounds:map.getBounds()
+        }).addTo(map.map);
+
+        //Push
+        map.dynamic_maps.push(session);
+
+        //Callback
+        callback();
+    });
 }
 
 map.onPopulationMapToggle = function(value) {
@@ -153,6 +227,9 @@ map.dino_marker_list_index = 0;
 
 /* Tribe dinos */
 map.onEnableTribeDinos = function(d) {
+    //Add to loading status
+    ark.loading_status += 1;
+
     //Add dinos
     for(var i = 0; i<d.dinos.length; i+=1) {
         var dino = d.dinos[i];
@@ -177,7 +254,7 @@ map.onEnableTribeDinos = function(d) {
 
     //Add structures
     var mad = ark.session.mapData.maps[0];
-    map.enableStructuresLayer(d, d.structures);
+    //map.enableStructuresLayer(d, d.structures);
 }
 
 map.enableStructuresLayer = function(data, structures) {
@@ -795,7 +872,7 @@ draw_map.onDeinitCurrentServer = function() {
 
 draw_map.onDoneSwitchServer = function() {
     //Fetch new maps
-    main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {}, function(c) {
+    main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {"enforceServer":true}, function(c) {
         //If there is a map, choose the first one on the list
         if(c.maps.length >= 1) {
             var m = c.maps[0];
@@ -859,7 +936,7 @@ draw_map.chooseMap = function(name, url, id) {
     draw_map.changeTitleName(name);
 
     //Request from the server
-    main.serverRequest(url, {}, function(c) {
+    main.serverRequest(url, {"enforceServer":true}, function(c) {
         draw_map.points = c.points;
         draw_map.redraw();
     });
@@ -932,7 +1009,8 @@ draw_map.onChooseCreateMap = function() {
         };
         main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {
             "type":"post",
-            "body":JSON.stringify(body)
+            "body":JSON.stringify(body),
+            "enforceServer":true
         }, function(c) {
             //Set this to the active map
             draw_map.activeMapId = c.id;

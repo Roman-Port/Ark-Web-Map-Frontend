@@ -27,7 +27,6 @@
     right: 10%;
     left: 10%;
     border-radius: 5px;
-    pointer-events: none;
 }
 
 .browser_tab {
@@ -100,6 +99,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    pointer-events: none;
 }
 
 .browser_iframe {
@@ -179,6 +179,12 @@ body, html {
     -webkit-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
     -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
     box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
+}
+
+.frontpage_top_white_btn {
+    background-color: #ebeef5;
+    color: #5585e6;
+    border: 1px solid #d4d6dc;
 }
 
 .frontpage_top_small_btn {

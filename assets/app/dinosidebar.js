@@ -5,6 +5,7 @@ dinosidebar.data = null;
 dinosidebar.filter = -1;
 dinosidebar.token = 0;
 dinosidebar.lastQuery = "";
+dinosidebar.sortType = 0;
 
 dinosidebar.makeItemDoms = function(query, done) {
     //Fetch data
@@ -67,13 +68,14 @@ dinosidebar.SECTIONS = [
                     "sub":d.arkName,
                     "img":d.img,
                     "img_classes":"",
-                    "meta":d
+                    "meta":d,
+                    "level":0
                 });
             }
             return output;
         },
         "onClick":function(d) {
-
+            map.flyToMarkerByName("players", d.arkId);
         }
     },
     {
@@ -91,13 +93,14 @@ dinosidebar.SECTIONS = [
                     "sub":d.classDisplayName+" - Lvl "+d.level.toString(),
                     "img":d.img,
                     "img_classes":"dino_sidebar_item_invertedimg",
-                    "meta":d
+                    "meta":d,
+                    "level":d.level
                 });
             }
             return output;
         },
         "onClick":function(d) {
-
+            map.flyToMarkerByName("dinos", d.id);
         }
     },
     {
@@ -108,6 +111,30 @@ dinosidebar.SECTIONS = [
         "makeDoms":dinosidebar.makeItemDoms
     }
 ]
+
+dinosidebar.SORT_NAMES = [
+    "Species",
+    "Name",
+    "Level"
+]
+
+dinosidebar.SORT_FUNCTIONS = [
+    function(data) {
+        data.sort(function(a, b) { 
+            return a.sub.localeCompare(b.sub);
+        });
+    },
+    function(data) {
+        data.sort(function(a, b) { 
+            return a.head.localeCompare(b.head);
+        });
+    },
+    function(data) {
+        data.sort(function(a, b) { 
+            return b.level - a.level;
+        });
+    }
+];
 
 dinosidebar.init = function() {
     //Loads initial data, then starts this
@@ -126,8 +153,45 @@ dinosidebar.deinit = function() {
     dinosidebar.data = null;
 }
 
+dinosidebar.redownload = function() {
+    ark.downloadData(ark.session.endpoint_tribes_overview, "overview", {}, function(d) {
+        dinosidebar.data = d;
+        dinosidebar.ready = true;
+        main.log("Dino Sidebar", 0, "Dino sidebar data reloaded.");
+        dinosidebar.refresh();
+    }, ark.fatalError);
+}
+
 dinosidebar.refresh = function() {
     dinosidebar.query(dinosidebar.lastQuery);
+}
+
+dinosidebar.getSortSpan = function(parent) {
+    var e = main.createDom("span", "dino_sidebar_top_nav_sort_type", parent);
+    e.innerText = " "+dinosidebar.SORT_NAMES[dinosidebar.sortType];
+    return e;
+}
+
+dinosidebar.changeSort = function() {
+    //Add to sort index
+    dinosidebar.sortType += 1;
+
+    //Check if overflows
+    if(dinosidebar.sortType >= dinosidebar.SORT_FUNCTIONS.length) {
+        dinosidebar.sortType = 0;
+    }
+
+    //Save
+    localStorage.setItem("latest_sort_type", dinosidebar.sortType);
+
+    //Update buttons
+    var a = document.getElementById('dino_sidebar');
+    var rb = document.getElementsByClassName("dino_sidebar_top_nav_right")[0];
+    rb.getElementsByClassName("dino_sidebar_top_nav_sort_type")[0].remove();
+    dinosidebar.getSortSpan(rb);
+
+    //Refresh
+    dinosidebar.refresh();
 }
 
 dinosidebar.query = function(query) {
@@ -141,6 +205,16 @@ dinosidebar.query = function(query) {
     var a = document.getElementById('dino_sidebar');
     dinosidebar.token++;
     a.innerHTML = "";
+
+    var lb = main.createDom("div", "dino_sidebar_top_nav dino_sidebar_top_nav_left", a);
+    lb.innerText = "Tribe Tools";
+    lb.addEventListener("click", dinolib.open);
+
+    var rb = main.createDom("div", "dino_sidebar_top_nav dino_sidebar_top_nav_right", a);
+    rb.innerText = "Sort";
+    rb.addEventListener("click", dinosidebar.changeSort);
+    dinosidebar.getSortSpan(rb);
+
     var token = dinosidebar.token;
     var waitingCount = 0; //How many we're waiting on
     var waitingFinishedCount = 0; //How many have finished
@@ -238,6 +312,10 @@ dinosidebar.addCategoryAsync = function(query, category, done, token) {
         var data = category.getData();
         var o = main.createDom("div", "");
         var count = 0;
+
+        //Sort the data
+        dinosidebar.SORT_FUNCTIONS[dinosidebar.sortType](data);
+
         for(var i = 0; i<data.length; i+=1) {
             var d = data[i];
             
@@ -271,4 +349,11 @@ dinosidebar.addCategoryAsync = function(query, category, done, token) {
 
 dinosidebar.onClick = function() {
     this.x_category.onClick(this.x_data);
+}
+
+if(localStorage.getItem("latest_sort_type") != null) {
+    dinosidebar.sortType = parseInt(localStorage.getItem("latest_sort_type"));
+    if(dinosidebar.sortType < 0 || dinosidebar.sortType >= dinosidebar.SORT_FUNCTIONS.length) {
+        dinosidebar.sortType = 0;
+    }
 }

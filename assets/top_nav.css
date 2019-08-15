@@ -280,15 +280,15 @@
 
 .bottom_nav_me_badge {
     position: absolute;
-    left: 0px;
+    right: 0px;
     height: 60px;
+    width:360px;
     background-color: #252629;
     border-radius: 10px;
     font-family: 'Roboto', sans-serif;
     opacity: 1;
     transition: all 150ms;
     transition-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
-    right: 0px;
     bottom: 0px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
@@ -362,4 +362,20 @@
 
 .server_picker_helper {
     bottom:0;
+}
+
+.top_nav_btn_wheel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height:100vh;
+    left: 367px;
+    overflow: hidden;
+    transition: top 200ms;
+    transition-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
+}
+
+.top_nav_btn_frame {
+    height: 60px;
+    position: relative;
 }

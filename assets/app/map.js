@@ -249,12 +249,8 @@ map.onEnableTribeDinos = function(d) {
             //Set death overlay
             imgOverlay = "//icon-assets.deltamap.net/legacy/player_death_cache.png";
         }
-        map.addMapIcon(1, player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
+        map.addMapIcon("players", player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
     }
-
-    //Add structures
-    var mad = ark.session.mapData.maps[0];
-    //map.enableStructuresLayer(d, d.structures);
 }
 
 map.enableStructuresLayer = function(data, structures) {
@@ -370,16 +366,15 @@ map.convertZCoordsToGameUnits = function(x, y, z) {
 
 map.addDinoMarker = function(dino) {
     var pos = map.convertFromNormalizedToMapPos(dino.adjusted_map_pos);
-    map.addMapIcon(0, dino.id, dino, pos, dino.imgUrl, map.onDinoClicked, map.onHoverDino, map.onEndHoverDino, false );
+    map.addMapIcon("dinos", dino.id, dino, pos, dino.imgUrl, map.onDinoClicked, map.onHoverDino, map.onEndHoverDino, false );
 }
 
-map.layer_list = [
-    {}, //Dinos
-    {} //Players
-]
+map.markers = {};
 
-map.marker_name_map = {}; //Maps marker names to their layer IDs and layer indexes
-map.marker_name_jump_map = {}; //Maps marker names to their layer IDs and layer indexes
+map.MARKER_Z_OFFSETS = {
+    "dinos":10,
+    "players":10000
+}; //Used to define layer priorities. If the layer name does not exist on this list, it is pushed to the bottom
 
 map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseover, onmouseout, doCrop, imgOverlay ) {
     var icon_size = 40;
@@ -394,36 +389,37 @@ map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseove
         popupAnchor:  [icon_size/2, icon_size/2] // point from which the popup should open relative to the iconAnchor
     });
 
+    //Make sure that we have an index in the markers for this
+    if(map.markers[layerId] == null) {
+        map.markers[layerId] = {};
+    }
+
+    //Determine Z-index
+    var z = 0;
+    if(map.MARKER_Z_OFFSETS[layerId] != null) {
+        //Get base
+        z = map.MARKER_Z_OFFSETS[layerId];
+
+        //Find number of items already here
+        z += Object.keys(map.markers[layerId]).length;
+    }
+
     //Add to map
-    var innerIndex = Object.keys(map.layer_list[layerId]).length;
-    var mapped_name = layerId.toString()+"_"+innerIndex;
-    var index = innerIndex + (3000 * layerId) + 80;
     var dino_icon = L.marker(pos, {
         icon: icon,
-        zIndexOffset:index+1
+        zIndexOffset:1
     }).addTo(map.map);
-    
+
+    //Add to list
+    map.markers[layerId][markerId] = dino_icon;
 
     //Add data
-    dino_icon.x_mapped_name = mapped_name;
     dino_icon.x_data = data;
 
     //Add events
     if(onclick != null) { dino_icon.on('click', onclick); }
     if(onmouseover != null) { dino_icon.on("mouseover", onmouseover); }
     if(onmouseout != null) { dino_icon.on("mouseout", onmouseout); }
-
-    //Remove existing markers if they exist
-    map.removeMarkerById(layerId, innerIndex);
-
-    //Add to list
-    map.layer_list[layerId][innerIndex] = dino_icon;
-    map.marker_name_map[mapped_name] = {
-        "layerId":layerId,
-        "name":markerId,
-        "internalIndex":innerIndex
-    };
-    map.marker_name_jump_map[markerId] = mapped_name;
     
     //Set real image
     if(imgOverlay == null) {
@@ -436,19 +432,27 @@ map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseove
     }
 }
 
-map.getMarkerByName = function(id) {
-    var pinIndex = map.marker_name_map[map.marker_name_jump_map[id]];
-    var pin = map.layer_list[pinIndex.layerId][pinIndex.internalIndex];
-    return pin;
+map.getMarkerByName = function(layerId, id) {
+    return map.markers[layerId][id];
 }
 
-map.removeMarkerById = function(layerId, id) {
-    if(map.layer_list[layerId][id] != null) {
-        map.layer_list[layerId][id].removeFrom(map.map); //Remove from map
-        var e = map.marker_name_map[ map.layer_list[layerId][id].x_mapped_name ];
-        delete map.layer_list[layerId][id]; //Remove from list
-        delete map.marker_name_jump_map[e.name];
-        delete map.marker_name_map[ map.layer_list[layerId][id].x_mapped_name ];
+map.flyToMarkerByName = function(layerId, id) {
+    var pin = map.getMarkerByName(layerId, id);
+    pin._map.flyTo(pin._latlng, 9, {
+        "animate":true,
+        "duration":0.5,
+        "easeLinearity":0.25,
+        "noMoveStart":false
+    });
+}
+
+map.removeMarkerLayer = function(layerId) {
+    if(map.markers[layerId] == null) {
+        return;
+    }
+    var keys = Object.keys(map.markers[layerId]);
+    for(var i = 0; i<keys.length; i+=1) {
+        map.markers[layerId][keys[i]].remove();
     }
 }
 
@@ -871,6 +875,11 @@ draw_map.onDeinitCurrentServer = function() {
 }
 
 draw_map.onDoneSwitchServer = function() {
+    //Stop if this is a demo server
+    if(main.isDemo) {
+        return;
+    }
+
     //Fetch new maps
     main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {"enforceServer":true}, function(c) {
         //If there is a map, choose the first one on the list

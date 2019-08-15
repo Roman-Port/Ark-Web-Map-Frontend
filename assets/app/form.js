@@ -1,6 +1,6 @@
 var form = {};
 
-form.ANIMATION_TIME_MS = 200;
+form.ANIMATION_TIME_MS = 70;
 
 form.stack = [];
 
@@ -32,6 +32,7 @@ form.add = function(title, bodyOptions, options, style, extra) { //String, Array
         btn.innerText = o.name;
         btn.x_callback = o.callback;
         btn.x_name = o.name;
+        btn.x_do_hide = o.do_hide; //If false, do not remove this from the stack. Default true
         btn.addEventListener("click", form._onBtnPressed);
     }
 
@@ -57,14 +58,18 @@ form.pop = function() {
     form._hideStackIndex(form.stack.length - 1);
     form.stack.splice(form.stack.length - 1, 1);
     
-    //Hide all
+    //Hide all, or show the one under this
     if(form.stack.length == 0) {
         form._hide();
+    } else {
+        form._showStackIndex(form.stack.length - 1);
     }
 }
 
 form._onBtnPressed = function() {
-    form.pop();
+    if(this.x_do_hide == null || this.x_do_hide == true) {
+        form.pop();
+    }
     this.x_callback();
 }
 

@@ -26,7 +26,7 @@
                         </tr>
                     </table>
                 </div>
-                <div class="browser">
+                <div class="browser" id="browser">
                     <div class="browser_tab">
                         <div class="browser_tab_rcover">
                             <div class="c" style="border-bottom-right-radius: 8px;"></div>
@@ -43,9 +43,15 @@
                         <div class="browser_nav_bar"></div>
                     </div>
                     <div class="browser_content">
-                        <iframe class="browser_iframe" src="https://deltamap.net/dummy_app.html"></iframe>
+                        <iframe class="browser_iframe" src="https://deltamap.net/app/#dwm-demo-frontpage-src"></iframe>
                     </div>
                 </div>
+                <script>
+                    document.getElementById('browser').addEventListener("mousedown", function() {
+                        console.log("[Demo] Activating demo...");
+                        document.getElementsByClassName('browser_content')[0].style.pointerEvents = "all";
+                    });
+                </script>
             </div>
         </div>
     </div>

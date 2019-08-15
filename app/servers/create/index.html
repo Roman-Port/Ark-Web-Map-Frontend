@@ -10,6 +10,7 @@
     <script src="assets/createserver_main.js"></script>
     <script src="/assets/user_portable.js"></script>
     <script src="assets/createserver_remotemsgs.js"></script>
+    <script src="//romanport.com/static/lib/lib_usercontent.js"></script>
     <script>
         cs.slides = [
             {
@@ -108,18 +109,17 @@
             <div class="dialog_slider" id="dialog_slider">
                 <div class="dialog_slider_cell">
                     <div class="cell_title">Welcome!</div>
-                    <div class="cell_content">To add your Ark server to Ark Web Map, make sure that your server meets these requirements, then click next.<br>
+                    <div class="cell_content">Welcome to Delta Web Map! To get started, make sure you have access to the following...<br>
                         <ul>
-                            <li>Ability to download and run the Ark Web Map companion program.</li>
+                            <li>Ability to download and run the Delta Web Map companion program.</li>
                             <li>Direct access to your Ark server save file.</li>
-                            <li>Windows 7+ or Linux capable of running .NET Core.</li>
                         </ul>
 
                     </div>
                 </div>
                 <div class="dialog_slider_cell">
                     <div class="cell_title">Add an Ark server</div>
-                    <div class="cell_content">To add your Ark server to Ark Web Map, you'll need to download a companion program to your Ark server on the next screen.</div>
+                    <div class="cell_content">Give your server a name and pick the map.</div>
                     <div class="servername_form" style="left: 90px; top: 112px;">
                         <div class="servername_form_side" style="left: 170px;">
                             <div class="form_entry" id="server_name_entry_form">
@@ -143,7 +143,7 @@
                 </div>
                 <div class="dialog_slider_cell">
                     <div class="cell_title">Download Companion Software</div>
-                    <div class="cell_content">Ark Web Map uses a companion program to read your Ark: Survival Evolved save file. It will never write to it. You'll need to forward ports on the next screen.</div>
+                    <div class="cell_content">Delta Web Map uses a companion program to read your Ark: Survival Evolved save file. Download and extract the zip file for your platform on your server, then run the executable inside.</div>
                     <div class="downloadbtns_container">
                         <div class="master_btn master_btn_blue downloadbtns_btn" onclick="cs.downloadBinary('windows');">Windows</div>
                         <div class="master_btn master_btn_blue downloadbtns_btn" onclick="cs.downloadBinary('linux');">Linux</div>

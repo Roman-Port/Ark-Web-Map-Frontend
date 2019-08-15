@@ -55,7 +55,7 @@
                 <tr>
                     <td style="text-align: center; vertical-align: middle;">
                         <img src="/assets/icon_hires.png" height="90" width="90" style="margin-bottom:30px;">
-                        <div class="loader_view_text">Connecting...</div>
+                        <div class="loader_view_text"><span class="loader_view_text_extra">Delta</span>WebMap</div>
                     </td>
                 </tr>
             </table>
@@ -94,29 +94,37 @@
                         <div class="top_nav_title_sub" id="map_sub_title"><!-- Last updated --></div>
                     </div>
                 </div>
-                <div class="top_nav_search">
-                    <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
-                    <select class="top_nav_search_select" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
-                        <option value="-1">All</option>
-                        <option value="1">Tribemembers</option>
-                        <option value="2">Items</option>
-                        <option value="3">Dinos</option>
-                        <option value="4">Baby Dinos</option>
-                    </select>
-                </div>
-                <div class="top_nav_btn_area">
-                    <div id="alerts_area" style="display: inline-block;">
-
+                <div class="top_nav_btn_wheel" id="top_nav_btn_wheel">
+                    <div class="top_nav_btn_frame">
+                        <div class="top_nav_search">
+                            <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
+                            <select class="top_nav_search_select" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
+                                <option value="-1">All</option>
+                                <option value="1">Tribemembers</option>
+                                <option value="2">Items</option>
+                                <option value="3">Dinos</option>
+                                <option value="4">Baby Dinos</option>
+                            </select>
+                        </div>
+                        <div class="top_nav_btn_area">
+                            <div id="alerts_area" style="display: inline-block;">
+        
+                            </div>
+                            <div class="top_nav_btn_area_sectioner" id="alerts_area_s" style="display:none;"></div>
+                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_tribe">Tribe</div>
+                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_edit">Edit Server</div>
+                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-exit_to_app-24px.svg);" id="nav_btn_leave">Leave</div>
+                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-lock-24px.svg);" id="nav_btn_private">Private</div>
+                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-public-24px.svg);" id="nav_btn_public">Public</div>
+                            <div class="top_nav_btn top_nav_btn_hidden top_nav_btn_map_layer_select" onclick="draw_map.toggleMenu();" style="background-image: url(/assets/icons/baseline-layers-24px.svg);" id="nav_btn_map"><span id="map_btn_layers_title">Tribe Maps</span><div id="map_btn_layers_content" class="map_layer_select_content"></div></div>
+                            <div class="top_nav_btn_area_sectioner"></div>
+                        </div>
                     </div>
-                    <div class="top_nav_btn_area_sectioner" id="alerts_area_s" style="display:none;"></div>
-                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_tribe">Tribe</div>
-                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_edit">Edit Server</div>
-                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-exit_to_app-24px.svg);" id="nav_btn_leave">Leave</div>
-                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-lock-24px.svg);" id="nav_btn_private">Private</div>
-                    <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-public-24px.svg);" id="nav_btn_public">Public</div>
-                    <div class="top_nav_btn top_nav_btn_hidden top_nav_btn_map_layer_select" onclick="draw_map.toggleMenu();" style="background-image: url(/assets/icons/baseline-layers-24px.svg);" id="nav_btn_map"><span id="map_btn_layers_title">Tribe Maps</span><div id="map_btn_layers_content" class="map_layer_select_content"></div></div>
-                    <div class="top_nav_btn_area_sectioner"></div>
+                    <div class="top_nav_btn_frame">
+                        test
+                    </div>
                 </div>
+                
             </div>
 
             <!-- Server picker -->
@@ -259,6 +267,8 @@
     <script src="/assets/app/frontend.js"></script>
     <script src="/assets/app/dinosidebar.js"></script>
     <script src="/assets/app/map.js"></script>
+    <script src="/assets/app/dino_popout.js"></script>
+    <script src="/assets/app/dinolib.js"></script>
 
     <script src="/assets/app/ark.js"></script>
     <script src="/assets/app/app.js"></script>

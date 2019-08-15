@@ -2,7 +2,7 @@
     position: absolute;
     top: 60px;
     bottom: 0px;
-    right: -360px;
+    right: 0px;
     width: 360px;
     color: white;
     font-family: 'Roboto', sans-serif;
@@ -10,10 +10,6 @@
     transition: all 250ms;
     transition-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
     z-index:3;
-}
-
-.dino_sidebar_open {
-    right:0px;
 }
 
 .dino_sidebar_filter {
@@ -58,13 +54,15 @@
     position: absolute;
     top: 0;
     bottom: 60px;
+    width: 330px;
     right: 0;
-    left: 0;
     padding: 15px;
-    padding-right: 34px;
     padding-top: 10px;
     margin-top: 0px;
     padding-bottom: 10px;
+    opacity: 1;
+    transition: opacity 250ms;
+    transition-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
 }
 
 .dino_sidebar_section_header {
@@ -259,7 +257,56 @@
 .dino_sidebar_stillloading {
     animation-name:stillloading_items;
     animation-timing-function: ease-in-out;
-    animation-duration: 800ms;
+    animation-duration: 1800ms;
     animation-iteration-count: infinite;
     text-align:center;
+}
+
+.dino_sidebar_top_nav {
+    width: 98px;
+    margin-bottom: 6px;
+    background-color: #252629;
+    border-radius: 5px;
+    border: 1px solid #44474b;
+    position: relative;
+    cursor: pointer;
+    height: 30px;
+    font-size: 15px;
+    color: #d0cfcf;
+    padding: 10px 17px;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    background-position-x: 17px;
+    padding-left: 40px;
+    background-size: 18px;
+    line-height: 30px;
+}
+
+.dino_sidebar_top_nav_left {
+    background-image: url(/assets/icons/baseline-arrow_back-24px.svg);
+}
+
+.dino_sidebar_top_nav_right {
+    background-image: url(/assets/icons/baseline-sort-24px.svg);
+    float:right;
+}
+
+.dino_sidebar_top_nav_sort_type {
+    font-size: 13px;
+    font-style: italic;
+    color: gray;
+}
+
+/* For expanding into tribe tools */
+.dino_sidebar_tribe_tools {
+    width:100vw;
+}
+
+.dino_sidebar_tribe_tools .dino_sidebar_helper {
+    opacity: 0;
+}
+
+.dino_sidebar_tribe_tools .bottom_nav_me_badge {
+    opacity: 0;
 }

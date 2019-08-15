@@ -40,3 +40,7 @@ frontend.showServerPlaceholders = function() {
         sub.appendChild(main.generateTextTemplate(12, "#37383a", 150));
     }
 }
+
+frontend.setNavWheel = function(id) {
+    document.getElementById('top_nav_btn_wheel').style.top = (id * -60).toString()+"px";
+}

@@ -64,8 +64,11 @@
 }
 
 .xform_element_body {
-    margin-bottom:80px;
+    margin-bottom: 80px;
     padding: 16px;
+    overflow-y: auto;
+    max-height: calc(80vh - 80px - 16px - 16px);
+    overflow-x: hidden;
 }
 
 .xform_element_shown {
@@ -118,6 +121,7 @@
     font-size: 15px;
     padding: 5px 0px;
     color: #bfbfbf;
+    margin-top:10px;
 }
 
 .xform_e_serverpicker {
@@ -151,4 +155,38 @@
     color: #bfbfbf;
     cursor: pointer;
     padding-top: 10px;
+}
+
+.xform_e_input_text {
+    font-size: 15px;
+    padding: 5px 0px;
+    padding-bottom:2px;
+    color: #bfbfbf;
+    margin-top:10px;
+}
+
+.xform_e_input {
+    width:300px;
+    padding:8px;
+    background-color:#252629;
+    border:1px solid #44474b;
+    color:white;
+    border-radius: 5px;
+}
+
+.xform_e_big_input {
+    width:100%;
+    padding:8px;
+    background-color:#252629;
+    border:1px solid #44474b;
+    color:white;
+    border-radius: 5px;
+    height:100px;
+}
+
+.xform_e_img {
+    width: calc(100% - 2px);
+    border: 1px solid #44474b;
+    margin-top: 10px;
+    border-radius: 5px;
 }

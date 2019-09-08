@@ -251,7 +251,16 @@ map.onEnableTribeDinos = function(d) {
         }
         map.addMapIcon("players", player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
     }
+
+    //Add structures you can interact with
+    /*for(var i = 0; i<d.structures.length; i+=1) {
+        var st = d.structures[i];
+        var pos = map.convertFromNormalizedToMapPos(st.mapPos);
+        map.addMapIcon("interactive_structures", st.index.toString(), st, pos, d.structure_images[st.icon], null, null, null, true, "" );
+    }*/
 }
+
+map.structure_size_config = {"adobe_ceiling.png":{"width":311,"height":316},"adobe_ceiling_tri.png":{"width":252,"height":273},"adobe_foundation.png":{"width":278,"height":276},"adobe_foundation_tri.png":{"width":252,"height":273},"adobe_pillar.png":{"width":97,"height":93},"adobe_ramp.png":{"width":276,"height":297},"adobe_wall.png":{"width":24,"height":285},"bunk_bed.png":{"width":194,"height":119},"cage_wood.png":{"width":183,"height":187},"campfire.png":{"width":137,"height":125},"chair.png":{"width":57,"height":62},"chem_bench.png":{"width":102,"height":304},"cooking_pot.png":{"width":225,"height":192},"crop_plot_large.png":{"width":280,"height":279},"crop_plot_medium.png":{"width":216,"height":211},"crop_plot_small.png":{"width":139,"height":136},"fabricator.png":{"width":189,"height":436},"feeder.png":{"width":122,"height":230},"feeder_tek.png":{"width":125,"height":267},"forge.png":{"width":148,"height":147},"generator.png":{"width":212,"height":219},"generator_tek.png":{"width":245,"height":256},"grinder.png":{"width":289,"height":787},"industrial_cooking_pot.png":{"width":181,"height":381},"industrial_forge.png":{"width":909,"height":709},"metal_ceiling.png":{"width":275,"height":283},"metal_ceiling_tri.png":{"width":237,"height":274},"metal_foundation.png":{"width":278,"height":276},"metal_foundation_tri.png":{"width":238,"height":274},"metal_pillar.png":{"width":88,"height":86},"metal_ramp.png":{"width":284,"height":278},"metal_wall.png":{"width":14,"height":273},"mortar_and_pestal.png":{"width":97,"height":67},"preserving_bin.png":{"width":96,"height":117},"refrigerator.png":{"width":166,"height":123},"single_bed.png":{"width":207,"height":138},"sleeping_bag.png":{"width":238,"height":129},"smithy.png":{"width":98,"height":245},"stone_ceiling.png":{"width":278,"height":284},"stone_ceiling_tri.png":{"width":239,"height":275},"stone_foundation.png":{"width":299,"height":281},"stone_foundation_tri.png":{"width":255,"height":294},"stone_ramp.png":{"width":318,"height":306},"stone_wall.png":{"width":20,"height":289},"storage_bin_large.png":{"width":69,"height":168},"storage_bin_small.png":{"width":78,"height":119},"table.png":{"width":116,"height":216},"tek_bed.png":{"width":181,"height":330},"tek_ceiling.png":{"width":278,"height":275},"tek_ceiling_tri.png":{"width":236,"height":273},"tek_foundation.png":{"width":314,"height":313},"tek_foundation_tri.png":{"width":249,"height":285},"tek_pillar.png":{"width":81,"height":80},"tek_ramp.png":{"width":284,"height":284},"tek_replicator.png":{"width":1024,"height":809},"tek_wall.png":{"width":33,"height":274},"thatch_ceiling.png":{"width":298,"height":309},"thatch_foundation.png":{"width":318,"height":308},"thatch_wall.png":{"width":34,"height":291},"vault.png":{"width":200,"height":184},"wood_ceiling.png":{"width":277,"height":283},"wood_ceiling_tri.png":{"width":238,"height":274},"wood_foundation.png":{"width":298,"height":281},"wood_foundation_tri.png":{"width":254,"height":291},"wood_pillar.png":{"width":77,"height":81},"wood_ramp.png":{"width":316,"height":304},"wood_wall.png":{"width":19,"height":288}};
 
 map.enableStructuresLayer = function(data, structures) {
     var StructureLayer = L.GridLayer.extend({
@@ -286,9 +295,8 @@ map.enableStructuresLayer = function(data, structures) {
                 var st = structures[i];
                 count+=1;
 
-                //Check if we should add this
-                var onList = this.options.x_list.includes(st.stype);
-                if(onList != this.options.x_show_list) {
+                //Only show if this has an inventory
+                if(!st.hasInventory) {
                     continue;
                 }
 
@@ -307,12 +315,23 @@ map.enableStructuresLayer = function(data, structures) {
                     z = 21;
                 }
 
+                //Get the image name. This jank will be fixed in a future update
+                var name = data.structure_images[st.img].substr(51);
+                var size = map.structure_size_config[name];
+
+                //Skip if we failed to find the size
+                if(size == null) {
+                    continue;
+                }
+
                 //Place structure
                 var sd = main.createDom("div", "structure_img", tile);
-                sd.style.backgroundImage = "url('"+data.structure_images[st.img]+"')";
+                sd.style.width = size.width+"px";
+                sd.style.height = size.height+"px";
+                sd.style.backgroundColor = "red";
                 sd.style.transform = "scale("+(ppmDiff).toString()+") rotate("+st.rot.toString()+"deg)";
-                sd.style.top = ((adjusted.y * 256) - 1152).toString()+"px";
-                sd.style.left = ((adjusted.x * 256) - 1152).toString()+"px";
+                sd.style.top = ((adjusted.y * 256) - 0).toString()+"px";
+                sd.style.left = ((adjusted.x * 256) - 0).toString()+"px";
                 sd.style.zIndex = z.toString();
             }
             
@@ -323,30 +342,14 @@ map.enableStructuresLayer = function(data, structures) {
             return tile;
         }
     });
-
-    var specialList = [3, 4]; //This specifies classes that should always be on top
-
     var lo = new StructureLayer({
         id: 'structure_map_hp',
         opacity: 1,
         zIndex: 3,
-        x_list: specialList,
-        x_show_list: true,
         updateWhenZooming: false,
         keepBuffer: 4,
     });
     lo.addTo(map.map);
-
-    var lt = new StructureLayer({
-        id: 'structure_map_lp',
-        opacity: 1,
-        zIndex: 2,
-        x_list: specialList,
-        x_show_list: false,
-        updateWhenZooming: false,
-        keepBuffer: 4,
-    });
-    lt.addTo(map.map);
 }
 
 map.getUnitsPerTile = function(z) {
@@ -457,12 +460,12 @@ map.removeMarkerLayer = function(layerId) {
 }
 
 map.createBackground = function(e, imgUrl) {
-    e.style.background = "url('"+imgUrl+"'), white";
+    e.style.background = "url('"+imgUrl+"')";
     map.baseCreateBackground(e);
 }
 
 map.createBackgroundMultiple = function(e, img1, img2) {
-    e.style.background = "url('"+img1+"'), url('"+img2+"'), white";
+    e.style.background = "url('"+img1+"'), url('"+img2+"')";
     map.baseCreateBackground(e);
 }
 
@@ -473,6 +476,7 @@ map.baseCreateBackground = function(e) {
     e.style.border = "2px solid black";
     e.style.borderRadius = "40px";
     e.style.backgroundSize = "30px";
+    e.style.backgroundColor = "white";
 }
 
 map.onDinoClicked = function(e) {

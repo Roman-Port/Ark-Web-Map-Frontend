@@ -435,3 +435,183 @@ main.selectLastServer = function() {
         ark.showServerPicker();
     }
 }
+
+main.startReportError = function() {
+    //Prompt for permission
+    form.add("Report Error",
+    [
+        {
+            "type":"text",
+            "text":"When you report an error, a screenshot of this page will be uploaded. Is that okay?"
+        }
+    ],
+    [
+        {
+            "type":0,
+            "name":"Accept",
+            "callback":function(){
+                //Show loading popup
+                form.add("Report Error", [ { "type":"text", "text":"Uploading, please wait..." } ], [], "xform_area_dim", {});
+                main.beginUploadScreenshot(function(d) {
+                    //Hide loader
+                    form.pop();
+
+                    //Prompt for the next part
+                    main.promptReportError(d.url, d.token);
+                });
+            }
+        },
+        {
+            "type":1,
+            "name":"Cancel",
+            "callback":function(){}
+        }
+    ], "xform_area_dim", {});
+}
+
+main.beginUploadScreenshot = function(callback) {
+    html2canvas(document.body, {
+        "allowTaint":true,
+        "useCORS":true,
+        "onclone":function(a) {
+            //Remove loader popup
+            a.getElementById('xform_area').remove();
+            a.getElementById('loader_view').remove();
+        }
+    }).then(canvas => {
+        var d = canvas.toDataURL("image/png");
+        fetch(d).then(res => res.blob()).then(blob => {
+            main.serverRequest("https://user-content.romanport.com/upload?application_id=DZYzaYh8UrgrCEDJEem7jGYD", {"body":blob, "type":"POST", "nocreds":true}, function(r) {
+                callback(r);
+            });
+        });
+    });
+}
+
+main.promptReportError = function(screenshot_url, screenshot_token) {
+    //Prompt for details
+    form.add("Report Error",
+    [
+        {
+            "type":"input",
+            "name":"Title",
+            "placeholder":"Keep it short and descriptive",
+            "id":"title"
+        },
+        {
+            "type":"select",
+            "name":"Topic",
+            "options":[
+                {
+                    "name":"Incorrect Game Data",
+                    "value":"Game Data"
+                },
+                {
+                    "name":"Incorrect Dino Stats",
+                    "value":"Dino Stats"
+                },
+                {
+                    "name":"Missing Dino/Structure",
+                    "value":"Missing Dino/Structure"
+                },
+                {
+                    "name":"Bug",
+                    "value":"Bug"
+                },
+                {
+                    "name":"Display Bug",
+                    "value":"Display Bug"
+                },
+                {
+                    "name":"Feature Request",
+                    "value":"Feature Request"
+                }
+            ],
+            "id":"topic"
+        },
+        {
+            "type":"big_input",
+            "name":"Describe What Happened",
+            "placeholder":"",
+            "id":"d_explain"
+        },
+        {
+            "type":"big_input",
+            "name":"Describe What You Expected",
+            "placeholder":"",
+            "id":"d_expected"
+        },
+        {
+            "type":"img",
+            "src":screenshot_url
+        },
+        {
+            "type":"text",
+            "text":"Reporting an error will post what you type, your browser info, and your screenshot publicly on GitHub."
+        },
+        {
+            "type":"html",
+            "html":"You could also look for help on our <a href=\"https://reddit.com/r/DeltaWebMap/\" target=\"_blank\">Reddit</a> page."
+        }
+    ],
+    [
+        {
+            "type":0,
+            "name":"Submit",
+            "callback":function(pack) {
+                main.submitErrorReport(pack, screenshot_token);
+            }
+        },
+        {
+            "type":1,
+            "name":"Cancel",
+            "callback":function(){}
+        }
+    ], "xform_area_dim", {});
+}
+
+main.submitErrorReport = function(pack, screenshot_token) {
+    //Create POST body
+    var b = {
+        "title":pack.title.value,
+        "topic":pack.topic.value,
+        "server_id":main.currentServerId,
+        "client_name":"web",
+        "client_info":navigator.userAgent,
+        "screenshot_token":screenshot_token,
+        "attachment_tokens":[],
+        "attachment_names":[],
+        "body_description":pack.d_explain.value,
+        "body_expected":pack.d_expected.value
+    };
+
+    //Submit
+    form.add("Reporting Error...", [ { "type":"text", "text":"Uploading, please wait..." } ], [], "xform_area_dim", {});
+    main.serverRequest(ROOT_URL+"users/@me/report_issue", {"body":JSON.stringify(b), "type":"POST"}, function(r) {
+        //Hide
+        form.pop();
+
+        //Show confirmation
+        form.add("Thank You!",
+        [
+            {
+                "type":"text",
+                "text":"Your report has been submitted. Thank you!"
+            }
+        ],
+        [
+            {
+                "type":0,
+                "name":"View",
+                "callback":function(){
+                    window.open(r.url, "_blank");
+                }
+            },
+            {
+                "type":1,
+                "name":"Okay",
+                "callback":function(){}
+            }
+        ], "xform_area_dim", {});
+    });
+}

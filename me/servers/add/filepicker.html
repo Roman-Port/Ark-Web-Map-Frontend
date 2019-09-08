@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Delta Web Map / Add Server (Filepicker)</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+        <style>
+            body, html {
+                margin:0;
+                padding:0;
+                background-color: white;
+                font-weight: 200;
+                font-size: 15px;
+                font-family: 'Open Sans', sans-serif;
+                color: rgb(72, 78, 121);
+            }
+
+            .fp_top {
+                padding:10px;
+                border-bottom: 1px solid #eaeaea;
+                background-color: white;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
+                height:20px;
+            }
+
+            .fp_path {
+                position: absolute;
+                padding:0;
+                border:0;
+                border: 1px solid #eaeaea;
+                background-color: white;
+                padding:2px;
+                height:16px;
+                font-size:14px;
+                line-height: 16px;
+                left: 38px;
+                width: calc(100% - 10px - 10px - 2px - 2px - 28px);
+            }
+
+            .fp_up {
+                height:16px;
+                width:16px;
+                padding:2px;
+                background:url(https://deltamap.net/assets/frontpage/me/servers/create/filepicker/up.svg);
+                background-size:14px;
+                display: inline-block;
+                background-repeat: no-repeat;
+                background-position: center;
+                border: 1px solid #eaeaea;
+                cursor:pointer;
+            }
+
+            .main {
+                font-size: 15px;
+                position: fixed;
+                top: 41px;
+                left: 0;
+                right: 0;
+                overflow-y: scroll;
+                bottom: 81px;
+                padding:10px;
+            }
+
+            .main_placeholder {
+                color:gray;
+                text-align: center;
+            }
+
+            .main_table_header {
+                padding: 4px;
+                padding-left: 24px;
+                background-size: 20px;
+                background-position-x: 0px;
+                background-position-y: 3px;
+                background-repeat: no-repeat;
+                cursor:pointer;
+                user-select: none;
+                border:1px solid transparent;
+                min-height:17px;
+            }
+
+            .main_table_header_deselected:hover {
+                background-color: #cce8ff63;
+                border-color: #adc5d836;
+            }
+
+            .main_table_header_top {
+                font-weight: 600;
+            }
+
+            .icon_file {
+                background-image:url(https://deltamap.net/assets/frontpage/me/servers/create/filepicker/file.svg);
+            }
+
+            .icon_drive {
+                background-image:url(https://deltamap.net/assets/frontpage/me/servers/create/filepicker/drive.svg);
+            }
+
+            .icon_folder {
+                background-image:url(https://deltamap.net/assets/frontpage/me/servers/create/filepicker/folder.svg);
+            }
+
+            .main_header_selected {
+                background-color:#CCE8FF;
+                border-color: #adc5d8;
+            }
+
+            .fp_bottom {
+                position:fixed;
+                bottom:0;
+                left:0;
+                right:0;
+                height:80px;
+                border-top: 1px solid #eaeaea;
+                background-color: white;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+            }
+
+            .pick_btn {
+                background-color: #e8e9ea;
+                border-radius: 5px;
+                color: black;
+                padding: 6px 24px;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                font-size: 15px;
+                display: inline-block;
+                border: 1px solid #afafaf;
+                text-align: center;
+                cursor: pointer;
+                line-height: 26px;
+                -webkit-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
+                -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.14);
+                box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.05);
+                vertical-align: middle;
+                position: absolute;
+                right: 20px;
+                top: 20px;
+            }
+
+            .fb_text {
+                position: absolute;
+                top:20px;
+                left:20px;
+                bottom:20px;
+                color:gray;
+                height:40px;
+                right:150px;
+                display:flex;
+                flex-flow: row wrap;
+                justify-content: center;
+                flex-direction: column;
+                text-align: left;
+                vertical-align: middle;
+                line-height: normal;
+            }
+
+            .pick_btn_active {
+                background-color: #5585e6;
+                border: 1px solid #5585e6;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="fp_top">
+            <div class="fp_up" onclick="GoUp();"></div>
+            <input readonly type="text" class="fp_path" id="path">
+        </div>
+        <div class="" id="main_area"></div>
+        <div class="fp_bottom">
+            <div class="pick_btn" id="required_btn" onclick="OnSubmit();">Choose</div>
+            <div class="fb_text"><span id="required_text"></span></div>
+        </div>
+
+        <script>
+            var fileHistory = [];
+            var area = document.getElementById('main_area');
+            var isBusy = false;
+            var lastOpenedPath = null;
+            var windowId = null;
+
+            function DisplayDirListing(path) {
+                //If busy, stop
+                if(isBusy) {
+                    return;
+                }
+                isBusy = true;
+                lastOpenedPath = path;
+
+                //Create placeholder listing
+                var placeholder = MakeDom("div", "main main_placeholder");
+                placeholder.innerText = "Please wait...";
+                UpdateMainArea(placeholder);
+                document.getElementById('path').value = path;
+                fileHistory.push(path);
+                SetOkBtn(false);
+
+                //Set history
+                window.opener.lastPathPack = {
+                    "history":fileHistory,
+                    "path":path
+                };
+
+                //Fetch results
+                SendPathRequest(path, function(data, ok) {
+                    if(ok) {
+                        //Create the table to place objects in
+                        var m = MakeDom("div", "main");
+                        MakeDom("div", "main_table_header main_table_header_top", m).innerText = "Name";
+
+                        //Add results
+                        var isDriveListing = path.length == 0;
+                        if(isDriveListing) {
+                            var drives = JSON.parse(data.drives);
+                            for(var i = 0; i<drives.length; i+=1) {
+                                var o = MakeDom("div", "main_table_header icon_drive main_table_header_deselected", m);
+                                o.innerText = GetFilename(drives[i], path);
+                                o.x_path = drives[i];
+                                o.addEventListener("click", OnClickEntry);
+                                o.addEventListener("dblclick", OnDblClickEntry);
+                            }
+                        } else {
+                            //Set
+                            var dirs = JSON.parse(data.dirs);
+                            for(var i = 0; i<dirs.length; i+=1) {
+                                var o = MakeDom("div", "main_table_header icon_folder main_table_header_deselected", m);
+                                o.innerText = GetFilename(dirs[i], path)+"\\";
+                                o.x_path = dirs[i];
+                                o.addEventListener("click", OnClickEntry);
+                                o.addEventListener("dblclick", OnDblClickEntry);
+                            }
+                            var files = JSON.parse(data.files);
+                            for(var i = 0; i<files.length; i+=1) {
+                                var o = MakeDom("div", "main_table_header icon_file main_table_header_deselected", m);
+                                o.innerText = GetFilename(files[i], path);
+                                o.x_path = files[i];
+                                o.addEventListener("click", OnClickEntry);
+                            }
+
+                            //Check if our requirements are met
+                            var foundExts = [];
+                            for(var i = 0; i<files.length; i+=1) {
+                                for(var j = 0; j<REQUIRED_EXTS.length; j+=1) {
+                                    var ext = REQUIRED_EXTS[j];
+                                    var fi = files[i].toLowerCase();
+                                    fi = fi.substr(fi.lastIndexOf("."));
+                                    if(fi == ext && !foundExts.includes(ext)) {
+                                        foundExts.push(ext);
+                                    }
+                                }
+                            }
+                            var isFound = foundExts.length == REQUIRED_EXTS.length;
+                            SetOkBtn(isFound);
+                        }
+
+                        //Update
+                        isBusy = false;
+                        UpdateMainArea(m);
+                    } else {
+                        //Failed! TODO
+                        if(fileHistory.length == 0) {
+                            placeholder.innerText = "Sorry, the filepicker failed to fetch drives. Contact support.";
+                        } else {
+                            placeholder.innerText = "Can't get this folder. Click here to go back.";
+                            placeholder.addEventListener("click", GoUp);
+                        }
+                        isBusy = false;
+                    }
+                })
+            }
+
+            var REQUIRED_EXTS = [];
+            var REQUIREMENTS_MET = false;
+
+            function SetRequirements(text, requiredExts) {
+                document.getElementById('required_text').innerText = text;
+                REQUIRED_EXTS = requiredExts;
+                SetOkBtn(false);
+            }
+
+            function OnSubmit() {
+                if(!REQUIREMENTS_MET) {
+                    return;
+                }
+                window.opener.EndPickPath(windowId, lastOpenedPath);
+                window.close();
+            }
+
+            function SetOkBtn(status) {
+                REQUIREMENTS_MET = status;
+                var e = document.getElementById('required_btn');
+                if(status) {
+                    e.classList.add("pick_btn_active");
+                } else {
+                    e.classList.remove("pick_btn_active");
+                }
+            }
+
+            function GetFilename(name, path) {
+                var p = name.substr(path.length);
+                if(p[0] == "/" || p[0] == "\\") {
+                    p = p.substr(1);
+                }
+                return p;
+            }
+
+            function GoUp() {
+                if(isBusy) {
+                    return;
+                }
+                var lastPath = fileHistory.splice(fileHistory.length - 1, 1)[0];
+                while(fileHistory[fileHistory.length - 1] == lastPath) {
+                    fileHistory.splice(fileHistory.length - 1, 1);
+                }
+                DisplayDirListing(fileHistory[fileHistory.length - 1]);
+            }
+
+            function OnDblClickEntry() {
+                //Switch
+                DisplayDirListing(this.x_path);
+            }
+
+            function OnClickEntry() {
+                //Deselect others
+                var others = this.parentElement.getElementsByClassName("main_header_selected");
+                for(var i = 0; i<others.length; i+=1) {
+                    others[i].classList.add("main_table_header_deselected");
+                    others[i].classList.remove("main_header_selected");
+                }
+
+                //Select this
+                this.classList.remove("main_table_header_deselected");
+                this.classList.add("main_header_selected");
+            }
+
+            function UpdateMainArea(e) {
+                area.parentElement.replaceChild(e, area);
+                area = e;
+            }
+
+            function MakeDom(type, classname, parent) {
+                var e = document.createElement(type);
+                e.className = classname;
+                if(parent != null) {
+                    parent.appendChild(e);
+                }
+                return e;
+            }
+
+            function SendPathRequest(path, callback) {
+                //Get ID and add callback
+                var rid = window.opener.rscFileCallbackIndex++;
+                window.opener.rscFileCallbacks[rid] = callback;
+
+                //Create request and send it
+                var d = {
+                    "rid":rid,
+                    "path":path
+                };
+                window.opener.SendRscMessage(10, d);
+            }
+
+            function Init(id, text, requiredExts, defaultPath) {
+                windowId = id;
+                fileHistory = defaultPath.history;
+                DisplayDirListing(defaultPath.path);
+                SetRequirements(text, requiredExts);
+            }
+
+            //SetRequirements("Select your ARK saves folder. This folder should contain a .ark file, and is usually located in /ShooterGame/Saved/SavedArks/.", [".ark"]);
+        </script>
+    </body>
+</html>

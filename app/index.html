@@ -36,13 +36,13 @@
         <meta name="msapplication-TileColor" content="#00a300">
         <meta name="msapplication-config" content="/browserconfig.xml">
         <meta name="theme-color" content="#ffffff">
-        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
         <script>
         (adsbygoogle = window.adsbygoogle || []).push({
             google_ad_client: "ca-pub-5630889835669988",
             enable_page_level_ads: true
         });
-        </script>
+        </script>-->
         <style>
             .leaflet-marker-icon {
                 /*transition:transform 200ms;*/
@@ -140,7 +140,7 @@
                 <div class="bottom_nav_servers" id="bottom_nav_servers" style="display:none;"></div>
                 <span class="bottom_nav_name_upper">Delta</span><span class="bottom_nav_name_lower">WebMap</span>
                 <a class="bottom_nav_link" href="/privacy" target="_blank">Privacy</a>
-                <a class="bottom_nav_link" href="/privacy" target="_blank">Report Error</a>
+                <a class="bottom_nav_link" href="javascript:main.startReportError()">Report Error</a>
             </div>
 
             <!-- Left sidebar -->
@@ -175,7 +175,7 @@
                         <div class="me_badge_text_title" id="me_badge_title">RomanPort</div>
                         <div class="me_badge_text_sub" id="me_badge_tribe">The TSA</div>
                     </div>
-                    <div class="sidebar_server_badge sidebar_profile_image_badge me_badge_settings" onclick="usett.show();"></div>
+                    <div class="sidebar_server_badge sidebar_profile_image_badge me_badge_settings" onclick="window.open('/me/', '_blank');"></div>
                 </div>
             </div>
 
@@ -261,7 +261,8 @@
 
     <!-- Scripts -->
     <script src="/assets/app/analytics.js"></script>
-    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+    <script src="/assets/app/external/leaflet.js"></script>
+    <script src="/assets/app/external/html2canvas.min.js"></script>
     <script src="/assets/app/gateway.js"></script>
     <script src="/assets/app/form.js"></script>
     <script src="/assets/app/frontend.js"></script>

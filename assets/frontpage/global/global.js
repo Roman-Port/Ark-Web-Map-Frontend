@@ -31,6 +31,29 @@ delta.serverRequest = function(url, args, callback) {
     xmlhttp.send(args.body);
 }
 
+delta.me = null;
+delta.signedIn = null;
+delta.waiting_me = []; //Callbacks waiting for user data to download
+delta.waiting_me_fail = []; //Callbacks waiting for user data to download
+
+delta.getUserAsync = function(callback, fail_callback) {
+    //If we already have the data, just return that
+    if(delta.me != null) {
+        callback(delta.me);
+        return;
+    }
+
+    //If we're already known to have failed login, send that too
+    if(delta.signedIn != null && delta.signedIn == false) {
+        fail_callback(401);
+        return;
+    }
+
+    //We'll attach our callback to the global user data callback
+    delta.waiting_me.push(callback);
+    delta.waiting_me_fail.push(fail_callback);
+}
+
 delta.createDom = function(type, classname, parent) {
     var e = document.createElement(type);
     e.className = classname;
@@ -42,15 +65,30 @@ delta.createDom = function(type, classname, parent) {
 
 delta.initHeader = function() {
     //Authorize us
-    delta.serverRequest("https://deltamap.net/api/users/@me/", {}, function(d) {
+    delta.serverRequest("https://deltamap.net/api/users/@me/", {"failOverride":function(ds) {
+        //Accept clients waiting
+        for(var i = 0; i<delta.waiting_me_fail.length; i+=1) {
+            delta.waiting_me_fail[i](ds.status);
+        }
+        delta.waiting_me_fail = [];
+        delta.signedIn = false;
+    }}, function(d) {
         //Change login button
-        document.getElementById('g_header_login_a').href = "/app/";
+        document.getElementById('g_header_login_a').href = "/me/";
         var btn = document.getElementById('g_header_login_b');
         btn.classList.add("g_header_big_btn_user");
         btn.classList.remove("g_header_big_btn_go");
         btn.innerHTML = "";
         delta.createDom("img", "", btn).src = d.profile_image_url;
         delta.createDom("span", "", btn).innerText = d.screen_name;
+
+        //Accept clients waiting
+        delta.me = d;
+        delta.signedIn = true;
+        for(var i = 0; i<delta.waiting_me.length; i+=1) {
+            delta.waiting_me[i](d);
+        }
+        delta.waiting_me = [];
     });
 }
 

@@ -27,8 +27,24 @@ body, html {
     background-color: #fafafa;
 }
 
-.main_content {
+.status_warning {
+    background-color: #e3453d;
+    padding:10px;
+    font-family: 'Open Sans', sans-serif;
+    color:white;
+    font-size:15px;
+    margin-bottom:10px;
+    border-radius: 8px;
+    display:block;
+    text-align: center;
+}
 
+.main_content {
+    color: rgb(72, 78, 121);
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+    font-size:16px;
+    margin-top:15px;
 }
 
 .main_content_fit {
@@ -38,11 +54,88 @@ body, html {
     margin-right: auto;
 }
 
+h1 {
+    font-weight: 800;
+    font-family: 'Rubik', sans-serif;
+    color: rgb(58, 65, 111);
+}
+
+.text {
+    color: rgb(72, 78, 121);
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+    font-size:16px;
+}
+
+p {
+    color: rgb(72, 78, 121);
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-size:16px;
+}
+
+mp {
+    color: rgb(72, 78, 121);
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+    display: block;
+    font-size:14px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #eaeaea;
+    margin: 1em 0;
+    padding: 0;
+}
+
+box_info {
+    background-color:whitesmoke;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-size:16px;
+    color: rgb(72, 78, 121);
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+    display: block;
+    padding:15px;
+    border-radius: 5px;
+    border:1px solid #dedede;
+}
+
+box_warning {
+    background-color: rgb(253, 237, 224);
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-size: 16px;
+    color: rgb(72, 78, 121);
+    font-weight: 200;
+    font-family: 'Open Sans', sans-serif;
+    display: block;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid rgb(218, 194, 175);
+}
+
 /* Header */
 
 .g_header_container {
     border-bottom:1px solid #eaeaea;
-    margin-bottom:15px;
     background-color: #fafafa;
 }
 

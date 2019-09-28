@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Sign In Complete</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body, html {
+            margin:0;
+            padding:0;
+            background-color: #191a1c;
+        }
+
+        .modal {
+            min-height: 50px;
+            padding-top: 20px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            background-color: #33363c;
+            border-top: 1px solid #50545b;
+            color: white;
+            padding-bottom: 10px;
+            position: fixed;
+            bottom:0;
+            left:0;
+            right:0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .modal_title {
+            color: white;
+            font-weight: 600;
+            font-size: 22px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .modal_text {
+            font-size: 14px;
+            color: white;
+            text-align: left;
+            padding-left: 15px;
+            padding-right: 15px;
+            margin-top: 8px;
+            color: #d8d8d8;
+            padding-bottom:10px;
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <noscript>
+        <div class="modal">
+            <div class="modal_title">Sign in Problem</div>
+            <div class="modal_text">Please enable JavaScript to sign in.</div>
+        </div>
+    </noscript>
+    <div class="modal" id="result" style="display:none;">
+        <div class="modal_title" id="rt">Sign in Complete!</div>
+        <div class="modal_text" id="rs">Go back into the app to get started. It's safe to close this tab.</div>
+    </div>
+    <script>
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status != 200) {
+                document.getElementById('rt').innerText = "Sign In Problem"
+                document.getElementById('rs').innerText = "There was an error sending the code. You might see this if you reload the page later.";
+            }
+            document.getElementById('result').style.display = "block";
+        }
+        xmlhttp.open("PUT", "https://deltamap.net/api/mobile_login_code/?code="+encodeURIComponent(window.location.hash.substr(1)), true);
+        xmlhttp.send(localStorage.getItem("access_token"));
+    </script>
+</body>
+</html>

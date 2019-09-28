@@ -28,6 +28,12 @@ delta.serverRequest = function(url, args, callback) {
         //Include auth
         xmlhttp.setRequestHeader("Authorization", "Bearer "+localStorage.getItem("access_token"));
     }
+    if(args.headers != null) {
+        var keys = Object.keys(args.headers);
+        for(var i = 0; i<keys.length; i+=1) {
+            xmlhttp.setRequestHeader(keys[i], args.headers[keys[i]]);
+        }
+    }
     xmlhttp.send(args.body);
 }
 

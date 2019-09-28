@@ -23,13 +23,6 @@ ark.init = function(d) {
         localStorage.setItem("latest_server", d.id);
     }
 
-    //Set offline/online status
-    if(d.is_online) {
-        ark.onServerGoOnline(false);
-    } else {
-        ark.onServerGoOffline();
-    }
-
     //Download session data
     ark.downloadData(d.endpoint_createsession, "session", {}, function(s) {
         ark.session = s;
@@ -59,43 +52,7 @@ ark.initAndVerify = function(d, isFirstStart, msgDismissCallback) {
 }
 
 ark.verify = function(d, doShowMsg, isFirstStart, msgDismissCallback) {
-    //Check data version
-    if(d.report_data_version < ark.MIN_DATA_VERSION || d.offline_data_version < ark.MIN_DATA_VERSION) {
-        if(doShowMsg) {
-            if(isFirstStart) {
-                form.add("The Last Server You Used Can No Longer Be Used", [
-                    {
-                        "type":"text",
-                        "text":"The last server you used is too far out of date to be used. Ask your server owner to start the Delta Web Map service. Select a new server."
-                    }
-                ], [
-                    {
-                        "type":0,
-                        "name":"Okay",
-                        "callback":function() {
-                            ark.showServerPicker(false);
-                            if(msgDismissCallback != null) {msgDismissCallback()}
-                        }
-                }], "xform_area_interrupt");
-            } else {
-                form.add("This Server Can't Be Used", [
-                    {
-                        "type":"text",
-                        "text":"This server has not been started in a while and the data is too far out of date. Ask your server owner to start the Delta Web Map service."
-                    }
-                ], [
-                    {
-                        "type":0,
-                        "name":"Okay",
-                        "callback":function() {
-                            if(msgDismissCallback != null) {msgDismissCallback()}
-                        }
-                }], "xform_area_interrupt");
-            }
-        }
-        return false;
-    }
-
+    //No longer needed
     return true;
 }
 
@@ -191,38 +148,9 @@ ark.switch = function(d) {
     ark.init(d);
 }
 
-ark.getOfflineData = function(callback, failCallback) {
-    //Check if we already have it.
-    if(ark.cachedOfflineData != null) {
-        callback(ark.cachedOfflineData);
-        return;
-    }
-
-    //We'll need to download it
-    main.log("ark-subserver", 1, "Downloading offline data...");
-    main.serverRequest(ark.getServerData().endpoint_offline_data, {"failOverride":function() {
-        failCallback("Couldn't download offline data. Try again later, or choose a new server.");
-    }, "enforceServer":true}, function(d) {
-        //Set it in the cache
-        ark.cachedOfflineData = d;
-        callback(d);
-    });
-}
-
 ark.downloadData = function(url, offlineDataKey, args, callback, failCallback) {
-    //If we already know the server is offline, use offline data
-    if(!main.currentServerOnline) {
-        ark.getOfflineData(function(offline) {
-            //Get this from the key
-            if(offline[offlineDataKey] == null) {
-                failCallback();
-            } else {
-                callback(offline[offlineDataKey]);
-            }
-        }, failCallback);
-        return;
-    }
-
+    //Function used back when offline data was used
+    
     //Download
     var fail = function(d) {
         //Failed. Check the status.

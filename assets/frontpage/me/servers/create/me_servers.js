@@ -268,6 +268,7 @@ function SubmitIntroForm() {
     var d = {
         "maps": MultipleFormGetValue(activeArea.getElementsByClassName('form_map')[0]),
         "type": FormGetValue(activeArea.getElementsByClassName('form_type')[0]),
+        "hosting": FormGetValue(activeArea.getElementsByClassName('form_hosting')[0]),
         "platform": FormGetValue(activeArea.getElementsByClassName('form_platform')[0])
     };
     introSettings = d;
@@ -275,6 +276,10 @@ function SubmitIntroForm() {
 
     //Now, go to the next slide
     ShowSlide("login", d);
+}
+
+function ShowFormOption(className) {
+    activeArea.getElementsByClassName(className)[0].classList.remove("user-option-form-hidden");
 }
 
 var latestImgToken = null;

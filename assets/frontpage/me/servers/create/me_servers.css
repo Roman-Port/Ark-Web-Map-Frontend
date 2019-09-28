@@ -56,6 +56,10 @@ user-option-form {
 
 }
 
+.user-option-form-hidden {
+    display:none;
+}
+
 user-option-form-options {
     margin-top:4px;
     margin: 0;

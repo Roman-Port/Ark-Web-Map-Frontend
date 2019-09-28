@@ -116,7 +116,7 @@ dinopop.show = function(x, y, data) {
 
     //Create name
     var ce = main.createDom("div", "popout_name", e);
-    main.createDom("div", "popout_name_title", ce).innerText = data.dino.tamedName;
+    main.createDom("div", "popout_name_title", ce).innerText = data.dino.tamed_name;
     main.createDom("div", "popout_name_sub", ce).innerText = data.dino_entry.screen_name+" - Lvl "+data.dino.level;
 
     //Add actual content
@@ -148,7 +148,7 @@ dinopop.createStatsBox = function(data, parent) {
         var statName = statusesToUse[i];
         var statusEntry = dinopop.statusEntries[statName];
         var maxStat = data.max_stats[statName];
-        var currentStat = data.dino.currentStats[statName];
+        var currentStat = data.dino.current_stats[statName];
 
         //Create a DOM element
         var e = main.createDom('div', 'stats_item stats_item_tweaked');
@@ -189,7 +189,7 @@ dinopop.createStaticStatsBox = function(data, parent) {
         //Get data
         var statName = statusesToUse[i];
         var statusEntry = dinopop.statusEntries[statName];
-        var value = data.dino.currentStats[statName];
+        var value = data.dino.current_stats[statName];
 
         //Add breaks if needed
         if(i != 0) {
@@ -211,18 +211,18 @@ dinopop.createItemsBox = function(data, parent) {
         var entry = main.createDom("li", "popout_stats_item", e);
         if(itemClass == null) {
             //Fallback
-            main.createDom("div", "popout_stats_item_text popout_stats_item_text_topleft", entry).innerText = "x"+item.stackSize.toString();
+            main.createDom("div", "popout_stats_item_text popout_stats_item_text_topleft", entry).innerText = "x"+item.stack_size.toString();
             main.createDom("div", "popout_stats_item_text popout_stats_item_text_bottomright", entry).innerText = "Missing Item Data";
         } else {
             entry.style.backgroundImage = "url('"+itemClass.icon.image_url+"')";
 
-            var stackWeightRounded = Math.round(itemClass.baseItemWeight * item.stackSize * 10) / 10;
+            var stackWeightRounded = Math.round(itemClass.baseItemWeight * item.stack_size * 10) / 10;
             var name = stackWeightRounded.toString();
             if(stackWeightRounded % 1 == 0) {
                 name += ".0";
             }
 
-            main.createDom("div", "popout_stats_item_text popout_stats_item_text_topleft", entry).innerText = "x"+item.stackSize.toString();
+            main.createDom("div", "popout_stats_item_text popout_stats_item_text_topleft", entry).innerText = "x"+item.stack_size.toString();
             main.createDom("div", "popout_stats_item_text popout_stats_item_text_bottomright", entry).innerText = name;
         }
     }

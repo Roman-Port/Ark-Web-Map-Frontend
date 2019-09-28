@@ -25,52 +25,52 @@
                     <user-option-form-description>This is the console or platform that you play the game on. <u>If you're on Windows 10 and run the game through the Xbox app, choose Xbox.</u></user-option-form-description>
                     <user-option-form-error>Unfortunately, we can only support PC at this time because we cannot access the server save file.</user-option-form-error>
                     <user-option-form-options>
-                        <user-option-element data-name="pc" data-error="-1" onclick="FormClickElement(this)" class="user-option-element-active"><user-option-element-title>PC</user-option-element-title></user-option-element>
-                        <user-option-element data-name="mac" data-error="-1" onclick="FormClickElement(this)"><user-option-element-title>Mac OS</user-option-element-title></user-option-element>
-                        <user-option-element data-name="linux" data-error="-1" onclick="FormClickElement(this)"><user-option-element-title>Linux</user-option-element-title></user-option-element>
+                        <user-option-element data-name="pc" data-error="-1" onclick="FormClickElement(this); ShowFormOption('form_hosting');" class=""><user-option-element-title>PC</user-option-element-title></user-option-element>
+                        <user-option-element data-name="mac" data-error="-1" onclick="FormClickElement(this); ShowFormOption('form_hosting');"><user-option-element-title>Mac OS</user-option-element-title></user-option-element>
+                        <user-option-element data-name="linux" data-error="-1" onclick="FormClickElement(this); ShowFormOption('form_hosting');"><user-option-element-title>Linux</user-option-element-title></user-option-element>
                         <user-option-element data-name="xbox" data-error="1" onclick="FormClickElement(this)"><user-option-element-title>Xbox</user-option-element-title></user-option-element>
                         <user-option-element data-name="ps4" data-error="1" onclick="FormClickElement(this)"><user-option-element-title>PS4</user-option-element-title></user-option-element>
                         <user-option-element data-name="other" data-error="1" onclick="FormClickElement(this)"><user-option-element-title>Other</user-option-element-title></user-option-element>
                     </user-option-form-options>
                 </user-option-form>
 
-                <user-option-form>
+                <user-option-form class="form_hosting user-option-form-hidden">
                     <user-option-form-title>Hosting</user-option-form-title>
                     <user-option-form-description>This is where your server is being operated. If you don't know, you're likely using a provider.</user-option-form-description>
                     <user-option-form-error>Unfortunately, we only support self hosting right now. You should ask your server provider to integrate Delta Web Map into their services. If you're a provider, click <a href="/providers/">here</a>.</user-option-form-error>
                     <user-option-form-options>
-                        <user-option-element data-name="self" data-error="-1" onclick="FormClickElement(this)" class="user-option-element-description user-option-element-active"><user-option-element-title>Self</user-option-element-title><user-option-element-description>Use this option if you run your server off of your own computer by running ShooterGameServer.exe.</user-option-element-description></user-option-element>
-                        <user-option-element data-name="provider" data-error="1" onclick="FormClickElement(this)" class="user-option-element-description"><user-option-element-title>Provider</user-option-element-title><user-option-element-description>Use this option if you pay monthly/yearly for someone else to host your server for you, such as Nitrado.</user-option-element-description></user-option-element>
+                        <user-option-element data-name="self" data-error="-1" onclick="FormClickElement(this); ShowFormOption('form_type');" class="user-option-element-description"><user-option-element-title>Self</user-option-element-title><user-option-element-description>Use this option if you run your server off of your own computer by running ShooterGameServer.exe.<br><br>If you use this option, you'll need to download our light client program to read your ARK save file.</user-option-element-description></user-option-element>
+                        <user-option-element data-name="provider" data-error="-1" onclick="FormClickElement(this); ShowFormOption('form_type');" class="user-option-element-description"><user-option-element-title>Provider</user-option-element-title><user-option-element-description>Use this option if you pay monthly/yearly for someone else to host your server for you, such as Nitrado.<br><br>If you use this option, you'll need to provide FTP credentials so we can download your ARK save file.</user-option-element-description></user-option-element>
                     </user-option-form-options>
                 </user-option-form>
 
-                <user-option-form class="form_type">
+                <user-option-form class="form_type user-option-form-hidden">
                     <user-option-form-title>Server Type</user-option-form-title>
                     <user-option-form-description>This is the type of server you host. If you don't know, your server is likely to be a single server.</user-option-form-description>
                     <user-option-form-error>This form is not for you. Please see our <a href="/providers/">providers page</a> for information about how to integrate Delta Web Map into your services. We'd love to have you.</user-option-form-error>
                     <user-option-form-options>
-                        <user-option-element data-name="single" data-error="-1" onclick="FormClickElement(this)" class="user-option-element-description user-option-element-active"><user-option-element-title>Single</user-option-element-title><user-option-element-description>This is the most common option. Use this if your unoffical server does not allow uploads/downloads to other servers.</user-option-element-description></user-option-element>
-                        <user-option-element data-name="cluster" data-error="-1" onclick="FormClickElement(this)" class="user-option-element-description"><user-option-element-title>Cluster</user-option-element-title><user-option-element-description>Use this option if you operate multiple servers that support uploads/downloads to each other. You'll know if you use this option.</user-option-element-description></user-option-element>
-                        <user-option-element data-name="provider" data-error="1" onclick="FormClickElement(this)" class="user-option-element-description"><user-option-element-title>Provider</user-option-element-title><user-option-element-description>Use this option if you provide servers to other users for a fee. Normal users will not use this option.</user-option-element-description></user-option-element>
+                        <user-option-element data-name="single" data-error="-1" onclick="FormClickElement(this); ShowFormOption('form_map user-option-errored');" class="user-option-element-description"><user-option-element-title>Single</user-option-element-title><user-option-element-description>This is the most common option. Use this if your unoffical server does not allow uploads/downloads to other servers.</user-option-element-description></user-option-element>
+                        <user-option-element data-name="cluster" data-error="-1" onclick="FormClickElement(this); ShowFormOption('form_map user-option-errored');" class="user-option-element-description"><user-option-element-title>Cluster</user-option-element-title><user-option-element-description>Use this option if you operate multiple servers that support uploads/downloads to each other. You'll know if you use this option.</user-option-element-description></user-option-element>
+                        <user-option-element data-name="provider" data-error="1" onclick="FormClickElement(this);" class="user-option-element-description"><user-option-element-title>Provider</user-option-element-title><user-option-element-description>Use this option if you provide servers to other users for a fee. Normal users will not use this option.</user-option-element-description></user-option-element>
                     </user-option-form-options>
                 </user-option-form>
 
-                <user-option-form class="form_map user-option-errored">
+                <user-option-form class="form_map user-option-errored user-option-form-hidden">
                     <user-option-form-title>ARK Maps</user-option-form-title>
                     <user-option-form-description>Select all of the map(s) that your server(s) use.</user-option-form-description>
                     <user-option-form-error>A map you selected is currently unsupported, but support may be added soon. Click <a href="/request/map/">here</a> to request a map.</user-option-form-error>
                     <user-option-form-error-select style="display:block;">You need to select at least one map.</user-option-form-error-select>
                     <user-option-form-options>
-                        <user-option-element data-name="0" data-error="1" onclick="FormSelectMultipleClickElement(this)"><user-option-element-title>The Island</user-option-element-title></user-option-element>
-                        <user-option-element data-name="1" data-error="-1" onclick="FormSelectMultipleClickElement(this)"><user-option-element-title>The Center</user-option-element-title></user-option-element>
-                        <user-option-element data-name="2" data-error="1" onclick="FormSelectMultipleClickElement(this)"><user-option-element-title>Scorched Earth</user-option-element-title></user-option-element>
-                        <user-option-element data-name="3" data-error="1" onclick="FormSelectMultipleClickElement(this)"><user-option-element-title>Aberration</user-option-element-title></user-option-element>
-                        <user-option-element data-name="4" data-error="-1" onclick="FormSelectMultipleClickElement(this)"><user-option-element-title>Extinction</user-option-element-title></user-option-element>
-                        <user-option-element data-name="5" data-error="1" onclick="FormSelectMultipleClickElement(this)"><user-option-element-title>Other</user-option-element-title></user-option-element>
+                        <user-option-element data-name="0" data-error="1" onclick="FormSelectMultipleClickElement(this); ShowFormOption('form_submit');"><user-option-element-title>The Island</user-option-element-title></user-option-element>
+                        <user-option-element data-name="1" data-error="-1" onclick="FormSelectMultipleClickElement(this); ShowFormOption('form_submit');"><user-option-element-title>The Center</user-option-element-title></user-option-element>
+                        <user-option-element data-name="2" data-error="1" onclick="FormSelectMultipleClickElement(this); ShowFormOption('form_submit');"><user-option-element-title>Scorched Earth</user-option-element-title></user-option-element>
+                        <user-option-element data-name="3" data-error="1" onclick="FormSelectMultipleClickElement(this); ShowFormOption('form_submit');"><user-option-element-title>Aberration</user-option-element-title></user-option-element>
+                        <user-option-element data-name="4" data-error="-1" onclick="FormSelectMultipleClickElement(this); ShowFormOption('form_submit');"><user-option-element-title>Extinction</user-option-element-title></user-option-element>
+                        <user-option-element data-name="5" data-error="1" onclick="FormSelectMultipleClickElement(this); ShowFormOption('form_submit');"><user-option-element-title>Other</user-option-element-title></user-option-element>
                     </user-option-form-options>
                 </user-option-form>
 
-                <user-option-form-submit onclick="SubmitIntroForm();">Add your First Server</user-option-form-submit>
+                <user-option-form-submit class="user-option-form-hidden form_submit" onclick="SubmitIntroForm();">Add your First Server</user-option-form-submit>
             </div>
         </template>
         <template id="slide_login">

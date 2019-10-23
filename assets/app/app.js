@@ -415,10 +415,7 @@ main.init = function() {
 
 main.initDemo = function() {
     //Sets up the demo view 
-    document.getElementsByClassName("top_nav_title_area")[0].style.display = "none";
-    document.getElementsByClassName("bottom_nav")[0].style.display = "none";
-    document.getElementsByClassName("bottom_nav_me_badge")[0].style.display = "none";
-    document.getElementById('dino_sidebar').style.bottom = "0";
+    
 }
 
 main.selectLastServer = function() {
@@ -614,4 +611,66 @@ main.submitErrorReport = function(pack, screenshot_token) {
             }
         ], "xform_area_dim", {});
     });
+}
+
+main.switchMainTab = function(name) {
+    //Find active buttons and disable them
+    var oldBtn = document.getElementsByClassName('left_nav_tab_selected')[0];
+    oldBtn.classList.add("left_nav_tab_unselected");
+    oldBtn.classList.remove("left_nav_tab_selected");
+
+    //Activate new btn
+    var newBtn = document.getElementById('tab_btn_'+name);
+    newBtn.classList.add("left_nav_tab_selected");
+    newBtn.classList.remove("left_nav_tab_unselected");
+
+    //Deactivate old area
+    document.getElementsByClassName('main_tab_active')[0].classList.remove("main_tab_active");
+
+    //Activate new area
+    document.getElementById('tab_'+name).classList.add("main_tab_active");
+}
+
+main.convertFromWorldToGamePos = function(pos) {
+    return (pos / ark.session.mapData.latLonMultiplier) + 50;
+}
+
+main.convertFromWorldToGamePosDisplay = function(pos) {
+    var v = Math.round(main.convertFromWorldToGamePos(pos) * 10);
+    return v / 10;
+}
+
+main.timerUserServerPrefs = null;
+
+main.queueSubmitUserServerPrefs = function() {
+    //Clear timeout if there is one
+    if(main.timerUserServerPrefs != null) {
+        clearTimeout(main.timerUserServerPrefs);
+    }
+    main.timerUserServerPrefs = setTimeout(function() {
+        main.timerUserServerPrefs = null;
+        main.forceSubmitUserServerPrefs();
+    }, 3000);
+}
+
+main.forceSubmitUserServerPrefs = function() {
+    //Stop timeout if any
+    if(main.timerUserServerPrefs != null) {
+        clearTimeout(main.timerUserServerPrefs);
+        main.timerUserServerPrefs = null;
+    }
+    
+    //Send
+    var body = {
+        "drawable_map":0,
+        "map":0,
+        "x":map.map.getCenter().lng,
+        "y":map.map.getCenter().lat,
+        "z":map.map.getZoom()
+    };
+    ark.getServerData().user_prefs = body;
+    main.serverRequest(ROOT_URL+"servers/"+main.currentServerId+"/put_user_prefs", {
+        "body":JSON.stringify(body),
+        "type":"POST"
+    }, function() {});
 }

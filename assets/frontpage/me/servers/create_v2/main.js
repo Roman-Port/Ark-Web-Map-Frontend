@@ -85,6 +85,10 @@ var slides = {
         "template":document.getElementById('slide_choose_hosting'),
         "init":function(e, context, next){next();}
     },
+    "hosting_provider_unsupported":{
+        "template":document.getElementById('slide_err_unsupported_hosting'),
+        "init":function(e, context, next){next();}
+    },
     "login_prompt":{
         "template":document.getElementById('slide_prompt_login'),
         "init":function(e, context, next){next();}
@@ -250,20 +254,16 @@ app.Boot = function() {
     //Startup. First, read args in URL
     var args = app.ParseURLParams();
 
-    //Temp
-    machine_token = "A6392C7CABDC33352E171159B0DAC9D301AB443D0AABDBDBCD4662674DED3E8DE5185B555B53412A51";
-    machine_map_name = "Extinction";
-    app.ShowSaveFilepicker(function() {
-
-    });
-    return;
-
     //If mode is set, follow it
     if(args.mode != null) {
         if(args.mode == "RETURN_LOGIN") {
             //Go to the slide specified
             machine_map_name = args.r_map;
             app.ShowSlide(args.r_slide, null);
+        } else if (args.mode == "ATTACH_SERVER_SELF") {
+            //Add a server to a self-hosted machine
+            machine_token = args.machine_token;
+            app.ShowSlide("choose_map", null);
         } else {
             //Unexpected!
             alert("Unexpected MODE: "+args.mode);
@@ -425,5 +425,19 @@ app.filepicker.GoUp = function() {
 app.filepicker.OnHitAcceptBtn = function() {
     if(app.filepicker.last_path_accepted) {
         app.filepicker.acceptFunction(app.filepicker.last_path);
+    }
+}
+
+/* Misc */
+app.OnPickMap = function(id) {
+    machine_map_name = id;
+    if(machine_token == null) {
+        //Go onto setup
+        app.ShowSlide('hosting_provider', null, false);
+    } else {
+        //We already know our machine token. We'll need to set up. Open file browser
+        app.ShowSaveFilepicker(function() {
+            /* Callback hell */
+        });
     }
 }

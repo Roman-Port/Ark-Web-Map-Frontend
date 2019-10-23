@@ -12,10 +12,8 @@
             <div class="landing_top_title_sub">Delta Web Map is a PVP-safe tool to manage your ARK: Survival Evolved tribe on servers- right from your web browser.</div>
         </div>
         <div class="landing_top_btn_container">
-            <!--<div class="landing_top_btn landing_top_btn_full" onclick="OnClickStartBtn();">Get Started</div>
-            <div class="landing_top_btn" onclick="window.location = '/app/#dwm-demo-frontpage-src';">View Demo</div>-->
-            <div class="landing_top_btn landing_top_btn_full" onclick="OnClickStartBtn();">Pre-Register</div>
-            <div class="landing_top_btn" onclick="window.open('https://discord.gg/99TcfCT', '_blank');">Join Our Discord</div>
+            <div class="landing_top_btn landing_top_btn_full" onclick="OnClickStartBtn();">Get Started</div>
+            <div class="landing_top_btn" onclick="window.location = '/app/#dwm-demo-frontpage-src';">View Demo</div>
         </div>
     </div>
     <div class="landing_top_img_container">
@@ -76,7 +74,7 @@
     <div class="landing_mid_title_sub" style="text-align: center; margin-bottom: 120px; margin-top: 60px;">...and lastly, it's <b>free forever</b>.</div>
 
     <!-- Welcome box -->
-    <!--<table class="welcome_popup_container">
+    <table class="welcome_popup_container">
         <tbody>
             <tr>
                 <td style="text-align: center;vertical-align: middle;">
@@ -96,29 +94,6 @@
                         </div>
                         <div class="welcome_popup_box_cutout_text">or</div>
                         <div class="welcome_popup_footer">Already a Delta Web Map user? <a href="/login/">Sign in</a>. Service provider? <a href="/providers/">We'd love to get in touch</a>.</div>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>-->
-    <table class="welcome_popup_container">
-        <tbody>
-            <tr>
-                <td style="text-align: center;vertical-align: middle;">
-                    <div class="welcome_popup">
-                        <div class="welcome_popup_header">Pre-Register Now!</div>
-                        <div class="welcome_popup_box welcome_popup_preregister" id="preregister_content">
-                            <div class="welcome_popup_box_title">We're Not Ready Yet</div>
-                            <div class="welcome_popup_box_description">We're aiming for a beta in the coming weeks and a release by the end of the year. Pre-register now so we can let you know when it's time!<br><br>We'll only send you an E-Mail once we're ready. By pre-registering, you're agreeing to our <a target="_blank" href="/privacy/">Terms of Service</a>.</div>
-                            <div class="welcome_popup_box_btn_preregister_frame" id="preregister_email_box">
-                                <input type="email" placeholder="Your E-Mail Address" id="preregister_email" class="welcome_popup_box_btn_preregister_input">
-                                <div class="welcome_popup_box_btn_preregister_btn" onclick="DoPreRegister();">Submit</div>
-                            </div>
-                        </div>
-                        <div class="welcome_popup_box welcome_popup_preregister" id="preregister_behind" style="height:unset; bottom:unset;">
-                            <div class="welcome_popup_box_description" style="padding:20px;">You're ready to go! Consider joining our <a target="_blank" href="https://discord.gg/99TcfCT">Discord server</a>. Thanks!</div>
-                        </div>
-                        <div class="welcome_popup_footer">Service provider? <a href="/providers/">We'd love to get in touch</a>.</div>
                     </div>
                 </td>
             </tr>

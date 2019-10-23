@@ -16,7 +16,6 @@ frontend.toolSetBackgroundImage = function(e, img) {
 }
 
 frontend.setServerData = function(d) {
-    frontend.toolSetBackgroundImage(document.getElementById('map_icon'), d.image_url);
     document.getElementById('map_title').innerText = d.display_name;
     document.getElementById('map_sub_title').innerText = d.map_name;
     frontend.setTribeName(d.tribeName);

@@ -5,11 +5,10 @@
     left:0;
     right:0;
     font-family: 'Roboto', sans-serif;
-    background-color: #252629; 
+    background-color: #252629;
 }
 
 .top_nav_server_icon {
-    background-image: url(https://ark.romanport.com/resources/placeholder_server_images/Tc.png);
     background-position: 50%;
     background-size: 100%;
     width: 40px;
@@ -34,15 +33,21 @@
 
 .top_nav_title_text_area {
     position: absolute;
-    left: 52px;
-    right:0;
-    top: 13px;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 34px;
+    background-color: #252629;
+    padding: 13px;
 }
 
 .top_nav_title_name {
     color:white;
     font-size: 17px;
     line-height: 20px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .top_nav_title_sub {
@@ -53,7 +58,7 @@
 
 .top_nav_search {
     position: absolute;
-    top: 12px;
+    top: -49px;
     width: 330px;
     right: 16px;
     height: 36px;
@@ -200,20 +205,20 @@
 
 /* BOTTOM NAV */
 .bottom_nav {
-    /* Configure */
-    z-index:2;
+    z-index: 2;
     position: absolute;
-    bottom:0px;
-    left:0;
-    right:360px;
-    height:26px;
+    bottom: 0px;
+    left: 260px;
+    right: 0;
+    height: 26px;
     line-height: 26px;
     background-color: #33363c;
-    color:gray;
-    padding-left:8px;
-    padding-right:8px;
+    color: gray;
+    padding-left: 8px;
+    padding-right: 8px;
     font-size: 13px;
     font-family: 'Roboto', sans-serif;
+    border-top: 1px solid #50545b;
 }
 
 .bottom_nav_name_upper {
@@ -282,16 +287,13 @@
     position: absolute;
     right: 0px;
     height: 60px;
-    width:360px;
+    width:260px;
     background-color: #252629;
-    border-radius: 10px;
     font-family: 'Roboto', sans-serif;
     opacity: 1;
     transition: all 150ms;
     transition-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
     bottom: 0px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
     border-top: 1px solid #44474b;
 }
 
@@ -378,4 +380,77 @@
 .top_nav_btn_frame {
     height: 60px;
     position: relative;
+}
+
+/* LEFT NAV */
+.left_nav_area {
+    right: unset;
+    left: 0;
+    width: 260px;
+    top: 0;
+}
+
+.left_nav_content {
+    position: absolute;
+    top: 60px;
+    bottom: 60px;
+    left:0;
+    right:0;
+    padding: 10px 0;
+    border-right: 1px solid #44474b;
+}
+
+.left_nav_tab {
+    margin-bottom: 2px;
+    margin-left: 8px;
+    padding: 7px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    color: #e2e2e2;
+    background-size: 18px;
+    height: 18px;
+    background-position-x: 8px;
+    background-position-y: center;
+    padding-left: 32px;
+    line-height: 18px;
+    font-size: 15px;
+    background-repeat: no-repeat;
+}
+
+.left_nav_tab_unselected {
+    cursor:pointer;
+    color: #bebebe;
+}
+
+.left_nav_tab_unselected:hover {
+    background-color: #45484d94;
+    color: #e2e2e2;
+}
+
+.left_nav_tab_selected {
+    background-color: #45484dFF;
+}
+
+/* Server picker */
+.server_list_v2 {
+    position: absolute;
+    top:0;
+    left:0;
+    width:70px;
+    bottom:0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.server_list_entry {
+    width:48px;
+    height:48px;
+    border:1px solid transparent;
+    margin:10px;
+    background-color: #33363c;
+    line-height:50px;
+    font-size:15px;
+    color:#cbcbcb;
+    text-align: center;
+    cursor:pointer;
+    border-radius: 50%;
 }

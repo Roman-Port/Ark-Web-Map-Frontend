@@ -128,6 +128,7 @@ gateway.onMsg = function(evt) {
     switch(d.opcode) {
         case 4: gateway.onSwitchSessionID(d.sessionId); break;
         case 9: ark.onServerStateChanged(d.serverId, d.isUp); break;
+        case 5: map.onLiveUpdateDinoMsg(d); break; //Known up to date
         case 16: ark.prettyRefreshDefer(); break;
     }
 }

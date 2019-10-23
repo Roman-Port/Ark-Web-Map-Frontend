@@ -40,6 +40,12 @@ ark.init = function(d) {
             map.onEnableTribeDinos(m);
             ark.loading_status += 1;
         }, ark.fatalError);
+
+        //Load dino stats data
+        dino_stats.init(s.endpoint_tribes_dino_stats);
+
+        //Load tribe logs
+        tribelogs.stream (s.endpoint_tribes_log);
     }, ark.fatalError);
 }
 
@@ -57,8 +63,14 @@ ark.verify = function(d, doShowMsg, isFirstStart, msgDismissCallback) {
 }
 
 ark.deinit = function() {
+    //Submit map settings
+    main.forceSubmitUserServerPrefs();
+    
     //Kill dino picker
     dinosidebar.deinit();
+
+    //Clear log
+    tribelogs.clear();
 
     //Kill map
     map.deinit();

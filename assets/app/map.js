@@ -7,13 +7,18 @@ map.onClickQueue = []; //List of events fired when a click is down. Only called 
 
 map.populationMapFilter = "";
 
+map.isInMotion = false;
+
 map.init = function() {
+    //Get prefs so we know where to spawn the map
+    var user_prefs = ark.getServerData().user_prefs;
+
     //Create map
     map.map = L.map('map_part', {
         crs: L.CRS.Simple,
         minZoom: 0,
         /*maxBounds:L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256))*/
-    }).setView([-128, 128], 2);
+    }).setView([user_prefs.y, user_prefs.x], user_prefs.z);
 
     //Set background color
     if(ark.session.mapBackgroundColor != null) {
@@ -64,9 +69,17 @@ map.init = function() {
         draw_map.onDrawMove(e.containerPoint, e.latlng);
     });
     map.map.on("contextmenu", function(){}); //Only used to prevent context menu
+    map.map.on("zoomend", main.queueSubmitUserServerPrefs);
+    map.map.on("moveend", main.queueSubmitUserServerPrefs);
+    map.map.on("move", map.updateReturnBtn);
+    map.map.on("movestart", function(){map.isInMotion = true;});
+    map.map.on("moveend", function(){map.isInMotion = false;});
 
     //Trigger resize of canvas
     draw_map.onResize();
+
+    //Check btn
+    map.updateReturnBtn();
 
     //Show map list
     draw_map.onDoneSwitchServer();
@@ -94,6 +107,24 @@ map.deinit = function() {
 
     //Remove map picker
     document.getElementById('nav_btn_map').classList.add("top_nav_btn_hidden");
+}
+
+map.updateReturnBtn = function() {
+    //Determine if we need to update or not
+    var center = map.map.getCenter();
+    var tolerance = 50;
+    var doReturn = center.lat > tolerance || center.lng < -tolerance || center.lat < -(250 + tolerance) || center.lng > (250 + tolerance);
+    var btn = document.getElementById('map_return_btn');
+    if(doReturn) {
+        btn.classList.add("map_return_btn_active");
+    } else {
+        btn.classList.remove("map_return_btn_active");
+    }
+}
+
+map.resetPos = function() {
+    map.map.setView(L.latLng(-128, 128));
+    main.queueSubmitUserServerPrefs();
 }
 
 map.resetPopulationMap = function(isOn, filteredClassname) {
@@ -130,7 +161,9 @@ map.dynamic_maps = []; //Dynamic maps we're using
 
 map.addDynamicMap = function(type, callback) {
     //Request to begin a dynamic map
-    main.serverRequest("https://dynamic-tiles.deltamap.net/create/"+encodeURIComponent(main.currentServerId)+"/"+encodeURIComponent(type), {"enforceServer":true}, function(d) {
+    main.serverRequest("https://dynamic-tiles.deltamap.net/create/"+encodeURIComponent(main.currentServerId)+"/"+encodeURIComponent(type), {"enforceServer":true, "failOverride":function() {
+        main.addHUDMessage("Layer "+type+" is currently unavailable. Try again later.", "#eb3434", "/assets/icons/baseline-cloud-24px.svg", 5, 11);
+    }}, function(d) {
         //We've created a session. Create an object to insert
         var session = {
             "token":d.token,
@@ -518,7 +551,7 @@ map.onHoverDino = function() {
     this.x_has_hovered_ended = false;
 
     //Stop if we're currently moving the map
-    if(draw_map.isDown) {
+    if(draw_map.isDown || map.isInMotion) {
         return;
     }
 
@@ -633,6 +666,30 @@ map.remoteUpdateMultipleRealtime = function(e) {
             }
         }
     }
+}
+
+map.onLiveUpdateDinoMsg = function(d) {
+    //Make sure that this data contains location data
+    if(d.updates.pos == null) {
+        return;
+    }
+
+    //Get marker
+    var marker = map.getMarkerByName("dinos", d.dino_id);
+    if(marker == null) {
+        return;
+    }
+
+    //Convert position to this
+    var x = (ark.session.mapData.mapImageOffset.x + d.updates.pos.X) / ark.session.mapData.captureSize;
+    var y = (ark.session.mapData.mapImageOffset.y + d.updates.pos.Y) / ark.session.mapData.captureSize;
+
+    //Move marker
+    var pos = map.convertFromNormalizedToMapPos({
+        "x":x+0.5,
+        "y":y+0.5
+    });
+    marker.setLatLng( L.latLng( pos[0], pos[1] ) );
 }
 
 var draw_map = {};
@@ -900,6 +957,9 @@ draw_map.onDoneSwitchServer = function() {
 
 draw_map.latestMaps = [];
 draw_map.setMapPicker = function(data) {
+    return;
+    //Todo
+
     draw_map.latestMaps = data;
     var e = document.getElementById('map_btn_layers_content');
     main.removeAllChildren(e);

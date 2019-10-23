@@ -23,7 +23,7 @@
         <!-- Templates -->
         <template id="slide_intro">
             <div>
-                <h1>Welcome to Delta for Ark!</h1>
+                <h1>Let's Get Started</h1>
                 <h2>To get started, choose the platform this server is using.</h2> 
                 <div class="select_item_binder">
                     <div class="select_btn" onclick="app.ShowSlide('choose_map', null, false);">Steam</div>
@@ -49,12 +49,13 @@
                 <h1>Choose Map</h1>
                 <h2>Pick a map to use on this server. If it isn't listed, it's not supported at this time.</h2> 
                 <div class="select_item_binder">
-                    <div class="select_btn" onclick="machine_map_name = 'Extinction'; app.ShowSlide('hosting_provider', null, false);">Extinction</div>
-                    <div class="select_btn" onclick="machine_map_name = 'Extinction'; app.ShowSlide('hosting_provider', null, false);">Extinction</div>
-                    <div class="select_btn" onclick="machine_map_name = 'Extinction'; app.ShowSlide('hosting_provider', null, false);">Extinction</div>
-                    <div class="select_btn" onclick="machine_map_name = 'Extinction'; app.ShowSlide('hosting_provider', null, false);">Extinction</div>
-                    <div class="select_btn" onclick="machine_map_name = 'Extinction'; app.ShowSlide('hosting_provider', null, false);">Extinction</div>
-                    <div class="select_btn" onclick="machine_map_name = 'Extinction'; app.ShowSlide('hosting_provider', null, false);">Extinction</div>
+                    <div class="select_btn" onclick="app.OnPickMap('TheIsland');">The Island</div>
+                    <div class="select_btn" onclick="app.OnPickMap('TheCenter');">The Center</div>
+                    <div class="select_btn" onclick="app.OnPickMap('ScorchedEarth');">Scorched Earth</div>
+                    <div class="select_btn" onclick="app.OnPickMap('Ragnarok');">Ragnarok</div>
+                    <div class="select_btn" onclick="app.OnPickMap('Aberration');">Aberration</div>
+                    <div class="select_btn" onclick="app.OnPickMap('Extinction');">Extinction</div>
+                    <div class="select_btn" onclick="app.OnPickMap('Valguero');">Valguero</div>
                 </div>
             </div>
         </template>
@@ -73,12 +74,23 @@
                         </div>
                     </div>
                     <div class="select_item_container">
-                        <div class="select_item" onclick="app.PromptLoginReturn('provider_setup');">
+                        <div class="select_item" onclick="app.PromptLoginReturn('hosting_provider_unsupported');">
                             <div class="select_item_title">Provider Hosted</div>
                             <p style="margin-top: 0;">Choose this option if you're using a remote provider to host your server. This is the most common option.</p><p>This setup requires you to provide FTP credentials so we can download the ARK save file.</p>
                             <div class="select_item_btn">Select</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Template for hosting that aren't supported -->
+        <template id="slide_err_unsupported_hosting">
+            <div>
+                <h1>Sorry, We're Not Ready Yet</h1>
+                <h2>Provider hosting isn't quite ready yet. It will be soon. Check back shortly!</h2> 
+                <div class="select_item_binder">
+                    <div class="select_btn" onclick="app.ShowSlide('hosting_provider', null, false);">Back</div>
                 </div>
             </div>
         </template>

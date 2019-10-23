@@ -1,4 +1,4 @@
-@font-face {
+/*@font-face {
     font-family: 'Rubik';
     font-style: normal;
     font-weight: 500;
@@ -166,7 +166,7 @@ box_warning {
     line-height:60px;
     height:60px;
     display:inline-block;
-    font-weight: 800;
+    font-weight: 700;
     font-family: 'Rubik', sans-serif;
     color: rgb(58, 65, 111);
     margin-right: 15px;

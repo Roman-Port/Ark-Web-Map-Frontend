@@ -4,15 +4,16 @@
         <title>Delta Web Map</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link rel="stylesheet" href="/assets/view.css">
-        <link rel="stylesheet" href="/assets/top_nav.css">
         <link rel="stylesheet" href="/assets/bottom_modal.css">
         <link rel="stylesheet" href="/assets/dino_list_sidebar.css">
+        <link rel="stylesheet" href="/assets/top_nav.css">
         <link rel="stylesheet" href="/assets/mini_map_modal.css">
         <link rel="stylesheet" href="/assets/hub.css">
         <link rel="stylesheet" href="/assets/user_settings.css">
         <link rel="stylesheet" href="/assets/dino_popout_user.css">
         <link rel="stylesheet" href="/assets/popup_form.css">
         <link rel="stylesheet" href="/assets/app/form.css">
+        <link rel="stylesheet" href="/assets/tribelogs.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
         <style>
             .leaflet-left {
@@ -23,6 +24,10 @@
 
             .nav_offset {
                 top: 120px;
+            }
+
+            .leaflet-marker-icon {
+                transition:transform 4s;
             }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -35,18 +40,6 @@
         <link rel="shortcut icon" href="/favicon.ico?v=m2RndGLnzl">
         <meta name="msapplication-TileColor" content="#5585e6">
         <meta name="theme-color" content="#5585e6">
-        <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-5630889835669988",
-            enable_page_level_ads: true
-        });
-        </script>-->
-        <style>
-            .leaflet-marker-icon {
-                /*transition:transform 200ms;*/
-            }
-        </style>
     </head>
     <body>
         <div class="loader_view" id="loader_view">
@@ -83,56 +76,18 @@
 
         </div>
 
+        <!-- Server list -->
+        <div class="server_list_v2">
+            <div class="server_list_entry">DTSE</div>
+            <div class="server_list_entry">DTSS</div>
+            <div class="server_list_entry">DTST</div>
+        </div>
+
         <div id="main_view" class="main_view">
             <!-- Top nav -->
             <div class="top_nav">
-                <div class="top_nav_title_area" onclick="uinav.toggleMenu();">
-                    <div class="top_nav_server_icon" id="map_icon"></div>
-                    <div class="top_nav_title_text_area">
-                        <div class="top_nav_title_name" id="map_title"><!-- Server name --></div>
-                        <div class="top_nav_title_sub" id="map_sub_title"><!-- Last updated --></div>
-                    </div>
-                </div>
-                <div class="top_nav_btn_wheel" id="top_nav_btn_wheel">
-                    <div class="top_nav_btn_frame">
-                        <div class="top_nav_search">
-                            <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
-                            <select class="top_nav_search_select" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
-                                <option value="-1">All</option>
-                                <option value="1">Tribemembers</option>
-                                <option value="2">Items</option>
-                                <option value="3">Dinos</option>
-                                <option value="4">Baby Dinos</option>
-                            </select>
-                        </div>
-                        <div class="top_nav_btn_area">
-                            <div id="alerts_area" style="display: inline-block;">
-        
-                            </div>
-                            <div class="top_nav_btn_area_sectioner" id="alerts_area_s" style="display:none;"></div>
-                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_tribe">Tribe</div>
-                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-edit-24px.svg);" id="nav_btn_edit">Edit Server</div>
-                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-exit_to_app-24px.svg);" id="nav_btn_leave">Leave</div>
-                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-lock-24px.svg);" id="nav_btn_private">Private</div>
-                            <div class="top_nav_btn top_nav_btn_hidden" style="background-image: url(/assets/icons/baseline-public-24px.svg);" id="nav_btn_public">Public</div>
-                            <div class="top_nav_btn top_nav_btn_hidden top_nav_btn_map_layer_select" onclick="draw_map.toggleMenu();" style="background-image: url(/assets/icons/baseline-layers-24px.svg);" id="nav_btn_map"><span id="map_btn_layers_title">Tribe Maps</span><div id="map_btn_layers_content" class="map_layer_select_content"></div></div>
-                            <div class="top_nav_btn_area_sectioner"></div>
-                        </div>
-                    </div>
-                    <div class="top_nav_btn_frame">
-                        test
-                    </div>
-                </div>
                 
             </div>
-
-            <!-- Server picker -->
-            <div class="server_picker_sidebar" id="server_picker_sidebar">
-
-            </div>
-
-            <!-- Rpws bottom modal I stole from my appstore -->
-            <div class="bottom_modal_rpws" id="bottom_modal_rpws"></div>
 
             <!-- Bottom nav -->
             <div class="bottom_nav">
@@ -141,59 +96,101 @@
                 <a class="bottom_nav_link" href="/privacy" target="_blank">Privacy</a>
                 <a class="bottom_nav_link" href="javascript:main.startReportError()">Report Error</a>
             </div>
-
-            <!-- Left sidebar -->
-            <div class="sidebar_part smooth_anim sidebar_part_active" id="sidebar_part" style="display:none;">
-
-                <!-- Servers list -->
-                <div class="sidebar_servers">
-                    
-                    <div id="server_list">
-
-                    </div>
+            
+            <!-- Left Sidebar -->
+            <div class="dino_sidebar smooth_anim dino_sidebar_open left_nav_area">
+                <!-- Title -->
+                <div class="top_nav_title_text_area">
+                    <div class="top_nav_title_name" id="map_title"><!-- Server name --></div>
+                    <div class="top_nav_title_sub" id="map_sub_title"><!-- Last updated --></div>
                 </div>
 
-                <!-- No session mask -->
-                <div class="no_session_mask smooth_anim" id="no_session_mask">
-                    
+                <!-- Content -->
+                <div class="left_nav_content">
+                    <div class="left_nav_tab left_nav_tab_selected" id="tab_btn_map" onclick="main.switchMainTab('map'); map.map._sizeChanged = true;" style="background-image:url(/assets/app/icons/left_nav/map.svg)">Overview</div>
+                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_dinos" onclick="main.switchMainTab('dinos');" style="background-image:url(/assets/app/icons/left_nav/dinosaur.png)">Dinos</div>
+                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_tribe" onclick="main.switchMainTab('tribe');" style="background-image:url(/assets/app/icons/left_nav/dinosaur.png)">Tribe</div>
+                    <!--<div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_mods" onclick="main.switchMainTab('mods');" style="background-image:url(/assets/app/icons/left_nav/mod.svg)">Mods</div>
+                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_players" onclick="main.switchMainTab('players');" style="background-image:url(/assets/app/icons/left_nav/people.svg)">Players</div>
+                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_settings" onclick="main.switchMainTab('settings');" style="background-image:url(/assets/app/icons/left_nav/map.svg)">Settings</div>-->
                 </div>
-            </div>
-            <div class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" id="map_part" style="background-color:#1c1d21;">
-                <!-- Actual map -->
-                <canvas class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" style=" z-index: 999; background: transparent; pointer-events: none; " id="map_draw_part"></canvas>
-                <div class="hud_bar_container"><div class="hud_bar" id="hud_bar"></div></div>
-            </div>
-            <!-- Sidebar dino list -->
-            <div class="dino_sidebar smooth_anim dino_sidebar_open" id="dino_sidebar_container">
-                <div id="dino_sidebar" class="dino_sidebar_helper">
 
-                </div>
+                <!-- Bottom -->
                 <div class="bottom_nav_me_badge">
-                    <div class="sidebar_server_badge sidebar_profile_image_badge" id="my_badge" style="background-image: url(&quot;https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/32/3212a8c5a45904e73f3b72142f9eb0c0946ba34e_full.jpg&quot;);"></div>
+                    <div class="sidebar_server_badge sidebar_profile_image_badge" id="my_badge"></div>
                     <div class="me_badge_text">
-                        <div class="me_badge_text_title" id="me_badge_title">RomanPort</div>
-                        <div class="me_badge_text_sub" id="me_badge_tribe">The TSA</div>
+                        <div class="me_badge_text_title" id="me_badge_title"></div>
+                        <div class="me_badge_text_sub" id="me_badge_tribe"></div>
                     </div>
                     <div class="sidebar_server_badge sidebar_profile_image_badge me_badge_settings" onclick="window.open('/me/', '_blank');"></div>
                 </div>
             </div>
 
-            <!-- Dino selector -->
-            <div class="dino_selector" id="dino_selector">
-                <div class="dino_selector_top">
-                    <input type="text" placeholder="Dinosaur Name" oninput="ark.searchDinoPicker(this.value);">
+            <!-- Actual tabs -->
+            <div class="main_tab main_tab_active" id="tab_map">
+                <!-- Map area -->
+                <div class="map_part" id="map_part" style="background-color:#1c1d21;">
+                    <!-- Actual map -->
+                    <canvas class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" style=" z-index: 999; background: transparent; pointer-events: none; " id="map_draw_part"></canvas>
+                    <div class="hud_bar_container"><div class="hud_bar" id="hud_bar"></div></div>
+                    <div class="map_return_btn" id="map_return_btn" onclick="map.resetPos();">Return to Map</div>
                 </div>
-                <div id="dino_selector_results" style="transition:all 300ms; overflow:auto; height: calc(100% - 100px);">
-    
+
+                <!-- Sidebar dino list -->
+                <div class="dino_sidebar smooth_anim dino_sidebar_open" id="dino_sidebar_container">
+                    <div id="dino_sidebar" class="dino_sidebar_helper">
+
+                    </div>
+                </div>
+
+                <!-- Sidebar search -->
+                <div class="top_nav_search">
+                    <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
+                    <select class="top_nav_search_select" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
+                        <option value="-1">All</option>
+                        <option value="1">Tribemembers</option>
+                        <option value="2">Items</option>
+                        <option value="3">Dinos</option>
+                        <option value="4">Baby Dinos</option>
+                    </select>
                 </div>
             </div>
-    
-            <!-- Custom -->
-            <div class="dino_selector" id="custom_view"></div>
-        </div>
 
-        <!-- Create server dialog 
-        <iframe src="/app/servers/create/" id="server_setup" class="server_setup_frame server_setup_frame_disabled"></iframe>-->
+            <div class="main_tab" id="tab_dinos">
+                <div class="dino_stats_title" id="dino_stats_title"></div>
+                <input type="text" class="dino_stats_search" id="dino_stats_search" placeholder="Search" oninput="dino_stats.refresh();">
+
+                <!-- Data -->
+                <div class="dino_stats_container">
+                    <table style="width:100%;white-space: nowrap;">
+                        <tbody id="tab_dinos_table">
+                            <tr>
+                                <th class="dino_stats_list_item_title"></th>
+                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_gender" onclick="dino_stats.changeSort('gender');"></th>
+                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_name" onclick="dino_stats.changeSort('name');">Name</th>
+                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_species" onclick="dino_stats.changeSort('species');">Class</th>
+                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_level" onclick="dino_stats.changeSort('level');">Level</th>
+                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_base_level" onclick="dino_stats.changeSort('base_level');">Base Level</th>
+                                <th class="dino_stats_list_item_title">Colors</th>
+                                <th class="dino_stats_list_item_title">Coordinates</th>
+                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_health" onclick="dino_stats.changeSortStat('health')" style="background-image:url(/assets/ui/status/health.png);"></th>
+                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_stamina" onclick="dino_stats.changeSortStat('stamina')" style="background-image:url(/assets/ui/status/stamina.png);"></th>
+                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_food" onclick="dino_stats.changeSortStat('food')" style="background-image:url(/assets/ui/status/food.png);"></th>
+                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_inventoryWeight" onclick="dino_stats.changeSortStat('inventoryWeight')" style="background-image:url(/assets/ui/status/inventoryWeight.png);"></th>
+                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_oxygen" onclick="dino_stats.changeSortStat('oxygen')" style="background-image:url(/assets/ui/status/oxygen.png);"></th>
+                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_movementSpeedMult" onclick="dino_stats.changeSortStat('movementSpeedMult')" style="background-image:url(/assets/ui/status/movementSpeedMult.png);"></th>
+                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_meleeDamageMult" onclick="dino_stats.changeSortStat('meleeDamageMult')" style="background-image:url(/assets/ui/status/meleeDamageMult.png);"></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tribe Log -->
+            <div class="main_tab main_tab_scrollable" id="tab_tribe">
+                <div class="tribelog_container" id="tribelog_container"></div>
+            </div>
+        </div>
 
         <!-- New custom menu -->
         <table class="new_custom_area new_custom_area_inactive" id="new_custom_area">
@@ -205,58 +202,26 @@
                 </td>
             </tr>
         </table>
-
-        <!-- User settings -->
-        <div class="fs_popup" id="fs_popup">
-            <div class="usersett_content">
-                <div class="usersett_area">
-                    <div class="usersett_sectionheader">Me</div>
-                    <div class="usersett_me" style="height:110px;">
-                        <div class="usersett_me_icon" id="usersett_me_icon"></div>
-                        <div class="usersett_me_text_title" style="top:15px;">Name</div>
-                        <div class="usersett_me_text_content" style="top:35px;" id="mame_usersett"></div>
-                        <div class="usersett_me_text_title" style="top:60px;">Steam ID</div>
-                        <div class="usersett_me_text_content" style="top:80px;" id="steamid_usersett"></div>
-                        <div class="usersett_me_btns">
-                            <div class="master_btn master_btn_rtl master_btn_red" onclick="usett.signOut('@this');">Sign Out</div>
-                        </div>
-                        <div class="usersett_me_btns" style="bottom:15px; top:unset;">
-                            <div class="master_btn master_btn_rtl master_btn_red_outline" onclick="usett.signOut('@all');">Sign Out Everywhere</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="usersett_area">
-                    <div class="usersett_sectionheader">Filter</div>
-                    <div class="usersett_contentbox">
-                        <div class="master_switch_zone" style="margin-top:10px;"><span>Filter</span> <div id="usersett_filter_switch" onclick="ark_users.me.user_settings.vulgar_filter_on = !ark_users.me.user_settings.vulgar_filter_on; ark.setSwitchActive(ark_users.me.user_settings.vulgar_filter_on, this);" class="master_btn master_switch"><div></div></div></div>
-                        <div class="master_switch_zone"><span>Show Blocked</span> <div class="master_btn master_switch" id="usersett_filter_censored_switch" onclick="ark_users.me.user_settings.vulgar_show_censored_on = !ark_users.me.user_settings.vulgar_show_censored_on; ark.setSwitchActive(ark_users.me.user_settings.vulgar_show_censored_on, this);"><div></div></div><div class="master_switch_zone_subtext">If checked, dinos will be shown but their names will not be.</div></div>
-                        <div class="master_switch_zone" id="usersett_customfiltertoggle"><span>Show Custom Block List</span> <div class="master_btn master_btn_blue" id="usersett_filter_blocked_list" onclick="usett.setCustomFilterWords(true);">Show</div><div class="master_switch_zone_subtext">Allows you to add your own list of words, separated by line.</div></div>
-                        
-                        <textarea class="usersett_textara" placeholder="Type custom words, separated by new lines" id="usersett_customfilter" style="display:none;"></textarea>
-                        <div style="margin-top:5px;">The filter hides dinosaur names that contain vulgar or offensive language.</div>
-                    </div>
-                </div>
-                <div class="usersett_area">
-                    <div class="usersett_sectionheader">Hidden Servers</div>
-                    <div id="hidden_servers_usersett"></div>
-                </div>
-                <div class="usersett_area">
-                    <div class="usersett_sectionheader">About ArkWebMap</div>
-                    <div class="usersett_contentbox">
-                        DeltaWebMap © 2019 <a target="_blank" href="https://romanport.com/">RomanPort</a><br>
-                        <a href="https://github.com/Roman-Port/Ark-Web-Map" target="_blank">Open Source</a><br>
-                        Game content is believed to be used under Fair Use. ArkWebMap is not affiliated with the game publisher.
-                    </div>
-                </div>
-            </div>
-            <div class="fs_popup_closebtn" onclick="usett.hide();"></div>
-        </div>
-
-        <div class="fs_popup fs_popup_hub" id="ui_hub">
-            <div class="hub_container smooth_anim" id="hub_container">
-            </div>
-        </div>
     </body>
+
+    <!-- Google Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-messaging.js"></script>
+
+    <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyC1DWyvvPdabxEOkwh1ukVx5nnegCV-Y9g",
+        authDomain: "delta-web-map.firebaseapp.com",
+        databaseURL: "https://delta-web-map.firebaseio.com",
+        projectId: "delta-web-map",
+        storageBucket: "delta-web-map.appspot.com",
+        messagingSenderId: "455995125604",
+        appId: "1:455995125604:web:43b0f25f1c6cb1bfc85471"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    </script>
 
     <!-- Scripts -->
     <script src="/assets/app/analytics.js"></script>
@@ -269,6 +234,8 @@
     <script src="/assets/app/map.js"></script>
     <script src="/assets/app/dino_popout.js"></script>
     <script src="/assets/app/dinolib.js"></script>
+    <script src="/assets/app/dino_stat_list.js"></script>
+    <script src="/assets/app/tribelogs.js"></script>
 
     <script src="/assets/app/ark.js"></script>
     <script src="/assets/app/app.js"></script>

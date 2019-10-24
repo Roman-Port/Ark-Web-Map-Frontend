@@ -8,6 +8,11 @@ ark.MIN_DATA_VERSION = 2;
 ark.loading_status = 0; //Target: 5
 
 ark.init = function(d) {
+    //Check if this server is already active
+    if(main.currentServerId == d.id) {
+        return;
+    }
+
     //Change token
     main.sessionToken += 1;
 
@@ -18,10 +23,15 @@ ark.init = function(d) {
 
     //Set data
     frontend.setServerData(d);
+    frontend.setServerListSelectedServer(d.id);
     main.currentServerId = d.id;
     if(!main.isDemo) {
         localStorage.setItem("latest_server", d.id);
     }
+
+    //Set the window title and URL
+    document.title = "Delta Web Map / "+d.display_name;
+    history.replaceState({}, "Delta Web Map / "+d.display_name, "/app/"+d.id+"/");
 
     //Download session data
     ark.downloadData(d.endpoint_createsession, "session", {}, function(s) {

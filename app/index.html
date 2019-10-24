@@ -27,7 +27,7 @@
             }
 
             .leaflet-marker-icon {
-                transition:transform 4s;
+                /*transition:transform 400ms;*/
             }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -40,6 +40,11 @@
         <link rel="shortcut icon" href="/favicon.ico?v=m2RndGLnzl">
         <meta name="msapplication-TileColor" content="#5585e6">
         <meta name="theme-color" content="#5585e6">
+
+        <meta property="og:site_name" content="Delta Web Map for Ark"/>
+        <meta property="og:title" content="Manage your Ark: Survival Evolved tribe with Delta Web Map"/>
+        <meta property="og:description" content="Delta Web Map is a PVP-safe tool to view your ARK: Survival Evolved tribe on your PC servers."/>
+        <meta property="og:image" content="https://deltamap.net/android-chrome-192x192.png" />
     </head>
     <body>
         <div class="loader_view" id="loader_view">
@@ -76,53 +81,20 @@
 
         </div>
 
-        <!-- Server list -->
-        <div class="server_list_v2">
-            <div class="server_list_entry">DTSE</div>
-            <div class="server_list_entry">DTSS</div>
-            <div class="server_list_entry">DTST</div>
-        </div>
-
         <div id="main_view" class="main_view">
             <!-- Top nav -->
-            <div class="top_nav">
-                
-            </div>
+            <div class="top_nav"></div>
 
-            <!-- Bottom nav -->
-            <div class="bottom_nav">
-                <div class="bottom_nav_servers" id="bottom_nav_servers" style="display:none;"></div>
-                <span class="bottom_nav_name_upper">Delta</span><span class="bottom_nav_name_lower">WebMap</span>
-                <a class="bottom_nav_link" href="/privacy" target="_blank">Privacy</a>
-                <a class="bottom_nav_link" href="javascript:main.startReportError()">Report Error</a>
-            </div>
-            
-            <!-- Left Sidebar -->
-            <div class="dino_sidebar smooth_anim dino_sidebar_open left_nav_area">
-                <!-- Title -->
-                <div class="top_nav_title_text_area">
-                    <div class="top_nav_title_name" id="map_title"><!-- Server name --></div>
-                    <div class="top_nav_title_sub" id="map_sub_title"><!-- Last updated --></div>
-                </div>
-
-                <!-- Content -->
-                <div class="left_nav_content">
-                    <div class="left_nav_tab left_nav_tab_selected" id="tab_btn_map" onclick="main.switchMainTab('map'); map.map._sizeChanged = true;" style="background-image:url(/assets/app/icons/left_nav/map.svg)">Overview</div>
-                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_dinos" onclick="main.switchMainTab('dinos');" style="background-image:url(/assets/app/icons/left_nav/dinosaur.png)">Dinos</div>
-                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_tribe" onclick="main.switchMainTab('tribe');" style="background-image:url(/assets/app/icons/left_nav/dinosaur.png)">Tribe</div>
-                    <!--<div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_mods" onclick="main.switchMainTab('mods');" style="background-image:url(/assets/app/icons/left_nav/mod.svg)">Mods</div>
-                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_players" onclick="main.switchMainTab('players');" style="background-image:url(/assets/app/icons/left_nav/people.svg)">Players</div>
-                    <div class="left_nav_tab left_nav_tab_unselected" id="tab_btn_settings" onclick="main.switchMainTab('settings');" style="background-image:url(/assets/app/icons/left_nav/map.svg)">Settings</div>-->
-                </div>
-
-                <!-- Bottom -->
-                <div class="bottom_nav_me_badge">
-                    <div class="sidebar_server_badge sidebar_profile_image_badge" id="my_badge"></div>
-                    <div class="me_badge_text">
-                        <div class="me_badge_text_title" id="me_badge_title"></div>
-                        <div class="me_badge_text_sub" id="me_badge_tribe"></div>
+            <!-- V3 left sidebar -->
+            <div class="dino_sidebar smooth_anim dino_sidebar_open v3_nav_area">
+                <div class="v3_nav_server_area" id="server_list_v3"></div>
+                <div class="v3_nav_bottom">
+                    <div class="v3_nav_server">
+                        <div class="v3_nav_server_top"><img class="v3_nav_server_top_icon" src="/assets/app/icons/left_nav_v3/add_server.svg">Add Server</div>
                     </div>
-                    <div class="sidebar_server_badge sidebar_profile_image_badge me_badge_settings" onclick="window.open('/me/', '_blank');"></div>
+                    <div class="v3_nav_server">
+                        <div class="v3_nav_server_top"><img class="v3_nav_server_top_icon" src="/assets/app/icons/left_nav_v3/user_settings.svg">User Settings</div>
+                    </div>
                 </div>
             </div>
 

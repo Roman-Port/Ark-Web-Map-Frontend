@@ -104,9 +104,6 @@ map.deinit = function() {
         map.map.remove();
         map.map = null;
     }
-
-    //Remove map picker
-    document.getElementById('nav_btn_map').classList.add("top_nav_btn_hidden");
 }
 
 map.updateReturnBtn = function() {

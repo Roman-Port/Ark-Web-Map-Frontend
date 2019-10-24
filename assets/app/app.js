@@ -33,7 +33,22 @@ main.serverRequest = function(url, args, callback) {
             //Callback
             callback(reply);
         } else if(this.readyState == 4) {
-            if(args.failOverride != null) {
+            if (this.status == 401 || this.status == 403) {
+                //Not authenticated
+                form.add("You've Been Signed Out", [
+                    {
+                        "type":"text",
+                        "text":"The account owner signed you out. Please sign in again."
+                    }
+                ], [
+                    {
+                        "type":0,
+                        "name":"Sign In",
+                        "callback":function() {
+                            main.signin();
+                        }
+                }], "xform_area_interrupt");
+            } else if(args.failOverride != null) {
                 //Check if we should cancel
                 if((args.enforceServer != null && args.enforceServer) && startId != main.sessionToken) {
                     main.log("server-request", 1, "Stopping reply because server changed when it was enforced.");
@@ -42,9 +57,7 @@ main.serverRequest = function(url, args, callback) {
                 
                 args.failOverride(this);
             } else {
-                if (this.readyState == 4 && this.status == 502) {
-                    //This is the error code when the subserver is offline.
-                } else if (this.readyState == 4 && this.status == 500) {
+                if (this.readyState == 4 && this.status == 500) {
                     //Server error.
                     form.add("Server Error", [
                         {
@@ -74,21 +87,6 @@ main.serverRequest = function(url, args, callback) {
                                 window.location.reload();
                             }
                     }], "xform_area_interrupt");
-                } else if (this.readyState == 4 && this.status == 401) {
-                    //Not authenticated
-                    form.add("You've Been Signed Out", [
-                        {
-                            "type":"text",
-                            "text":"The account owner signed you out. Please sign in again."
-                        }
-                    ], [
-                        {
-                            "type":0,
-                            "name":"Sign In",
-                            "callback":function() {
-                                window.location = "/login/";
-                            }
-                    }], "xform_area_interrupt");
                 } else if (this.readyState == 4) {
                     //Other error
                 }
@@ -102,7 +100,8 @@ main.serverRequest = function(url, args, callback) {
     if(args.nocreds == null || !args.nocreds) {
         //Include auth. If we don't have a token, redirect to login now
         if(main.getAccessToken() == null) {
-            window.location = "/login/";
+            main.signin();
+            return;
         } else {
             xmlhttp.setRequestHeader("Authorization", "Bearer "+main.getAccessToken());
         }
@@ -284,39 +283,8 @@ main.removeHUDMessage = function(id) {
     main.refreshHUDMessages();
 }
 
-main.makeServerList = function(onClick) {
-    //Create elements
-    var body = main.createDom("div", "dino_sidebar_helper server_picker_helper");
-    for(var i = 0; i<main.me.servers.length; i+=1) {
-        var s = main.me.servers[i];
-        main.makeServerEntry(body, s.id, s.display_name, s.map_name, s.image_url, onClick);
-    }
-
-    return body;
-}
-
-main.makeServerEntry = function(body, id, name, sub, icon, onclick) {
-    var b = main.createDom("div", "dino_sidebar_item", body);
-    b.x_id = id;
-    main.createDom("img", "server_picker_img", b).src = icon;
-    main.createDom("div", "dino_sidebar_item_title", b).innerText = name;
-    main.createDom("div", "dino_sidebar_item_sub", b).innerText = sub;
-    b.addEventListener("click", onclick);
-}
-
-main.createSidebarServerList = function() {
-    var body = main.makeServerList(function() {
-        var id = this.x_id;
-        
-    });
-
-    //Add "create server" option
-    main.createDom("div", "dino_sidebar_section_header", body);
-    main.makeServerEntry(body, null, "Create Server", "Add your own server!", "/assets/icons/baseline-add-24px.svg", main.onClickServer);
-}
-
 main.createServer = function() {
-    window.location = "/app/servers/create/";
+    window.location = "/me/servers/create/";
 }
 
 main.createLink = function(parent, text, url) {
@@ -360,7 +328,7 @@ main.logout = function() {
                         "type":0,
                         "name":"Sign In Again",
                         "callback":function() {
-                            window.location = "/login/";
+                            main.signin();
                         }
                     }
                 ], "xform_area_interrupt");
@@ -374,6 +342,64 @@ main.logout = function() {
                 
             }
     }], "xform_area_interrupt");
+}
+
+main.signin = function() {
+    var container = main.createDom("div", "xform_element");
+    var body = main.createDom("div", "xform_element_box", container);
+    var top_a = main.createDom("div", "login_v2_top", body);
+    main.createDom("div", "login_v2_top_img", top_a);
+
+    var bottom_a = main.createDom("div", "login_v2_bottom", body);
+
+    main.createDom("div", "login_v2_bottom_title", bottom_a).innerText = "Welcome to Delta Web Map!";
+    main.createDom("div", "login_v2_bottom_sub", bottom_a).innerText = "Sign in to get access to the structures, dinos, and items in your ARK tribe!";
+
+    var terms = main.createDom("div", "login_v2_bottom_btn_terms", bottom_a);
+    main.createDom("span", "", terms).innerText = "By signing in, you're agreeing to our ";
+    var privacy = main.createDom("a", "", terms);
+    privacy.href = "/privacy/";
+    privacy.target = "_blank";
+    privacy.innerText = "Privacy Policy";
+    main.createDom("span", "", terms).innerText = ".";
+
+    var btn = main.createDom("div", "master_btn master_btn_blue", main.createDom("div", "login_v2_bottom_btn_container", terms));
+    btn.innerText = "Login with Steam";
+    btn.addEventListener("click", function() {
+        window.location = "https://deltamap.net/api/auth/steam_auth/?next="+encodeURIComponent(window.location.href);
+    });
+
+    form.add_raw(container, 'xform_area_interrupt', {});
+}
+
+main.promptNoServers = function() {
+    var container = main.createDom("div", "xform_element");
+    var body = main.createDom("div", "xform_element_box", container);
+    var top_a = main.createDom("div", "login_v2_top", body);
+    main.createDom("div", "login_v2_top_img", top_a);
+
+    var bottom_a = main.createDom("div", "login_v2_bottom", body);
+
+    main.createDom("div", "login_v2_bottom_title", bottom_a).innerText = "You Have No ARK Servers!";
+    main.createDom("div", "login_v2_bottom_sub", bottom_a).innerText = "Unfortunately, this app is useless until you have a server.";
+    main.createDom("div", "login_v2_bottom_sub", bottom_a).innerText = "If you just joined a server, wait 10-15 minutes and check back. Or, ask your server owner to set up Delta Web Map on their server.";
+
+    var terms = main.createDom("div", "login_v2_bottom_btn_terms", bottom_a);
+    main.createDom("span", "", terms).innerText = "You're signed in as "+main.me.screen_name+". Not you? ";
+    var privacy = main.createDom("span", "link", terms);
+    privacy.innerText = "Sign out";
+    privacy.addEventListener("click", function() {
+        main.logout();
+    })
+    main.createDom("span", "", terms).innerText = ".";
+
+    var btn = main.createDom("div", "master_btn master_btn_blue", main.createDom("div", "login_v2_bottom_btn_container", terms));
+    btn.innerText = "Add Your Server";
+    btn.addEventListener("click", function() {
+        main.createServer();
+    });
+
+    form.add_raw(container, 'xform_area_interrupt', {});
 }
 
 /* Init */
@@ -391,6 +417,7 @@ main.init = function() {
         main.me = d;
 
         //Set placeholders
+        frontend.refreshServerList();
         frontend.setUserData(d);
         frontend.showServerPlaceholders();
 
@@ -419,8 +446,33 @@ main.initDemo = function() {
 }
 
 main.selectLastServer = function() {
-    var lastServerId = localStorage.getItem("latest_server");
+    //If we have no servers, prompt and show an error
+    if(main.me.servers.length == 0) {
+        main.promptNoServers();
+        return;
+    }
+
+    //First, check if there's a server in the URL
+    var lastServerId;
     var d = null;
+    if(window.location.pathname.split('/').length >= 3) {
+        lastServerId = window.location.pathname.split('/')[2];
+
+        if(lastServerId.length == 24) {
+            //Look for this server
+            d = ark.getServerDataById(lastServerId);
+            if(d == null) {
+                //Notify that it failed
+                form.add("Server not Found", [ { "type":"text", "text":"This URL tries to view a server you don't have access to view." }, { "type":"text", "text":"If you just joined this Ark server, wait 5-15 minutes and check back." } ], [ { "type":0, "name":"Okay", "callback":function() { } }], "xform_area_interrupt");
+            } else {
+                //Load this server
+                main.log("load-server",0,  "Loaded server "+d.id+" from the URL.");
+                ark.initAndVerify(d, true);
+                return;
+            }
+        }
+    }
+    lastServerId = localStorage.getItem("latest_server");
     for(var i = 0; i<main.me.servers.length; i+=1) {
         if(main.me.servers[i].id == lastServerId) {
             d = main.me.servers[i];
@@ -429,7 +481,7 @@ main.selectLastServer = function() {
     if(d != null) {
         ark.initAndVerify(d, true);
     } else {
-        ark.showServerPicker();
+        ark.initAndVerify(main.me.servers[0], true);
     }
 }
 

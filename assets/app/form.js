@@ -7,16 +7,13 @@ form.stack = [];
 form.area = document.getElementById('xform_area');
 
 form.add = function(title, bodyOptions, options, style, extra) { //String, Array, Array, Object
-    //Ensure we have focus. Style should either be xform_area_interrupt or xform_area_dim
-    form._show(style);
-
     //Make sure extras is added
     if(extra == null) {
         extra = {};
     }
 
     //Create a form element
-    var container = main.createDom("div", "xform_element", form.area);
+    var container = main.createDom("div", "xform_element");
     var box = main.createDom("div", "xform_element_box", container);
     var nav = main.createDom("div", "xform_element_nav", box);
     var body = main.createDom("div", "xform_element_body", box);
@@ -48,13 +45,30 @@ form.add = function(title, bodyOptions, options, style, extra) { //String, Array
     }
     container.x_pack = pack;
 
+    return form.add_raw(container, style, extra);
+}
+
+form.add_raw = function(data, style, extra) {
+    //Adds a form after it's data has been created.
+
+    //Make sure extras is added
+    if(extra == null) {
+        extra = {};
+    }
+
+    //Ensure we have focus. Style should either be xform_area_interrupt or xform_area_dim
+    form._show(style);
+
+    //Append
+    form.area.appendChild(data);
+
     //Now, push to stack
     if(extra.pop_under == true) {
         //Push it under this one
-        form.stack.splice(form.stack.length - 1, 0, container);
+        form.stack.splice(form.stack.length - 1, 0, data);
     } else {
         //Go now
-        form._push(container);
+        form._push(data);
     }
 }
 

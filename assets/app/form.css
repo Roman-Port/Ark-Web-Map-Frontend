@@ -23,10 +23,11 @@
 }
 
 .xform_area_interrupt {
-    background: url(/assets/app/img/interrupt_wavy_02.svg), url(/assets/app/img/interrupt_tiled_break.png),linear-gradient(0deg, rgba(28, 29, 35, 0.83) 0%, rgba(28, 29, 35, 0) 44%), url(/assets/app/img/interrupt_wavy_01.svg), #1c1d23;
+    /*background: url(/assets/app/img/interrupt_wavy_02.svg), url(/assets/app/img/interrupt_tiled_break.png),linear-gradient(0deg, rgba(28, 29, 35, 0.83) 0%, rgba(28, 29, 35, 0) 44%), url(/assets/app/img/interrupt_wavy_01.svg), #1c1d23;
     background-position: bottom, bottom, center, bottom, center;
     background-repeat: no-repeat, repeat, repeat, no-repeat;
-    background-size: contain, auto, contain, contain, auto;
+    background-size: contain, auto, contain, contain, auto;*/
+    background:#212124;
 }
 
 .xform_element {

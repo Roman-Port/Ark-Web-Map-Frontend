@@ -76,7 +76,10 @@ dinosidebar.SECTIONS = [
         },
         "onClick":function(d) {
             map.flyToMarkerByName("players", d.arkId);
-        }
+        },
+        "extras":[
+
+        ]
     },
     {
         "name":"Dinos",
@@ -94,14 +97,18 @@ dinosidebar.SECTIONS = [
                     "img":d.img,
                     "img_classes":"dino_sidebar_item_invertedimg",
                     "meta":d,
-                    "level":d.level
+                    "level":d.level,
+                    "x_status":d.status
                 });
             }
             return output;
         },
         "onClick":function(d) {
             map.flyToMarkerByName("dinos", d.id);
-        }
+        },
+        "extras":[
+            "DINO_STATUS"
+        ]
     },
     {
         "name":"Items",
@@ -331,6 +338,20 @@ dinosidebar.addCategoryAsync = function(query, category, done, token) {
             img.src = d.img;
             name.innerText = d.head;
             sub.innerText = d.sub;
+
+            //Add extras
+            if(category.extras.includes("DINO_STATUS")) {
+                var status = main.createDom('div', 'dino_sidebar_item_sub dino_sidebar_item_sub_state', e);
+                if(d.x_status != null) {
+                    var statusData = ark.STATUS_STATES[d.x_status];
+                    status.innerText = statusData.text.toUpperCase();
+                    status.style.color = statusData.modal_color;
+                } else {
+                    status.innerText = "UNKNOWN";
+                    status.style.color = "#E0E0E0";
+                }
+            }
+
             e.x_data = d.meta;
             e.x_category = category;
             e.addEventListener('click', dinosidebar.onClick);

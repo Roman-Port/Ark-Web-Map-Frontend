@@ -65,23 +65,24 @@ dinopop.statusEntries = {
 };
 
 dinopop.downloadAndShow = function(x, y, url, ele) {
-    ele.x_is_loading = true;
-    main.serverRequest(url, {"failOverride":function() {
-        ele.x_is_loading = false;
-        if(ele.x_has_hovered_ended) {
-            map.doEndHover(ele);
-        }
-    }}, function(e) {
-        ele.x_is_loading = false;
+    //Stop if we're already loading
+    if(ele.classList.contains("map_icon_dino_loading")) {
+        return;
+    }
 
+    //Add loading tag
+    ele.classList.add("map_icon_dino_loading");
+
+    //Download
+    main.serverRequest(url, {"failOverride":function() {
+        //Remove loading tag
+        ele.classList.remove("map_icon_dino_loading");
+    }}, function(e) {
         //Show
         dinopop.show(x, y, e);
 
-        //Kill hoverer
-        if(ele.x_modal != null) {
-            ele.x_modal.remove();
-        }
-        ele.x_modal = null;
+        //Remove loading tag
+        ele.classList.remove("map_icon_dino_loading");
     });
 }
 
@@ -110,9 +111,8 @@ dinopop.show = function(x, y, data) {
     var e = main.createDom("div", "popout_modal");
 
     //Add icon
-    var icon = main.createDom("img", "popout_icon", e);
-    icon.src = "/assets/images/blank_50px.png";
-    map.createBackground(icon, data.dino_entry.icon.image_thumb_url);
+    var icon = main.createDom("img", "mini_modal_icon map_icon_base map_icon_dino", e);
+    icon.style.backgroundImage = "url("+data.dino_entry.icon.image_thumb_url+")";
 
     //Create name
     var ce = main.createDom("div", "popout_name", e);
@@ -123,7 +123,9 @@ dinopop.show = function(x, y, data) {
     var co = main.createDom("div", "popout_content", e);
     dinopop.createStatsBox(data, co);
     dinopop.createStaticStatsBox(data, co);
-    dinopop.createItemsBox(data, co);
+    if(data.inventory_items.length > 0) {
+        dinopop.createItemsBox(data, main.createDom("div", "popout_lower_content", e));
+    }
 
     //Place
     e.style.top = y.toString()+"px";
@@ -200,6 +202,17 @@ dinopop.createStaticStatsBox = function(data, parent) {
         var e = main.createDom("li", "popout_staticstats_s", container);
         e.innerText = statusEntry.formatString(value);
         main.createDom("img", "popout_staticstats_s_icon", e).src = statusEntry.icon;
+    }
+
+    //Add state
+    var status = main.createDom("li", "popout_staticstats_s popout_staticstats_status", container);
+    if(data.dino.status != null) {
+        var statusData = ark.STATUS_STATES[data.dino.status];
+        status.innerText = statusData.text.toUpperCase();
+        status.style.color = statusData.modal_color;
+    } else {
+        status.innerText = "UNKNOWN";
+        status.style.color = "#E0E0E0";
     }
 }
 

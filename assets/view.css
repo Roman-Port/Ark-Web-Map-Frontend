@@ -1974,3 +1974,55 @@ a {
     color:#c3c3c3;
     width:80%;
 }
+
+/* Some classes for map items*/
+.map_icon_base {
+    border-radius: 50%;
+    background-color:white;
+    border: 2px solid black;
+    background-repeat: no-repeat;
+    background-position: center;
+    width:40px;
+    height:40px;
+}
+
+.map_icon_dino {
+    background-size:30px;
+}
+
+.mini_modal {
+    position: absolute;
+    top: -12px;
+    left: -16px;
+}
+
+.map_icon_dino:hover .mini_modal {
+    opacity: 1;
+}
+
+.map_icon_base:hover {
+    z-index:9999998 !important;
+}
+
+.map_icon_dino .mini_modal {
+    line-height: initial;
+    min-width:260px;
+}
+
+.map_icon_dino_loading .mini_modal {
+    opacity: 1;
+}
+
+.map_icon_base_loading {
+    z-index:9999999 !important;
+}
+
+.map_icon_tag {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid black;
+    border-radius: 50%;
+}

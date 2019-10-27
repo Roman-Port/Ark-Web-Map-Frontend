@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html id="html">
     <head>
         <meta charset="UTF-8">
@@ -78,7 +79,10 @@
 
         <!-- Form area -->
         <div id="xform_area" class="xform_area">
-
+            <!-- No script error -->
+            <noscript>
+                <div class="xform_element xform_element_shown"><div class="xform_element_box"><div class="xform_element_nav"></div><div class="xform_element_body"><div class="xform_e_title">JavaScript Required</div><div class="xform_e_text">Sorry, JavaScript is required to load this app. Enable it or upgrade your browser.</div></div></div></div>
+            </noscript>
         </div>
 
         <div id="main_view" class="main_view">
@@ -176,6 +180,10 @@
         </table>
     </body>
 
+    <!-- Polyfill 
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=HTMLCanvasElement.prototype.toBlob%2CHTMLDocument%2CJSON%2CNumber.isNaN%2CNumber.parseFloat%2CNumber.parseInt%2CObject.keys%2CURL%2CWindow%2CXMLHttpRequest%2Cdocument.getElementsByClassName%2ClocalStorage%2CrequestAnimationFrame%2C%7Ehtml5-elements%2C%7Eviewport%2Ces2015%2Ces2016%2Ces2017%2Ces2018%2Ces7%2Ces6%2Ces5%2Cdefault%2CBlob%2CPromise%2CPromise.prototype.finally"></script>
+        -->
+
     <!-- Google Firebase -->
     <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-messaging.js"></script>
@@ -191,8 +199,11 @@
         messagingSenderId: "455995125604",
         appId: "1:455995125604:web:43b0f25f1c6cb1bfc85471"
     };
+
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+    messaging.usePublicVapidKey("BMkfrrmH5M0s3-odVAT2-I2T-Xt6xEjfwWuj5zQ0brWOiwH0N8t5urhqAYcJ54TrnRYu3_eC3b5C6veME5tJHqE");
     </script>
 
     <!-- Scripts -->

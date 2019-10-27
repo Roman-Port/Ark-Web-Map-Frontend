@@ -32,24 +32,39 @@
 .popout_name_title {
     font-size: 16px;
     color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .popout_name_sub {
     font-size: 15px;
     color: #b5b5b5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .popout_content {
-    margin-left: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
+    margin-left: 10px;
     margin-right: 10px;
+}
+
+.popout_lower_content {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #2b2d32;
 }
 
 .stats_item {
     display: inline-block;
-    width: calc(50% - 10px);
-    height:32px;
+    width: calc(50% - 4px);
+    height: 38px;
+    margin: 1px 2px;
 }
 
 .stats_item_content {
@@ -60,20 +75,31 @@
 }
 
 .stats_item img {
-    top: 2px;
-    bottom: 2px;
-    left: 2px;
+    top: 5px;
+    bottom: 4px;
+    left: 4px;
     height: 22px;
     width: 22px;
 }
 
 .stats_item .title {
-    font-size: 13px;
-    left:30px;
+    position: absolute;
+    top: 2px;
+    bottom: 0px;
+    line-height: 16px;
+    height: 26px;
+    font-size: 14px;
+    left: 35px;
 }
 
 .stats_item .amount {
-    color: #fffffff7;
+    position: absolute;
+    top: 18px;
+    bottom: 0px;
+    line-height: 13px;
+    left: 35px;
+    color: #ffffffd4;
+    font-size: 12px;
 }
 
 /* Item */
@@ -84,6 +110,7 @@
     border:1px solid #45484e;
     border-radius:5px;
     position: relative;
+    background-color: #33363c;
 
     background-image:url('https://ark.romanport.com/assets/img_failed.png');
     background-position: center;
@@ -99,10 +126,8 @@
     flex-flow: row wrap;
     justify-content: center;
     padding: 0;
-    max-height: 252px;
-    overflow-y: scroll;
-    margin-top: 5px;
-    margin-left:10px;
+    max-height: 162px;
+    overflow-y: auto;
 }
 
 .popout_stats_item_text {
@@ -154,4 +179,13 @@
     height: 9px;
     border-radius: 100%;
     background-color: #45484e;
+}
+
+.popout_staticstats_status {
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 2px 10px;
+    margin: 4px 0;
+    margin-left: 12px;
+    text-transform: uppercase;
 }

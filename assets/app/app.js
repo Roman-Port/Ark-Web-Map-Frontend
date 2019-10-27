@@ -432,10 +432,40 @@ main.init = function() {
     
             //We'll load the last server
             main.selectLastServer();
+
+            //Set up notifications
+            //main.pushNotificationToken();
         } else {
             //Show just the demo server
             main.setLoader(true);
             ark.init(main.me.servers[0]);
+        }
+    });
+}
+
+main.pushNotificationToken = function() {
+    //First, request notifications
+    Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+            //Permission granted. Fetch a token
+            messaging.getToken().then((currentToken) => {
+                //Send the token to our server
+                main.serverRequest(ROOT_URL+"users/@me/push_token", {
+                    "type":"POST",
+                    "body":JSON.stringify(
+                        {
+                            "token":currentToken
+                        }
+                    )
+                }, function() {
+                    //Done!
+                    main.log("enable-notifications", 1, "Submitted notification token!");
+                });
+            }).catch((err) => {
+                main.log("enable-notifications", 4, "An error occurred while retrieving token.");
+            });
+        } else {
+            main.log("enable-notifications", 1, "Unable to get permission to notify.");
         }
     });
 }

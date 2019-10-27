@@ -129,7 +129,7 @@ map.resetPopulationMap = function(isOn, filteredClassname) {
     if(map.layerList["population_map"] != null) {
         try {
             map.layerList["population_map"].removeFrom(map.map);
-        } catch {
+        } catch (e) {
 
         }
     }
@@ -398,8 +398,28 @@ map.convertZCoordsToGameUnits = function(x, y, z) {
 }
 
 map.addDinoMarker = function(dino) {
+    //Get pos
     var pos = map.convertFromNormalizedToMapPos(dino.adjusted_map_pos);
-    map.addMapIcon("dinos", dino.id, dino, pos, dino.imgUrl, map.onDinoClicked, map.onHoverDino, map.onEndHoverDino, false );
+
+    //Create the hover content
+    var hover = map.createDinoHoverElement(dino);
+
+    //Create inner content
+    var content = main.createDom("div", "");
+    content.appendChild(hover);
+
+    //Add tag
+    if(dino.color_tag != null) {
+        main.createDom("div", "map_icon_tag", content).style.backgroundColor = dino.color_tag;
+    }
+
+    //Create icon
+    var icon = map.addMapIcon("dinos", dino.id, dino, pos, dino.imgUrl, map.onDinoClicked, "map_icon_dino", content);
+
+    //Set border from state
+    if(dino.status != null) {
+        icon.style.borderColor = ark.STATUS_STATES[dino.status].color;
+    }
 }
 
 map.markers = {};
@@ -409,17 +429,11 @@ map.MARKER_Z_OFFSETS = {
     "players":10000
 }; //Used to define layer priorities. If the layer name does not exist on this list, it is pushed to the bottom
 
-map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseover, onmouseout, doCrop, imgOverlay ) {
-    var icon_size = 40;
-    var icon = L.icon({
-        iconUrl: "/assets/images/blank_50px.png",
-        shadowUrl: null,
-    
-        iconSize:     [icon_size, icon_size], // size of the icon
-        shadowSize:   [0, 0], // size of the shadow
-        iconAnchor:   [icon_size/2, icon_size/2], // point of the icon which will correspond to marker's location
-        shadowAnchor: [icon_size/2, icon_size/2],  // the same for the shadow
-        popupAnchor:  [icon_size/2, icon_size/2] // point from which the popup should open relative to the iconAnchor
+map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, classNames, inner) {
+    var icon = L.divIcon({
+        iconSize:       [40, 40],
+        className:      "map_icon_base "+classNames,
+        html:           inner.innerHTML
     });
 
     //Make sure that we have an index in the markers for this
@@ -451,18 +465,12 @@ map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, onmouseove
 
     //Add events
     if(onclick != null) { dino_icon.on('click', onclick); }
-    if(onmouseover != null) { dino_icon.on("mouseover", onmouseover); }
-    if(onmouseout != null) { dino_icon.on("mouseout", onmouseout); }
-    
-    //Set real image
-    if(imgOverlay == null) {
-        map.createBackground(dino_icon._icon, img);
-    } else {
-        map.createBackgroundMultiple(dino_icon._icon, imgOverlay, img);
-    }
-    if(doCrop) {
-        dino_icon._icon.style.backgroundSize = "40px";
-    }
+
+    //Set image
+    dino_icon._icon.style.backgroundImage = "url("+img+")";
+    dino_icon._icon.style.zIndex = null;
+
+    return dino_icon._icon;
 }
 
 map.getMarkerByName = function(layerId, id) {
@@ -489,48 +497,21 @@ map.removeMarkerLayer = function(layerId) {
     }
 }
 
-map.createBackground = function(e, imgUrl) {
-    e.style.background = "url('"+imgUrl+"')";
-    map.baseCreateBackground(e);
-}
-
-map.createBackgroundMultiple = function(e, img1, img2) {
-    e.style.background = "url('"+img1+"'), url('"+img2+"')";
-    map.baseCreateBackground(e);
-}
-
-map.baseCreateBackground = function(e) {
-    e.style.backgroundRepeat = "no-repeat";
-    e.style.backgroundPositionX = "center";
-    e.style.backgroundPositionY = "center";
-    e.style.border = "2px solid black";
-    e.style.borderRadius = "40px";
-    e.style.backgroundSize = "30px";
-    e.style.backgroundColor = "white";
-}
-
 map.onDinoClicked = function(e) {
-    //If the system is currently offline, stop this
-    if(!main.currentServerOnline) {
-        analytics.action("map-dino-click-offline", "web-main", {
-            "dino_id":this.x_data.id,
-            "dino_classname":this.x_data.classname
-        });
-        return;
-    }
-
+    //Log
     analytics.action("map-dino-click-online", "web-main", {
         "dino_id":this.x_data.id,
         "dino_classname":this.x_data.classname
     });
 
+    //Get URL
     var url = this.x_data.apiUrl;
 
-    //Get pos
-    var rect = this._icon.getBoundingClientRect();
+        //Get pos
+        var rect = this._icon.getBoundingClientRect();
 
     //Show
-    dinopop.downloadAndShow(rect.left - 14, rect.top - 10, url, this);
+    dinopop.downloadAndShow(rect.left - 14, rect.top - 10, url, this._icon);
 }
 
 map.setBackground = function(color) {
@@ -541,82 +522,20 @@ map.restoreDefaultBackgroundColor = function() {
     map.setBackground("#1c1d21");
 }
 
-map.onHoverDino = function() {
-    var ele = this._icon;
-    var pos = ele.getBoundingClientRect();
-    var data = this.x_data;
-    this.x_has_hovered_ended = false;
-
-    //Stop if we're currently moving the map
-    if(draw_map.isDown || map.isInMotion) {
-        return;
-    }
-
-    //Check if we only need to interrupt a fadeout
-    if(this.x_modal_removeanim != null) {
-        //Cancel
-        clearTimeout(this.x_modal_removeanim);
-        this.x_modal_removeanim = null;
-
-        //Fade in
-        this.x_modal.classList.add("mini_modal_active");
-
-        //Stop creation
-        return;
-    }
-    
+map.createDinoHoverElement = function(data) {
     //Create element
     var e = main.createDom("div", "mini_modal mini_modal_anim");
 
-    //Set position
-    e.style.top = pos.top - 10;
-    e.style.left = pos.left - 14;
-
     //Add icon
-    var icon = main.createDom("img", "mini_modal_icon", e);
-    icon.src = "/assets/images/blank_50px.png";
-    map.createBackground(icon, data.imgUrl);
+    var icon = main.createDom("img", "mini_modal_icon map_icon_base map_icon_dino", e);
+    icon.style.backgroundImage = "url("+data.imgUrl+")";
 
     //Create content
     var ce = main.createDom("div", "mini_modal_content", e);
     main.createDom("div", "mini_modal_title", ce).innerText = data.tamedName;
     main.createDom("div", "mini_modal_sub", ce).innerText = data.displayClassname+" - Lvl "+data.level;;
 
-    //Add to body and set ref on it
-    this.x_modal = e;
-    document.body.appendChild(e);
-
-    //Fade in
-    setTimeout(function() {
-        e.classList.add("mini_modal_active");
-    }, 10);
-}
-
-map.onEndHoverDino = function() {
-    //Do not run if already running.
-    if(this.x_modal == null) {
-        return;
-    }
-
-    //Do not run if we're currently loading the dino data
-    if(this.x_is_loading) {
-        this.x_has_hovered_ended = true;
-        return;
-    }
-
-    map.doEndHover(this);    
-}
-
-map.doEndHover = function(e) {
-    //Remove
-    var ele = e.x_modal;
-    e.x_modal = null;
-    setTimeout(function() {
-        ele.remove();
-    }, 100);
-
-    //Anim out
-    ele.classList.remove("mini_modal_active");
+    return e;
 }
 
 map.convertFromNormalizedToMapPos = function(pos) {

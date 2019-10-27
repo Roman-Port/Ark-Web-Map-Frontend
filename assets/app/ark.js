@@ -7,6 +7,43 @@ ark.MIN_DATA_VERSION = 2;
 
 ark.loading_status = 0; //Target: 5
 
+ark.STATUS_STATES = {
+    "PASSIVE":{
+        "color":"#5AE000",
+        "text":"Passive",
+        "modal_color":"#5AE000"
+    },
+    "NEUTRAL":{
+        "color":"#000000",
+        "text":"Neutral",
+        "modal_color":"#FFFFFF"
+    },
+    "AGGRESSIVE":{
+        "color":"#E63F19",
+        "text":"Aggressive",
+        "modal_color":"#FF7777"
+    },
+    "PASSIVE_FLEE":{
+        "color":"#E6D51C",
+        "text":"Passive Flee",
+        "modal_color":"#E6D51C"
+    },
+    "YOUR_TARGET":{
+        "color":"#1C9BE6",
+        "text":"Your Target",
+        "modal_color":"#1C9BE6"
+    }
+};
+
+ark.COLOR_TAGS = [
+    "#ff6a6a",
+    "#fff26a",
+    "#3cfa2d",
+    "#2df3fa",
+    "#2033fa",
+    "#ed32f2"
+]
+
 ark.init = function(d) {
     //Check if this server is already active
     if(main.currentServerId == d.id) {

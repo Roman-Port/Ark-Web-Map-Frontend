@@ -4,18 +4,18 @@
         <meta charset="UTF-8">
         <title>Delta Web Map</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-        <link rel="stylesheet" href="/assets/view.css">
-        <link rel="stylesheet" href="/assets/bottom_modal.css">
-        <link rel="stylesheet" href="/assets/dino_list_sidebar.css">
-        <link rel="stylesheet" href="/assets/top_nav.css">
-        <link rel="stylesheet" href="/assets/mini_map_modal.css">
-        <link rel="stylesheet" href="/assets/hub.css">
-        <link rel="stylesheet" href="/assets/user_settings.css">
-        <link rel="stylesheet" href="/assets/dino_popout_user.css">
-        <link rel="stylesheet" href="/assets/popup_form.css">
-        <link rel="stylesheet" href="/assets/app/form.css">
-        <link rel="stylesheet" href="/assets/app/settings.css">
-        <link rel="stylesheet" href="/assets/tribelogs.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/view.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/bottom_modal.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/dino_list_sidebar.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/top_nav.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/mini_map_modal.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/hub.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/user_settings.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/dino_popout_user.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/popup_form.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/form.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/settings.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/tribelogs.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
         <style>
             .leaflet-left {
@@ -30,6 +30,10 @@
 
             .leaflet-marker-icon {
                 /*transition:transform 400ms;*/
+            }
+
+            .leaflet-control-attribution {
+                display:none;
             }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -185,52 +189,36 @@
         </table>
     </body>
 
-    <!-- Polyfill 
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=HTMLCanvasElement.prototype.toBlob%2CHTMLDocument%2CJSON%2CNumber.isNaN%2CNumber.parseFloat%2CNumber.parseInt%2CObject.keys%2CURL%2CWindow%2CXMLHttpRequest%2Cdocument.getElementsByClassName%2ClocalStorage%2CrequestAnimationFrame%2C%7Ehtml5-elements%2C%7Eviewport%2Ces2015%2Ces2016%2Ces2017%2Ces2018%2Ces7%2Ces6%2Ces5%2Cdefault%2CBlob%2CPromise%2CPromise.prototype.finally"></script>
-        -->
+    <!--
+
+        /* TODO: Switch to this */
+    <script>
+        var CONFIG_ROOT = "https://config.deltamap.net/";
+        var CONFIG_ENVIORNMENT = "prod";
+    </script>
+    <script src="/assets/app/boot.js"></script>
+    -->
 
     <!-- Google Firebase -->
     <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-messaging.js"></script>
 
-    <script>
-    // Your web app's Firebase configuration
-    var firebaseConfig = {
-        apiKey: "AIzaSyC1DWyvvPdabxEOkwh1ukVx5nnegCV-Y9g",
-        authDomain: "delta-web-map.firebaseapp.com",
-        databaseURL: "https://delta-web-map.firebaseio.com",
-        projectId: "delta-web-map",
-        storageBucket: "delta-web-map.appspot.com",
-        messagingSenderId: "455995125604",
-        appId: "1:455995125604:web:43b0f25f1c6cb1bfc85471"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-    messaging.usePublicVapidKey("BMkfrrmH5M0s3-odVAT2-I2T-Xt6xEjfwWuj5zQ0brWOiwH0N8t5urhqAYcJ54TrnRYu3_eC3b5C6veME5tJHqE");
-    </script>
-
     <!-- Scripts -->
-    <script src="/assets/app/analytics.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/analytics.js"></script>
     <script src="/assets/app/external/leaflet.js"></script>
     <script src="/assets/app/external/html2canvas.min.js"></script>
-    <script src="/assets/app/gateway.js"></script>
-    <script src="/assets/app/form.js"></script>
-    <script src="/assets/app/frontend.js"></script>
-    <script src="/assets/app/dinosidebar.js"></script>
-    <script src="/assets/app/map.js"></script>
-    <script src="/assets/app/map_dtiles.js"></script>
-    <script src="/assets/app/dino_popout.js"></script>
-    <script src="/assets/app/dinolib.js"></script>
-    <script src="/assets/app/dino_stat_list.js"></script>
-    <script src="/assets/app/tribelogs.js"></script>
-    <script src="/assets/app/settings.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/gateway.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/form.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/frontend.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_sidebar.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/map.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/map_dtiles.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_popout.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dinolib.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_stat_list.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/tribelogs.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/settings.js"></script>
 
-    <script src="/assets/app/ark.js"></script>
-    <script src="/assets/app/app.js"></script>
-
-    <script>
-        main.init();
-    </script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/ark.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/app.js"></script>
 </html>

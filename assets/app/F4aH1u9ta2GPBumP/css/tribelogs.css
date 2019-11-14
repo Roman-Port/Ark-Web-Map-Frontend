@@ -1,0 +1,33 @@
+.tribelog_container {
+    margin:15px;
+    margin-bottom:10px;
+}
+
+.tribelog_entry {
+    background-color:#252629;
+    border-radius:5px;
+    padding:10px;
+    border: 1px solid #44474b;
+    border-left:5px solid white;
+    font-family: 'Roboto', sans-serif;
+    font-size:15px;
+    margin-bottom:5px;
+}
+
+.tribelog_entry_time {
+    color:gray;
+    margin-bottom:2px;
+}
+
+.tribelog_entry_time_real {
+    float:right;
+}
+
+.tribelog_entry_time_game {
+    float:left;
+}
+
+.tribelog_entry_content {
+    color:white;
+    clear: both;
+}

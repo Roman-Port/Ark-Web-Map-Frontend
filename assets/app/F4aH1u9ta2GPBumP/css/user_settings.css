@@ -1,0 +1,92 @@
+.usersett_content {
+    background-color:#33363c;
+    position: absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    left:25%;
+    padding:20px;
+    padding-right:120px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.usersett_sectionheader {
+    padding: 5px;
+    font-size: 15px;
+    text-transform: uppercase;
+    color: #b4b4b4;
+}
+
+.usersett_area {
+    margin-bottom:15px;
+}
+
+.usersett_me {
+    background-color: #252629;
+    border-radius: 5px;
+    font-size: 15px;
+    color: white;
+    overflow: hidden;
+    border: 1px solid #3e3e3e;
+    position: relative;
+    max-width:550px;
+    width:100%;
+}
+
+.usersett_textara {
+    display: block;
+    margin-top: 5px;
+    padding: 5px;
+    background-color: #252629;
+    border: 1px solid #3e3e3e;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 350px;
+    min-height: 100px;
+    color: white;
+    font-size: 13px;
+}
+
+.usersett_hiddenserver_btn {
+    position: absolute;
+    right: 5px;
+    top: 7px;
+}
+
+.usersett_contentbox {
+    color: white;
+    font-size: 15px;
+    padding-left: 5px;
+}
+
+.usersett_me_icon {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    bottom: 15px;
+    width: 80px;
+    border-radius: 80px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.usersett_me_text_title {
+    position: absolute;
+    left:110px;
+    font-size:15px;
+    color:gray;
+}
+
+.usersett_me_text_content {
+    position: absolute;
+    left:110px;
+    font-size:15px;
+    color:white;
+}
+
+.usersett_me_btns {
+    position: absolute;
+    right:15px;
+    top:15px;
+}

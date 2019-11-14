@@ -110,6 +110,12 @@ var slides = {
                     });
                 });
 
+                //Set code
+                var c = e.getElementsByClassName('setup_code');
+                for(var i = 0; i<c.length; i+=1) {
+                    c[i].innerText = d.shorthand;
+                }
+
                 //Next
                 next();
             });
@@ -439,5 +445,23 @@ app.OnPickMap = function(id) {
         app.ShowSaveFilepicker(function() {
             /* Callback hell */
         });
+    }
+}
+
+app.downloadUrl = function(url) {
+    var i = delta.createDom("iframe", "");
+    i.src = url;
+    i.style.display = "none";
+    document.body.appendChild(i);
+}
+
+app.switchToHeadless = function() {
+    var c = document.getElementsByClassName('download_step_normal');
+    for(var i = 0; i<c.length; i+=1) {
+        c[i].style.display = "none";
+    }
+    c = document.getElementsByClassName('download_step_headless');
+    for(var i = 0; i<c.length; i+=1) {
+        c[i].style.display = "block";
     }
 }

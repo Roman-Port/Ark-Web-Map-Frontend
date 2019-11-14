@@ -155,13 +155,13 @@ frontend._SERVER_NAV_OPTIONS = [
 
         }
     },
-    {
+    /*{
         "name":"Tribe Log",
         "tab_element":document.getElementById('tab_tribe'),
         "open_function":function() {
 
         }
-    }
+    }*/
 ];
 
 frontend._onNavBtnClicked = function() {

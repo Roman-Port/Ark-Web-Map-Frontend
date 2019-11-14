@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="/assets/dino_popout_user.css">
         <link rel="stylesheet" href="/assets/popup_form.css">
         <link rel="stylesheet" href="/assets/app/form.css">
+        <link rel="stylesheet" href="/assets/app/settings.css">
         <link rel="stylesheet" href="/assets/tribelogs.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
         <style>
@@ -96,7 +97,7 @@
                     <div class="v3_nav_server">
                         <div class="v3_nav_server_top"><img class="v3_nav_server_top_icon" src="/assets/app/icons/left_nav_v3/add_server.svg">Add Server</div>
                     </div>
-                    <div class="v3_nav_server">
+                    <div class="v3_nav_server" onclick="usettings.openUserSettings();">
                         <div class="v3_nav_server_top"><img class="v3_nav_server_top_icon" src="/assets/app/icons/left_nav_v3/user_settings.svg">User Settings</div>
                     </div>
                 </div>
@@ -110,6 +111,10 @@
                     <canvas class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" style=" z-index: 999; background: transparent; pointer-events: none; " id="map_draw_part"></canvas>
                     <div class="hud_bar_container"><div class="hud_bar" id="hud_bar"></div></div>
                     <div class="map_return_btn" id="map_return_btn" onclick="map.resetPos();">Return to Map</div>
+                    <div class="map_structure_loader" id="map_structure_loader">
+                        <div class="map_structure_loader_bar" id="map_structure_loader_bar"></div>
+                        <div class="map_structure_loader_text">Preparing Structures...</div>
+                    </div>
                 </div>
 
                 <!-- Sidebar dino list -->
@@ -215,10 +220,12 @@
     <script src="/assets/app/frontend.js"></script>
     <script src="/assets/app/dinosidebar.js"></script>
     <script src="/assets/app/map.js"></script>
+    <script src="/assets/app/map_dtiles.js"></script>
     <script src="/assets/app/dino_popout.js"></script>
     <script src="/assets/app/dinolib.js"></script>
     <script src="/assets/app/dino_stat_list.js"></script>
     <script src="/assets/app/tribelogs.js"></script>
+    <script src="/assets/app/settings.js"></script>
 
     <script src="/assets/app/ark.js"></script>
     <script src="/assets/app/app.js"></script>

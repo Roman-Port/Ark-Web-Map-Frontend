@@ -1636,6 +1636,16 @@ body {
     border:1px solid #e65555;
 }
 
+.master_btn_no_frame {
+    background: none;
+    border-color: transparent;
+    color: #d0d0d0;
+}
+.master_btn_disabled {
+    opacity: 0.75;
+    cursor: no-drop;
+}
+
 .master_switch_zone .master_btn {
     vertical-align: middle;
     position: absolute;
@@ -2025,4 +2035,49 @@ a {
     height: 10px;
     border: 2px solid black;
     border-radius: 50%;
+}
+
+.map_dtile_tile_img {
+    position: absolute;
+    top:0;
+    left:0;
+}
+
+.map_structure_tile_image {
+    visibility: visible;
+    z-index:10000;
+}
+
+.map_structure_loader {
+    background-color: #33363c;
+    border: 1px solid #44474b;
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    width: 200px;
+    height: 10px;
+    z-index: 9999;
+    border-radius: 10px;
+}
+
+.map_structure_loader_bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #368df7;
+    border-radius: 10px;
+    min-width:10px;
+}
+
+.map_structure_loader_text {
+    position: absolute;
+    top: -24px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 300;
+    left: 0px;
+    z-index: 2;
+    right: 0;
+    padding: 2px 0px;
 }

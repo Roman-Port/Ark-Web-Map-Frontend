@@ -1,6 +1,8 @@
 var APP_VERSION = 1;
 var ROOT_URL = "https://deltamap.net/api/";
 var APP_HASH = "2185ee3957de4f8d9ea23f6f4c5cf8535cff89d1";
+var CONFIG_URL = "https://config.deltamap.net/prod/app_config.json";
+var dconfig = null;
 
 var main = {};
 
@@ -154,11 +156,14 @@ main.setLoader = function(status) {
     main.setClass(document.getElementById('loader_view'), "loader_view_hidden", status);
 }
 
-main.createDom = function(type, classname, parent) {
+main.createDom = function(type, classname, parent, text) {
     var e = document.createElement(type);
     e.className = classname;
     if(parent != null) {
         parent.appendChild(e);
+    }
+    if(text != null) {
+        e.innerText = text;
     }
     return e;
 }
@@ -405,41 +410,65 @@ main.promptNoServers = function() {
 /* Init */
 
 main.init = function() {
-    //Set up demo if needed
-    main.isDemo = window.location.hash == "#dwm-demo-frontpage-src";
-    if(main.isDemo) {
-        main.initDemo();
-    }
+    //Fetch config file
+    main.serverRequest(CONFIG_URL, {"nocreds":true}, function(config) {
+        //Set params
+        dconfig = config;
+        ROOT_URL = config.api+"/";
 
-    //First, we'll download user data
-    main.serverRequest(ROOT_URL+"users/@me/", {}, function(d) {
-        main.log("Init", 0, "User data downloaded.");
-        main.me = d;
+        //Set timer for updating config
+        window.setTimeout(main.refreshConfig, dconfig.refresh_policy_seconds * 1000);
 
-        //Set placeholders
-        frontend.refreshServerList();
-        frontend.setUserData(d);
-        frontend.showServerPlaceholders();
-
-        if(!main.isDemo) {
-            main.addHUDMessage("Connecting...", "#4973c9", "/assets/icons/baseline-cloud-24px.svg", 2, 10);
-            main.setLoader(true);
-    
-            //Now, we'll connect to the gateway
-            gateway.create(function() {
-                main.log("Init", 0, "Gateway connected.");
-            }, main.onGatewayDisconnect, main.onGatewayConnect);
-    
-            //We'll load the last server
-            main.selectLastServer();
-
-            //Set up notifications
-            //main.pushNotificationToken();
-        } else {
-            //Show just the demo server
-            main.setLoader(true);
-            ark.init(main.me.servers[0]);
+        //Set up demo if needed
+        main.isDemo = window.location.hash == "#dwm-demo-frontpage-src";
+        if(main.isDemo) {
+            main.initDemo();
         }
+
+        //First, we'll download user data
+        main.serverRequest(ROOT_URL+"users/@me/", {}, function(d) {
+            main.log("Init", 0, "User data downloaded.");
+            main.me = d;
+
+            //Set placeholders
+            frontend.refreshServerList();
+            frontend.setUserData(d);
+            frontend.showServerPlaceholders();
+
+            if(!main.isDemo) {
+                main.addHUDMessage("Connecting...", "#4973c9", "/assets/icons/baseline-cloud-24px.svg", 2, 10);
+                main.setLoader(true);
+        
+                //Now, we'll connect to the gateway
+                gateway.create(function() {
+                    main.log("Init", 0, "Gateway connected.");
+                }, main.onGatewayDisconnect, main.onGatewayConnect);
+        
+                //We'll load the last server
+                main.selectLastServer();
+
+                //Set up notifications
+                //main.pushNotificationToken();
+            } else {
+                //Show just the demo server
+                main.setLoader(true);
+                ark.init(main.me.servers[0]);
+            }
+        });
+    });
+}
+
+main.refreshConfig = function() {
+    main.serverRequest(CONFIG_URL, {"nocreds":true, "failOverride":function() {
+        //Attempt to fetch it again later
+        window.setTimeout(main.refreshConfig, dconfig.refresh_policy_seconds * 1000);
+    }}, function(config) {
+        //Set
+        dconfig = config;
+        ROOT_URL = config.api+"/";
+
+        //Fetch it again later
+        window.setTimeout(main.refreshConfig, dconfig.refresh_policy_seconds * 1000);
     });
 }
 

@@ -50,23 +50,23 @@ map.init = function() {
     });
 
     //Add events for drawable
-    map.map.on("move", draw_map.redraw);
+    //map.map.on("move", draw_map.redraw);
     map.map.on('mousedown', function(e) {
         if(e.originalEvent.button == 2) {
             //Right click
             map.map.dragging.disable();
-            draw_map.onDrawBegin();
+            //draw_map.onDrawBegin();
         }
     });
     map.map.on('mouseup', function(e) {
         if(e.originalEvent.button == 2) {
             //Right click
             map.map.dragging.enable();
-            draw_map.onDrawEnd();
+            //draw_map.onDrawEnd();
         }
     });
     map.map.addEventListener('mousemove', function(e) {
-        draw_map.onDrawMove(e.containerPoint, e.latlng);
+        //draw_map.onDrawMove(e.containerPoint, e.latlng);
     });
     map.map.on("contextmenu", function(){}); //Only used to prevent context menu
     map.map.on("zoomend", main.queueSubmitUserServerPrefs);
@@ -76,18 +76,12 @@ map.init = function() {
     map.map.on("moveend", function(){map.isInMotion = false;});
 
     //Trigger resize of canvas
-    draw_map.onResize();
+    //draw_map.onResize();
 
     //Check btn
     map.updateReturnBtn();
 
-    //Show map list
-    draw_map.onDoneSwitchServer();
-
-    //Add structures map
-    map.addDynamicMap("structures", function() {
-        ark.loading_status += 1;
-    });
+    map.dtiles.init();
 };
 
 map.deinit = function() {
@@ -281,16 +275,7 @@ map.onEnableTribeDinos = function(d) {
         }
         map.addMapIcon("players", player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
     }
-
-    //Add structures you can interact with
-    /*for(var i = 0; i<d.structures.length; i+=1) {
-        var st = d.structures[i];
-        var pos = map.convertFromNormalizedToMapPos(st.mapPos);
-        map.addMapIcon("interactive_structures", st.index.toString(), st, pos, d.structure_images[st.icon], null, null, null, true, "" );
-    }*/
 }
-
-map.structure_size_config = {"adobe_ceiling.png":{"width":311,"height":316},"adobe_ceiling_tri.png":{"width":252,"height":273},"adobe_foundation.png":{"width":278,"height":276},"adobe_foundation_tri.png":{"width":252,"height":273},"adobe_pillar.png":{"width":97,"height":93},"adobe_ramp.png":{"width":276,"height":297},"adobe_wall.png":{"width":24,"height":285},"bunk_bed.png":{"width":194,"height":119},"cage_wood.png":{"width":183,"height":187},"campfire.png":{"width":137,"height":125},"chair.png":{"width":57,"height":62},"chem_bench.png":{"width":102,"height":304},"cooking_pot.png":{"width":225,"height":192},"crop_plot_large.png":{"width":280,"height":279},"crop_plot_medium.png":{"width":216,"height":211},"crop_plot_small.png":{"width":139,"height":136},"fabricator.png":{"width":189,"height":436},"feeder.png":{"width":122,"height":230},"feeder_tek.png":{"width":125,"height":267},"forge.png":{"width":148,"height":147},"generator.png":{"width":212,"height":219},"generator_tek.png":{"width":245,"height":256},"grinder.png":{"width":289,"height":787},"industrial_cooking_pot.png":{"width":181,"height":381},"industrial_forge.png":{"width":909,"height":709},"metal_ceiling.png":{"width":275,"height":283},"metal_ceiling_tri.png":{"width":237,"height":274},"metal_foundation.png":{"width":278,"height":276},"metal_foundation_tri.png":{"width":238,"height":274},"metal_pillar.png":{"width":88,"height":86},"metal_ramp.png":{"width":284,"height":278},"metal_wall.png":{"width":14,"height":273},"mortar_and_pestal.png":{"width":97,"height":67},"preserving_bin.png":{"width":96,"height":117},"refrigerator.png":{"width":166,"height":123},"single_bed.png":{"width":207,"height":138},"sleeping_bag.png":{"width":238,"height":129},"smithy.png":{"width":98,"height":245},"stone_ceiling.png":{"width":278,"height":284},"stone_ceiling_tri.png":{"width":239,"height":275},"stone_foundation.png":{"width":299,"height":281},"stone_foundation_tri.png":{"width":255,"height":294},"stone_ramp.png":{"width":318,"height":306},"stone_wall.png":{"width":20,"height":289},"storage_bin_large.png":{"width":69,"height":168},"storage_bin_small.png":{"width":78,"height":119},"table.png":{"width":116,"height":216},"tek_bed.png":{"width":181,"height":330},"tek_ceiling.png":{"width":278,"height":275},"tek_ceiling_tri.png":{"width":236,"height":273},"tek_foundation.png":{"width":314,"height":313},"tek_foundation_tri.png":{"width":249,"height":285},"tek_pillar.png":{"width":81,"height":80},"tek_ramp.png":{"width":284,"height":284},"tek_replicator.png":{"width":1024,"height":809},"tek_wall.png":{"width":33,"height":274},"thatch_ceiling.png":{"width":298,"height":309},"thatch_foundation.png":{"width":318,"height":308},"thatch_wall.png":{"width":34,"height":291},"vault.png":{"width":200,"height":184},"wood_ceiling.png":{"width":277,"height":283},"wood_ceiling_tri.png":{"width":238,"height":274},"wood_foundation.png":{"width":298,"height":281},"wood_foundation_tri.png":{"width":254,"height":291},"wood_pillar.png":{"width":77,"height":81},"wood_ramp.png":{"width":316,"height":304},"wood_wall.png":{"width":19,"height":288}};
 
 map.enableStructuresLayer = function(data, structures) {
     var StructureLayer = L.GridLayer.extend({
@@ -554,6 +539,27 @@ map.convertFromMapPosToNormalized = function(pos) {
     ];
 }
 
+map.convertFromGamePosToMapPos = function(x, y) {
+    //Add offsets
+    x += ark.session.mapData.mapImageOffset.x;
+    y += ark.session.mapData.mapImageOffset.y;
+
+    //Divide by scale
+    x /= ark.session.mapData.captureSize;
+    y /= ark.session.mapData.captureSize;
+
+    //Move
+    x += 0.5;
+    y += 0.5;
+
+    //Convert to map pos
+    x = x * 256;
+    y = -y * 256;
+
+    //Now, return latlng
+    return L.latLng(y, x);
+}
+
 map.addClickEvent = function(callback, context) {
     //Push
     map.onClickQueue.push({
@@ -562,526 +568,13 @@ map.addClickEvent = function(callback, context) {
     })
 };
 
-map.remoteUpdateMultipleRealtime = function(e) {
-    //Loop through and check names
-    var keys = Object.keys(map.marker_name_map);
-    for(var i = 0; i<keys.length; i+=1) {
-        var entry = map.marker_name_map[keys[i]];
-        
-        //Check if this matches any of our items
-        for(var j = 0; j<e.length; j+=1) {
-            var search = e[j];
-            if(search.t == entry.layerId && search.id == entry.name) {
-                //Update this
-                var marker = map.layer_list[entry.layerId][entry.internalIndex];
-                var pos = map.convertFromNormalizedToMapPos({
-                    "x":search.mx,
-                    "y":search.my
-                });
-                marker.setLatLng(L.latLng( pos[0], pos[1] ));
-            }
-        }
-    }
-}
-
-map.onLiveUpdateDinoMsg = function(d) {
-    //Make sure that this data contains location data
-    if(d.updates.pos == null) {
-        return;
-    }
-
+map.remoteUpdateDino = function(e) {
     //Get marker
-    var marker = map.getMarkerByName("dinos", d.dino_id);
-    if(marker == null) {
-        return;
-    }
+    var marker = map.getMarkerByName("dinos", e.id);
 
-    //Convert position to this
-    var x = (ark.session.mapData.mapImageOffset.x + d.updates.pos.X) / ark.session.mapData.captureSize;
-    var y = (ark.session.mapData.mapImageOffset.y + d.updates.pos.Y) / ark.session.mapData.captureSize;
-
-    //Move marker
-    var pos = map.convertFromNormalizedToMapPos({
-        "x":x+0.5,
-        "y":y+0.5
-    });
-    marker.setLatLng( L.latLng( pos[0], pos[1] ) );
-}
-
-var draw_map = {};
-draw_map.e = document.getElementById('map_draw_part');
-draw_map.c = draw_map.e.getContext('2d');
-
-draw_map.points = [];
-
-draw_map.txBuffer = [];
-draw_map.rxBuffer = [];
-
-draw_map.activeMapId = -1;
-
-draw_map.reset = function() {
-    draw_map.lastZoom = null;
-    draw_map.isFirst = true;
-
-    draw_map.points = [];
-    draw_map.c.clearRect(0, 0, draw_map.c.canvas.width, draw_map.c.canvas.height);
-}
-
-draw_map.onResize = function() {
-    //Resize to match the frame of the standard map
-    var map = document.getElementById('map_part');
-    draw_map.e.width = map.clientWidth;
-    draw_map.e.height = map.clientHeight;
-
-    //Log
-    if(draw_map.redraw_logger_timeout == null) {
-        draw_map.redraw_logger_timeout = window.setTimeout(function() {
-            draw_map.redraw_logger_timeout = null;
-            analytics.action("map-drawable-resize", "web-main", {
-                "width":map.clientWidth.toString(),
-                "height":map.clientHeight.toString()
-            });
-        }, 2000);
-    }
-
-    //Redraw
-    draw_map.redraw();
-}
-window.addEventListener("resize", draw_map.onResize);
-
-draw_map.redraw_logger_timeout = null;
-
-draw_map.redraw = function() {
-    draw_map.c.clearRect(0, 0, draw_map.c.canvas.width, draw_map.c.canvas.height);
-    var center = map.map.getBounds().getNorthWest();
-  
-    draw_map.c.strokeStyle = "#df4b26";
-    draw_map.c.lineJoin = "round";
-    draw_map.c.lineWidth = 5;
-
-    var zoom = map.map.getZoom();
-
-    if(draw_map.points.length >= 1) {
-        var p;
-        var pos;
-        draw_map.c.beginPath();
-        for(var i = 1; i<draw_map.points.length; i+=1) {
-            p = draw_map.points[i];
-            pos = map.map.project(L.latLng(p.ex - center.lat, p.ey - center.lng), zoom);
-            if(p.n) {
-                draw_map.c.stroke();
-                draw_map.c.beginPath();
-                draw_map.c.moveTo(pos.x, pos.y);
-            } else {
-                draw_map.c.lineTo(pos.x, pos.y);
-            }
-        }
-        draw_map.c.stroke();
-        draw_map.c.beginPath();
+    //Add a marker if it isn't already added. Else, we can update the marker
+    if(marker != null) {
+        //Move marker
+        marker.setLatLng(map.convertFromGamePosToMapPos(e.x, e.y));
     }
 }
-
-draw_map.isDown = false;
-draw_map.isFirst = true;
-draw_map.lastPoint = null;
-
-draw_map.onDrawBegin = function() {
-    draw_map.isDown = true;
-}
-
-draw_map.onDrawEnd = function() {
-    draw_map.isDown = false;
-    draw_map.isFirst = true;
-    draw_map.lastPoint = null;
-
-    //Flush the latest buffer to the gateway
-    draw_map.flushTx();
-
-    //Log
-    analytics.action("map-drawable-drawend", "web-main", {
-        "point_count":draw_map.rxBuffer.length.toString()
-    });
-
-    //Flush the rx buffer into the standard buffer
-    for(var i = 0; i<draw_map.rxBuffer.length; i+=1) {
-        draw_map.points.push( draw_map.rxBuffer[i] );
-    }
-    draw_map.rxBuffer = [];
-}
-
-draw_map.lastZoom = null;
-
-draw_map.onDrawMove = function(screenPos, mapPos) {
-    if(!draw_map.isDown || draw_map.activeMapId == -1) { return; }
-
-    //Check if we're close enough to the last to ignore
-    /*if(draw_map.lastPoint != null) {
-        if(Math.abs(draw_map.lastPoint.x - screenPos.x) <= 2) {return;}
-        if(Math.abs(draw_map.lastPoint.y - screenPos.y) <= 2) {return;}
-    }*/
-    draw_map.lastPoint = screenPos;
-
-    //Push to map
-    var p = {
-        "ex":mapPos.lat,
-        "ey":mapPos.lng,
-        "n":draw_map.isFirst
-    };
-
-    var pr = {
-        "ex":draw_map.roundNetwork(mapPos.lat),
-        "ey":draw_map.roundNetwork(mapPos.lng),
-        "n":draw_map.isFirst
-    };
-
-    //Add any setting changes
-    var zoom = map.map.getZoom();
-    if(draw_map.lastZoom != zoom) {
-        draw_map.lastZoom = zoom;
-        p.z = zoom;
-    }
-
-    draw_map.isFirst = false;
-    draw_map.points.push(p);
-    draw_map.txBuffer.push(pr);
-    
-    //Now, draw
-    if(p.n) {
-        draw_map.c.moveTo(screenPos.x, screenPos.y);
-    } else {
-        draw_map.c.lineTo(screenPos.x, screenPos.y);
-    }
-    draw_map.c.stroke();
-}
-
-draw_map.injectLines = function(points) {
-    //Interrupt any currently active drawing and inject these points.
-    //Start new
-    draw_map.c.stroke();
-    draw_map.c.beginPath();
-
-    //Draw lines
-    var center = map.map.getBounds().getNorthWest();
-    var zoom = map.map.getZoom();
-    var pos;
-    for(var i = 0; i<points.length; i+=1) {
-        var p = points[i];
-        pos = map.map.project(L.latLng(p.ex - center.lat, p.ey - center.lng), zoom);
-        if(p.n) {
-            draw_map.c.stroke();
-            draw_map.c.beginPath();
-            draw_map.c.moveTo(pos.x, pos.y);
-        } else {
-            draw_map.c.lineTo(pos.x, pos.y);
-        }
-
-        //Push for redraw
-        if(!draw_map.isDown) {
-            draw_map.points.push(p); //Push now
-        } else {
-            draw_map.rxBuffer.push(p); //This'll be applied to the redraw buffer when we release the mouse button
-        }
-        
-    }
-
-    //Now apply and reset
-    draw_map.c.stroke();
-    draw_map.c.beginPath();
-
-    //And jump back if needed
-    if(draw_map.points.length > 0) {
-        var p = draw_map.points[draw_map.points.length-1];
-        pos = map.map.project(L.latLng(p.ex - center.lat, p.ey - center.lng), zoom);
-        draw_map.c.moveTo(pos.x, pos.y);
-    }
-}
-
-draw_map.onRx = function(msg) {
-    if(draw_map.activeMapId == msg.mapId && msg.senderSessionId != gateway.sessionId) {
-        //This was not sent by us and it is for this targetted map ID
-        draw_map.injectLines(msg.points);
-
-        //Log
-        analytics.action("map-drawable-rx", "web-main", {
-            "point_count":msg.points.length.toString()
-        });
-    }
-}
-
-draw_map.flushTx = function() {
-    //Flush the tx buffer, up to 100 points at a time
-    while(draw_map.txBuffer.length > 0) {
-        //Get up to 100 items at once
-        var items = draw_map.txBuffer.splice(0, 100);
-
-        //Send
-        var p = {
-            "points":items,
-            "mapId":draw_map.activeMapId
-        };
-        gateway.sendMsg(2, p);
-    }
-}
-
-draw_map.roundNetwork = function(e) {
-    //Rounds a number to send over the network
-    return Math.round(e * 100) / 100;
-}
-
-draw_map.isShowingMenuAllowed = false;
-draw_map.setAllowShowMenu = function(allow) {
-    draw_map.isShowingMenuAllowed = allow;
-    if(!allow) {
-        //Close in case it is open
-        document.getElementById('nav_btn_map').classList.remove('map_layer_select_active');
-    }
-}
-
-draw_map.toggleMenu = function() {
-    if(draw_map.isShowingMenuAllowed) {
-        document.getElementById('nav_btn_map').classList.toggle('map_layer_select_active');
-    }
-}
-
-draw_map.onDeinitCurrentServer = function() {
-    //Clear the map
-    draw_map.reset();
-    draw_map.activeMapId = -1;
-    draw_map.changeTitleName("Tribe Maps");
-    draw_map.setAllowShowMenu(false);
-}
-
-draw_map.onDoneSwitchServer = function() {
-    //Stop if this is a demo server
-    if(main.isDemo) {
-        return;
-    }
-
-    //Fetch new maps
-    main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {"enforceServer":true}, function(c) {
-        //If there is a map, choose the first one on the list
-        if(c.maps.length >= 1) {
-            var m = c.maps[0];
-            draw_map.chooseMap(m.name, m.url, m.id);
-        }
-
-        //Set picker
-        draw_map.setMapPicker(c.maps);
-        draw_map.setAllowShowMenu(true);
-    });
-}
-
-draw_map.latestMaps = [];
-draw_map.setMapPicker = function(data) {
-    return;
-    //Todo
-
-    draw_map.latestMaps = data;
-    var e = document.getElementById('map_btn_layers_content');
-    main.removeAllChildren(e);
-
-    //Add maps
-    for(var i = 0; i<data.length; i+=1) {
-        var m = data[i];
-        var c = main.createDom("div", "map_layer_select_item", e);
-        c.x_id = m.id;
-        c.x_url = m.url;
-        c.x_name = m.name;
-        c.innerText = m.name;
-        c.addEventListener("click", draw_map.onChooseNewMap);
-        var d = main.createDom("div", "map_layer_select_item_delete", c);
-        d.addEventListener("click", draw_map.onChooseDeleteMap);
-        if(m.isNextStepDelete) {
-            d.classList.add("map_layer_select_item_delete_forever");
-        }
-    }
-
-    //Add the add button
-    var c = main.createDom("div", "map_layer_select_item_add", e);
-    c.innerText = "Add Map";
-    c.addEventListener("click", draw_map.onChooseCreateMap);
-
-    //Add bottom
-    main.createDom("div", "map_layer_select_item_bottom", e).innerText = "Draw on the map by holding right click. Drawings are synced in realtime with tribemates.";
-
-    //Show
-    document.getElementById('nav_btn_map').classList.remove("top_nav_btn_hidden");
-}
-
-draw_map.onChooseNewMap = function() {
-    console.log("Switching to map ID "+this.x_id);
-    draw_map.chooseMap(this.x_name, this.x_url, this.x_id);
-    analytics.action("map-drawable-mapchange", "web-main", {
-        "map_id":this.x_id
-    });
-}
-
-draw_map.chooseMap = function(name, url, id) {
-    //Clear
-    draw_map.reset();
-
-    //Set map
-    draw_map.activeMapId = id;
-    draw_map.changeTitleName(name);
-
-    //Request from the server
-    main.serverRequest(url, {"enforceServer":true}, function(c) {
-        draw_map.points = c.points;
-        draw_map.redraw();
-    });
-}
-
-draw_map.onChooseDeleteMap = function(evt) {
-    //Stop continuation
-    evt.stopImmediatePropagation();
-
-    //Get parent URL
-    var context = this;
-    var parentUrl = this.parentNode.x_url;
-    var parentName = this.parentNode.x_name;
-    var parentId = this.parentNode.x_id;
-    
-    //The first click on this clears, and the second click deletes. Check if we have cleared yet.
-    if(!this.classList.contains("map_layer_select_item_delete_forever")) {
-        //Set the flag on the entry in the saved maps list
-        //Rename on our stored list
-        for(var i = 0; i<draw_map.latestMaps.length; i+=1) {
-            if(draw_map.latestMaps[i].id == parentId) {
-                draw_map.latestMaps[i].isNextStepDelete = true;
-                break;
-            }
-        }
-
-        //Clear
-        var body = {
-            "name":parentName,
-            "doClear":true
-        };
-        main.serverRequest(parentUrl, {"type":"post", "body":JSON.stringify(body)}, function() {
-            //Now handled from the gateway.
-        });
-    } else {
-        //Delete
-        main.serverRequest(parentUrl, {"type":"delete", "body":"{}"}, function() {
-            //Now handled from the gateway.
-        });
-    }
-}
-
-draw_map.onChooseCreateMap = function() {
-    pform.show([
-        {
-            "type":"input",
-            "name":"Map Name",
-            "id":"f_mapname"
-        },
-        {
-            "type":"bottom",
-            "text":"This map will sync across all of your tribemates and will save automatically. Only your tribe can see this map. Hold right click on the map to draw."
-        }
-    ], "Create New Map", "Create Map", function(){
-
-        //The map request was ok. Continue and create the map.
-        var name = document.getElementById('f_mapname').value;
-        if(name.length > 24 || name.length < 2) {
-            return [
-                {
-                    "id":"f_mapname",
-                    "text":"2-24 characters are required."
-                }
-            ];
-        }
-        
-        //Now, create it 
-        var body = {
-            "name":name
-        };
-        main.serverRequest("https://deltamap.net/api/servers/"+main.currentServerId+"/maps", {
-            "type":"post",
-            "body":JSON.stringify(body),
-            "enforceServer":true
-        }, function(c) {
-            //Set this to the active map
-            draw_map.activeMapId = c.id;
-            draw_map.changeTitleName(name);
-
-            //Adding is now handled from the gateway.
-
-            //Log
-            analytics.action("map-drawable-addmap", "web-main", {
-                "map_id":c.id
-            });
-        });
-
-    }, function(){});
-}
-
-draw_map.changeTitleName = function(name) {
-    document.getElementById('map_btn_layers_title').innerText = name;
-}
-
-draw_map.onGatewayMapEvent = function(msg) {
-    switch(msg.mapOpcode) {
-        case 0: draw_map.onRemoteDelete(msg.id, msg.name); break;
-        case 1: draw_map.onRemoteCreate(msg.id, msg.name); break;
-        case 2: draw_map.onRemoteRename(msg.id, msg.name); break;
-        case 3: draw_map.onRemoteClear(msg.id, msg.name); break;
-    }
-}
-
-draw_map.onRemoteDelete = function(id, name) {
-    //Remove it from the stored list
-    for(var i = 0; i<draw_map.latestMaps.length; i+=1) {
-        if(draw_map.latestMaps[i].id == id) {
-            draw_map.latestMaps.splice(i, 1);
-            break;
-        }
-    }
-
-    //Refresh
-    draw_map.setMapPicker(draw_map.latestMaps);
-
-    //If this is the active map, clear and switch away from any
-    if(draw_map.activeMapId == id) {
-        draw_map.reset();
-        draw_map.activeMapId = -1;
-        draw_map.changeTitleName("Tribe Maps");
-    }
-}
-
-draw_map.onRemoteCreate = function(id, name) {
-    //Add it to the list of maps and reload the list
-    var entry = {
-        "name":name,
-        "id":id,
-        "url":"https://deltamap.net/api/servers/"+main.currentServerId+"/maps/"+id
-    };
-    draw_map.latestMaps.push(entry);
-    draw_map.setMapPicker(draw_map.latestMaps);
-}
-
-draw_map.onRemoteRename = function(id, name) {
-    //Rename on our stored list
-    for(var i = 0; i<draw_map.latestMaps.length; i+=1) {
-        if(draw_map.latestMaps[i].id == id) {
-            draw_map.latestMaps[i].name = name;
-            break;
-        }
-    }
-
-    //Refresh
-    draw_map.setMapPicker(draw_map.latestMaps);
-
-    //If this is the active map, rename
-    if(draw_map.activeMapId == id) {
-        draw_map.changeTitleName(name);
-    }
-}
-
-draw_map.onRemoteClear = function(id, name) {
-    //If this matches the active ID, clear
-    if(draw_map.activeMapId == id) {
-        draw_map.reset();
-    }
-}
-

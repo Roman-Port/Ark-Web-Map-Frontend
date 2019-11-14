@@ -154,7 +154,7 @@ dino_stats.init = function(url) {
     dino_stats.changeSort("species");
 
     //Fetch new data
-    dino_stats.load(url+"?limit=10", dino_stats.container);
+    dino_stats.load(url, dino_stats.container);
 }
 
 dino_stats.load = function(url, container) {

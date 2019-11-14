@@ -87,15 +87,6 @@ dinopop.downloadAndShow = function(x, y, url, ele) {
 }
 
 dinopop.clickCatcher = function(evt) {
-    //Check if we're in the path
-    for(var i = 0; i<evt.path.length; i+=1) {
-        if(evt.path[i].classList != null) {
-            if(evt.path[i].classList.contains("popout_modal")) {
-                return;
-            }
-        }
-    }
-
     //Hide
     var e = document.getElementsByClassName("popout_modal");
     for(var i = 0; i<e.length; i+=1) {

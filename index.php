@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="landing_top_img_container">
-        <img src="/assets/frontpage/landing/img/big.png" class="landing_top_img">
+        <img src="/assets/frontpage/landing/img/big.webp" class="landing_top_img">
         <div class="landing_top_img_container_bg"></div>
     </div>
     <div class="landing_mid">

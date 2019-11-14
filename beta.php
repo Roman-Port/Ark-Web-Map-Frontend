@@ -8,12 +8,12 @@
 <body>
     <div class="landing_blue_top">
         <div class="landing_top_title">
-            <div class="landing_top_title_big">MANAGE YOUR ARK TRIBE</div>
-            <div class="landing_top_title_sub">Delta Web Map is a PVP-safe tool to manage your ARK: Survival Evolved tribe on servers- right from your web browser.</div>
+            <div class="landing_top_title_big">SUPERCHARGE YOUR ARK TRIBE</div>
+            <div class="landing_top_title_sub">Delta Web Map is a PVP-safe tool to manage your ARK: Survival Evolved tribe, right from your web browser.</div>
         </div>
         <div class="landing_top_btn_container">
-            <div class="landing_top_btn landing_top_btn_full" onclick="OnClickStartBtn();">Get Started</div>
-            <div class="landing_top_btn" onclick="window.location = '/app/#dwm-demo-frontpage-src';">View Demo</div>
+            <div class="landing_top_btn landing_top_btn_full" onclick="OnClickStartBtn();">Join as Player</div>
+            <div class="landing_top_btn" onclick="window.location = '/app/#dwm-demo-frontpage-src';">Add Your Server</div>
         </div>
     </div>
     <div class="landing_top_img_container">

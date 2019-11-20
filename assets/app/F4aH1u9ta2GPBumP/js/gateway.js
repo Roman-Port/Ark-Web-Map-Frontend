@@ -89,6 +89,9 @@ gateway.onMsg = function(evt) {
     switch(d.opcode) {
         case 0: gateway.onOpenSession(d.payload); break;
         case 1: gateway._onDinoUpdateEvent(d.payload); break;
+        case 3: map.canvas.onGatewayUpdate(d.payload); break;
+        case 4: map.refreshOnlinePlayersList(d.payload); break;
+        case 5: map.remoteUpdateDinoPrefs(d.payload); break;
     }
 }
 

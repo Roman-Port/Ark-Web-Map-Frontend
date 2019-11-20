@@ -74,6 +74,8 @@ map.init = function() {
     map.map.on("move", map.updateReturnBtn);
     map.map.on("movestart", function(){map.isInMotion = true;});
     map.map.on("moveend", function(){map.isInMotion = false;});
+    map.map.on("zoomstart", dinopop.dismissModal);
+    map.canvas.hook(map.map);
 
     //Trigger resize of canvas
     //draw_map.onResize();
@@ -82,9 +84,13 @@ map.init = function() {
     map.updateReturnBtn();
 
     map.dtiles.init();
+    map.canvas.init();
 };
 
 map.deinit = function() {
+    //Deinit addons
+    map.canvas.deinit();
+
     //Clear all dynamic maps
     main.foreach(map.dynamic_maps, function(m) {
         clearInterval(m.heart);
@@ -396,6 +402,8 @@ map.addDinoMarker = function(dino) {
     //Add tag
     if(dino.color_tag != null) {
         main.createDom("div", "map_icon_tag", content).style.backgroundColor = dino.color_tag;
+    } else {
+        main.createDom("div", "map_icon_tag", content).style.display = "none";
     }
 
     //Create icon
@@ -576,5 +584,52 @@ map.remoteUpdateDino = function(e) {
     if(marker != null) {
         //Move marker
         marker.setLatLng(map.convertFromGamePosToMapPos(e.x, e.y));
+    }
+}
+
+//Called when dino prefs are updated
+map.remoteUpdateDinoPrefs = function(data) {
+    //We'll update dino color
+    //Get marker
+    var marker = map.getMarkerByName("dinos", data.dino_id);
+
+    //Add a marker if it isn't already added. Else, we can update the marker
+    var tag = marker._icon.getElementsByClassName("map_icon_tag")[0];
+    if(marker != null && data.prefs.color_tag == null) {
+        tag.style.display = "none";
+    } else if(marker != null && data.prefs.color_tag != null) {
+        tag.style.display = "block";
+        tag.style.backgroundColor = data.prefs.color_tag;
+    }
+}
+
+//Refreshes the list of online players on the top
+map.refreshOnlinePlayersList = function(d) {
+    //Set top bar text. Only use icons if 0<x<=5
+    var sub = document.getElementsByClassName('v1_playerlist_sub')[0];
+    var icons = document.getElementsByClassName('v1_playerlist_icon_holder')[0];
+    sub.innerText = "";
+    icons.innerHTML = "";
+    if(d.players.length > 0 && d.players.length <= 5) {
+        for(var i = 0; i<d.players.length; i+=1) {
+            var ii = main.createDom("img", "v1_playerlist_icon", icons);
+            ii.src = d.players[i].icon;
+        }
+    } else if(d.players.length == 0) {
+        sub.innerText = "No Players";
+    } else {
+        sub.innerText = d.players.length+" Players";
+    }
+
+    //Set contents of list
+    var list = document.getElementsByClassName('v1_playerlist_list')[0];
+    list.innerHTML = "";
+    for(var i = 0; i<d.players.length; i+=1) {
+        var e = main.createDom("div", "v1_playerlist_item", list);
+        main.createDom("img", "v1_playerlist_item_icon", e).src = d.players[i].icon;
+        main.createDom("div", "v1_playerlist_item_name", e).innerText = d.players[i].name;
+        if(d.tribes[d.players[i].tribe_id] != null) {
+            main.createDom("div", "v1_playerlist_icon_tribe", e).innerText = d.tribes[d.players[i].tribe_id].name;
+        }
     }
 }

@@ -213,15 +213,6 @@ dinosidebar.query = function(query) {
     dinosidebar.token++;
     a.innerHTML = "";
 
-    var lb = main.createDom("div", "dino_sidebar_top_nav dino_sidebar_top_nav_left", a);
-    lb.innerText = "Tribe Tools";
-    lb.addEventListener("click", dinolib.open);
-
-    var rb = main.createDom("div", "dino_sidebar_top_nav dino_sidebar_top_nav_right", a);
-    rb.innerText = "Sort";
-    rb.addEventListener("click", dinosidebar.changeSort);
-    dinosidebar.getSortSpan(rb);
-
     var token = dinosidebar.token;
     var waitingCount = 0; //How many we're waiting on
     var waitingFinishedCount = 0; //How many have finished

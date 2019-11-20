@@ -112,7 +112,7 @@
                 <!-- Map area -->
                 <div class="map_part" id="map_part" style="background-color:#1c1d21;">
                     <!-- Actual map -->
-                    <canvas class="map_part smooth_anim map_part_active_leftsidebar map_part_active_rightsidebar" style=" z-index: 999; background: transparent; pointer-events: none; " id="map_draw_part"></canvas>
+                    <canvas style=" z-index: 999; background: transparent; pointer-events: none; position:absolute; top:0; left:0; right:0; bottom:0;" id="map_draw_part"></canvas>
                     <div class="hud_bar_container"><div class="hud_bar" id="hud_bar"></div></div>
                     <div class="map_return_btn" id="map_return_btn" onclick="map.resetPos();">Return to Map</div>
                     <div class="map_structure_loader" id="map_structure_loader">
@@ -129,15 +129,59 @@
                 </div>
 
                 <!-- Sidebar search -->
-                <div class="top_nav_search">
-                    <input type="text" class="top_nav_search_entry" placeholder="Search" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
-                    <select class="top_nav_search_select" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
+                <div class="dino_stats_search_box">
+                    <input type="text" class="dino_stats_search_base dino_stats_search_text" placeholder="Search Tribe" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
+                    <select class="dino_stats_search_base dino_stats_search_sort" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
                         <option value="-1">All</option>
                         <option value="1">Tribemembers</option>
                         <option value="2">Items</option>
                         <option value="3">Dinos</option>
                         <option value="4">Baby Dinos</option>
                     </select>
+                </div>
+
+                <!-- Drawers -->
+                <div class="v1_top_drawer">
+                    
+                    <!-- Canvas options -->
+                    <div class="v1_top_drawer_box">
+                        <div class="v1_canvas_picker_container v1_top_drawer_container">
+                            <div class="v1_top_drawer_title v1_canvas_title">
+                                    <span class="v1_canvas_picker_title v1_top_drawer_title_main">CANVAS</span>
+                                    <span class="v1_top_drawer_title_sub v1_canvas_picker_name v1_canvas_picker_name_none">Not Active</span>
+                                </div>
+                            <div class="v1_canvas_picker_size"><div class="v1_canvas_picker_size_dot"></div></div>
+                            <div class="v1_top_drawer_board_container">
+                                <div class="v1_top_drawer_board">
+                                    <div class="v1_canvas_colorpicker"><!-- Will be filled automatically --></div>
+                                    <div class="v1_canvas_help">Hold right click on the map to draw. It'll be synced to tribemembers in real-time!</div>
+                                    <div class="v1_canvas_help v1_canvas_options">
+                                        <div class="v1_canvas_options_select v1_canvas_options_select_delete v1_canvas_options_select_disabled" onclick="map.canvas.deleteCanvas();">Delete</div>
+                                        <div class="v1_canvas_options_select v1_canvas_options_select_clear v1_canvas_options_select_disabled" onclick="map.canvas.clearCanvas();">Clear</div>
+                                    </div>
+                                    <div class="v1_canvas_content"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End canvas options -->
+
+                    <!-- Player list -->
+                    <div class="v1_top_drawer_box" style="width:180px;">
+                        <div class="v1_top_drawer_container">
+                            <div class="v1_top_drawer_title">
+                                <span class="v1_top_drawer_title_main">ONLINE</span>
+                                <span class="v1_top_drawer_title_sub v1_playerlist_sub"></span>
+                            </div>
+                            <div class="v1_playerlist_icon_holder"></div>
+                            <div class="v1_top_drawer_board_container">
+                                <div class="v1_top_drawer_board v1_playerlist_list">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End player list -->
                 </div>
             </div>
 
@@ -213,6 +257,7 @@
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_sidebar.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/map.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/map_dtiles.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/map_canvas.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_popout.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/dinolib.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_stat_list.js"></script>

@@ -189,3 +189,83 @@
     margin-left: 12px;
     text-transform: uppercase;
 }
+
+.popout_colorpicker {
+    position: absolute;
+    top: 15px;
+    height: 28px;
+    right: 0;
+    width: 55px;
+    background-image: url(/assets/app/icons/dino_popout/colorpicker_right.svg);
+    background-repeat: no-repeat;
+    background-position-y: center;
+    background-position-x: right;
+    background-size: 30px;
+    cursor: pointer;
+}
+
+.popout_colorpicker_dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 28px;
+    width: 28px;
+    border-radius: 20%;
+    background-color: #F92A2A;
+    border: 1px solid #686a6d;
+    border-color:transparent;
+    pointer-events: none;
+}
+
+.popout_colorpicker_slider {
+    position: absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    width:80px;
+}
+
+.popout_colorpicker_menu {
+    position: absolute;
+    width: 30px;
+    left:40px;
+    top: -10px;
+    background-color: #33363c;
+    border-radius: 5px;
+    box-shadow: 2px 2px 9px 0px rgba(0,0,0,0.43);
+    pointer-events: none;
+    opacity:0;
+    transition: left 150ms cubic-bezier(0.42, 0, 0.54, 1.24), opacity 100ms ease-in-out;
+    padding: 10px;
+}
+
+.popout_colorpicker:hover .popout_colorpicker_menu {
+    left:60px;
+    pointer-events: all;
+    opacity:1;
+}
+
+.popout_colorpicker_menu_option {
+    height: 28px;
+    width: 28px;
+    border-radius: 20%;
+    background-color: #F92A2A;
+    border: 1px solid transparent;
+    margin-top:5px;
+    transition: border-radius 150ms ease-in-out, border-color 100ms ease-in-out;
+}
+
+.popout_colorpicker_menu_option:first-child {
+    margin-top:0;
+}
+
+.popout_colorpicker_menu_option:hover {
+    border-radius: 40%;
+}
+
+.popout_colorpicker_none {
+    background-image: url(/assets/app/icons/dino_popout/colorpicker_none.svg);
+    background-size: cover;
+    border-color: #686a6d;
+    background-color: #45484e;
+}

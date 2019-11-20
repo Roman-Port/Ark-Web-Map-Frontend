@@ -799,13 +799,23 @@ main.forceSubmitUserServerPrefs = function() {
         "map":0,
         "x":map.map.getCenter().lng,
         "y":map.map.getCenter().lat,
-        "z":map.map.getZoom()
+        "z":map.map.getZoom(),
+        "canvas_id":map.canvas.getCurrentID(),
+        "canvas_brush_color":map.canvas.currentBrushSettings.brushColor
     };
     ark.getServerData().user_prefs = body;
     main.serverRequest(ROOT_URL+"servers/"+main.currentServerId+"/put_user_prefs", {
         "body":JSON.stringify(body),
         "type":"POST"
     }, function() {});
+}
+
+main.uploadContent = function(application_id, data, callback) {
+    //Send server request
+    main.serverRequest(dconfig.apis.USER_CONTENT+"/upload?application_id="+encodeURIComponent(application_id), {
+        "type":"POST",
+        "body":data
+    }, callback);
 }
 
 //Start (run at end)

@@ -64,6 +64,15 @@ dinopop.statusEntries = {
     },
 };
 
+dinopop.COLOR_TAGS = [
+    "#F92A2A",
+    "#FCA71A",
+    "#F7F123",
+    "#34F820",
+    "#3B8AF5",
+    "#932DF9"
+]
+
 dinopop.downloadAndShow = function(x, y, url, ele) {
     //Stop if we're already loading
     if(ele.classList.contains("map_icon_dino_loading")) {
@@ -87,6 +96,10 @@ dinopop.downloadAndShow = function(x, y, url, ele) {
 }
 
 dinopop.clickCatcher = function(evt) {
+    dinopop.dismissModal();
+}
+
+dinopop.dismissModal = function() {
     //Hide
     var e = document.getElementsByClassName("popout_modal");
     for(var i = 0; i<e.length; i+=1) {
@@ -118,6 +131,26 @@ dinopop.show = function(x, y, data) {
         dinopop.createItemsBox(data, main.createDom("div", "popout_lower_content", e));
     }
 
+    //Add color picker options
+    var cp = main.createDom("div", "popout_colorpicker", e);
+    var cpd = main.createDom("div", "popout_colorpicker_dot popout_colorpicker_none", cp);
+    var cps = main.createDom("div", "popout_colorpicker_slider", cp);
+    var cpm = main.createDom("div", "popout_colorpicker_menu", cps);
+    cpm.x_color_dot = cpd;
+    cpm.x_data = data;
+    for(var i = 0; i<dinopop.COLOR_TAGS.length; i+=1) {
+        var cpmo = main.createDom("div", "popout_colorpicker_menu_option", cpm);
+        cpmo.style.backgroundColor = dinopop.COLOR_TAGS[i];
+        cpmo.x_color = dinopop.COLOR_TAGS[i];
+        cpmo.addEventListener("click", dinopop.onClickNewColor);
+    }
+    var cpmon = main.createDom("div", "popout_colorpicker_menu_option popout_colorpicker_none", cpm);
+    cpmon.addEventListener("click", dinopop.onClickNewColor);
+    if(data.prefs.color_tag != null) {
+        cpd.classList.remove("popout_colorpicker_none");
+        cpd.style.backgroundColor = data.prefs.color_tag;
+    }
+
     //Place
     e.style.top = y.toString()+"px";
     e.style.left = x.toString()+"px";
@@ -125,6 +158,36 @@ dinopop.show = function(x, y, data) {
 
     //Add events
     window.addEventListener("mousedown", dinopop.clickCatcher);
+    e.addEventListener("mousedown", function(evt) {
+        evt.stopPropagation();
+    });
+}
+
+dinopop.onClickNewColor = function() {
+    var dot = this.parentElement.x_color_dot;
+    var data = this.parentElement.x_data;
+    var color = this.x_color;
+
+    //Set dot color
+    if(color == null) {
+        dot.style.backgroundColor = null;
+        dot.classList.add("popout_colorpicker_none");
+    } else {
+        dot.style.backgroundColor = color;
+        dot.classList.remove("popout_colorpicker_none");
+    }
+    
+    //Upload to server
+    data.prefs.color_tag = color;
+    dinopop.uploadNewDinoPrefs(data);
+}
+
+dinopop.uploadNewDinoPrefs = function(data) {
+    var url = ark.session.endpoint_put_dino_prefs.replace("{dino}", data.dino_id);
+    main.serverRequest(url, {
+        "type":"POST",
+        "body":JSON.stringify(data.prefs)
+    }, function() {});
 }
 
 dinopop.createStatsBox = function(data, parent) {

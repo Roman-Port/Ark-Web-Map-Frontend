@@ -2081,3 +2081,49 @@ a {
     right: 0;
     padding: 2px 0px;
 }
+
+.map_canvas_userpointer {
+    position: absolute;
+    z-index: 9999;
+    padding: 15px;
+    background-color: #252629;
+    border: 1px solid #33363c;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 15px;
+    text-transform: uppercase;
+    color:white;
+    line-height: 20px;
+    vertical-align: middle;
+    padding-left: 50px;
+    border-bottom-left-radius: 0;
+    opacity:0;
+    pointer-events: none;
+    transition:opacity 100ms ease-in-out;
+}
+
+.map_canvas_userpointer img {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    height: 26px;
+    width: 26px;
+    border-radius: 5px;
+}
+
+.map_canvas_userpointer::after {
+    position: absolute;
+    top: 50px;
+    height: 30px;
+    width: 30px;
+    left: -1px;
+    background: url(/assets/app/img/canvas_pointer.svg);
+    background-position: center;
+    background-size: 30px;
+    z-index: 9999;
+    content:"";
+}
+
+.map_canvas_userpointer_shown {
+    opacity:1;
+}

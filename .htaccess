@@ -1,0 +1,14 @@
+ErrorDocument 400 /assets/error_pages/400.php
+ErrorDocument 401 /assets/error_pages/401.php
+ErrorDocument 403 /assets/error_pages/403.php
+ErrorDocument 404 /assets/error_pages/404.php
+ErrorDocument 500 /assets/error_pages/500.php
+ErrorDocument 502 /assets/error_pages/502.php
+ErrorDocument 503 /assets/error_pages/503.php
+
+Redirect /privacy/ /legal/privacy/
+Redirect /d/win https://github.com/deltawebmap/DeltaClientServer/releases/download/v0.1/windows.zip
+Redirect /d/linux https://github.com/deltawebmap/DeltaClientServer/releases/download/v0.1/linux.zip
+
+RewriteEngine on
+RewriteRule ^/?app/(.+)/$ /app/ [PT]

@@ -64,15 +64,6 @@ dinopop.statusEntries = {
     },
 };
 
-dinopop.COLOR_TAGS = [
-    "#F92A2A",
-    "#FCA71A",
-    "#F7F123",
-    "#34F820",
-    "#3B8AF5",
-    "#932DF9"
-]
-
 dinopop.downloadAndShow = function(x, y, url, ele) {
     //Stop if we're already loading
     if(ele.classList.contains("map_icon_dino_loading")) {
@@ -138,10 +129,10 @@ dinopop.show = function(x, y, data) {
     var cpm = main.createDom("div", "popout_colorpicker_menu", cps);
     cpm.x_color_dot = cpd;
     cpm.x_data = data;
-    for(var i = 0; i<dinopop.COLOR_TAGS.length; i+=1) {
+    for(var i = 0; i<statics.COLOR_TAGS.length; i+=1) {
         var cpmo = main.createDom("div", "popout_colorpicker_menu_option", cpm);
-        cpmo.style.backgroundColor = dinopop.COLOR_TAGS[i];
-        cpmo.x_color = dinopop.COLOR_TAGS[i];
+        cpmo.style.backgroundColor = statics.COLOR_TAGS[i];
+        cpmo.x_color = statics.COLOR_TAGS[i];
         cpmo.addEventListener("click", dinopop.onClickNewColor);
     }
     var cpmon = main.createDom("div", "popout_colorpicker_menu_option popout_colorpicker_none", cpm);
@@ -261,7 +252,7 @@ dinopop.createStaticStatsBox = function(data, parent) {
     //Add state
     var status = main.createDom("li", "popout_staticstats_s popout_staticstats_status", container);
     if(data.dino.status != null) {
-        var statusData = ark.STATUS_STATES[data.dino.status];
+        var statusData = statics.STATUS_STATES[data.dino.status];
         status.innerText = statusData.text.toUpperCase();
         status.style.color = statusData.modal_color;
     } else {

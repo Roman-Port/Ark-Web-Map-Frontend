@@ -1,0 +1,119 @@
+body, html {
+    background-color: #252629;
+    padding:0;
+    margin:0;
+    height:100vh;
+}
+
+.inner_box {
+    font-family: 'Roboto', sans-serif;
+    background-color: #33363c;
+    max-width: 500px;
+    width: calc(100% - 40px);
+    height: 500px;
+    text-align: left;
+    display: inline-block;
+    border: 1px solid #45484dFF;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.error_text {
+    color:#c1c1c1;
+    font-size:18px;
+    max-width:600px;
+    text-transform: uppercase;
+    width: calc(100% - 40px);
+    font-family: 'Roboto', sans-serif;
+    display:inline-block;
+}
+
+.consent_top {
+    padding: 20px;
+    border-bottom: 1px solid #45484dFF;
+}
+
+.consent_top_icon {
+    background-repeat: no-repeat;
+    background-size: 54px;
+    background-position-x: 20px;
+    padding-left: 85px;
+    background-position-y: 20px;
+}
+
+.consent_top_subtitle {
+    color: gray;
+    font-weight: 600;
+    font-size: 15px;
+    text-transform: uppercase;
+}
+
+.consent_top_application {
+    color: #43b581;
+    font-size: 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.consent_mid {
+    color: gray;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 20px 20px;
+}
+
+.consent_mid_accent {
+    color: #43b581;
+}
+
+.consent_mid ul {
+    padding-left: 20px;
+}
+
+.consent_bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.consent_bottom_reminder {
+    border-top: 1px solid #45484dFF;
+    color: #c1c1c1;
+    padding: 10px;
+    font-size: 13px;
+    text-align: center;
+    border-bottom: 1px solid #45484dFF;
+    background-color: #45484dFF;
+}
+
+.consent_bottom_nav {
+    bottom: 0;
+    padding: 15px;
+    height: 42px;
+    background: #45484d78;
+}
+
+.consent_bottom_nav_btn {
+    padding: 12px 25px;
+    background-color: #368df7;
+    border-radius: 5px;
+    display: inline-block;
+    color: white;
+    font-size: 15px;
+    height: 18px;
+    line-height: 18px;
+    float: right;
+    cursor: pointer;
+}
+
+.consent_bottom_nav_flag {
+    float:left;
+    height:42px;
+    line-height:42px;
+    color:gray;
+    font-size:13px;
+    cursor:pointer;
+    text-decoration: underline;
+}

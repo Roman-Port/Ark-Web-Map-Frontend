@@ -1,5 +1,6 @@
 map.dtiles = {};
 map.dtiles.ready = false;
+map.dtiles.ready_queue = [];
 map.dtiles.layer = null;
 map.dtiles.assets = {};
 map.dtiles.loaded_assets = 0;
@@ -23,6 +24,14 @@ map.dtiles.init = function() {
         //Load server
         map.dtiles.switchServer();
     });
+}
+
+map.dtiles.subscribeToFinished = function(callback) {
+    if(map.dtiles.ready == true) {
+        callback();
+    } else {
+        map.dtiles.ready_queue.push(callback);
+    }
 }
 
 map.dtiles.switchServer = function() {
@@ -65,6 +74,10 @@ map.dtiles.loadAssets = function(callback) {
                 //If complete, call callback
                 if(map.dtiles.loaded_assets == map.dtiles.metadata.length) {
                     console.log("[Dynamic Tiles] Asset store loading finished!");
+                    for(var i = 0; i<map.dtiles.ready_queue.length; i+=1) {
+                        map.dtiles.ready_queue[i]();
+                    }
+                    map.dtiles.ready_queue = [];
                     callback();
                 }
             });
@@ -75,14 +88,15 @@ map.dtiles.loadAssets = function(callback) {
 
 map.dtiles.addLayer = function() {
     //Create the map layer
-    map.dtiles.layer = new map.dtiles.mapLayer("/", {
+    var mapSettings = {
         updateWhenZooming:false,
         maxZoom:12,
         id: 'structures',
         opacity: 1,
         zIndex: 10,
         bounds:map.getBounds()
-    }).addTo(map.map);
+    };
+    map.dtiles.layer = new map.dtiles.mapLayer("/", mapSettings).addTo(map.map);
 }
 
 map.dtiles.updateLoader = function(amount) {
@@ -109,7 +123,7 @@ map.dtiles.mapLayer = L.GridLayer.extend({
         var context = e.getContext('2d');
 
         //Calculate the range of data
-        var calcOffset = ark.session.mapData.captureSize/2
+        var calcOffset = ark.session.mapData.captureSize/2;
         var units_per_tile = ark.session.mapData.captureSize / Math.pow(2, coords.z);
         var game_min_x = (coords.x * units_per_tile) - calcOffset;
         var game_min_y = (coords.y * units_per_tile) - calcOffset;
@@ -117,37 +131,41 @@ map.dtiles.mapLayer = L.GridLayer.extend({
         var game_max_y = ((coords.y+1) * units_per_tile) - calcOffset;
 
         //Add all of the elements to this
-        for(var i = 0; i<d.s.length; i+=1) {
-            var s = d.s[i];
-
-            //Check if this is within range
-            if(s.x > game_max_x+(s.s * 1.5) || s.x < game_min_x-(s.s * 1.5)) {
-                continue;
-            }
-            if(s.y > game_max_y+(s.s * 1.5) || s.y < game_min_y-(s.s * 1.5)) {
-                continue;
-            }
-
-            //Do size calculations
-            var size = (s.s / units_per_tile) * tsize.x;
-
-            //Skip if it is too small
-            if(size < 5) {
-                continue;
-            }
-
-            //Determine location
-            var loc_tile_x = ((s.x - (s.s / 2) - game_min_x) / units_per_tile)*tsize.x;
-            var loc_tile_y = ((s.y - (s.s / 2) - game_min_y) / units_per_tile)*tsize.y;
-            
-            //Draw this
-            map.dtiles.drawRotatedImage(context, map.dtiles.assets[d.i[s.i]], loc_tile_x, loc_tile_y, s.r, size, size);
-        }
+        map.dtiles.writeToCanvas(context, d, game_min_x, game_min_y, game_max_x, game_max_y, tsize, units_per_tile, 0, 0);
 
         // return the tile so it can be rendered on screen
         return e;
     }
 });
+
+map.dtiles.writeToCanvas = function(context, d, game_min_x, game_min_y, game_max_x, game_max_y, tsize, units_per_tile, globalOffsetX, globalOffsetY) {
+    for(var i = 0; i<d.s.length; i+=1) {
+        var s = d.s[i];
+
+        //Check if this is within range
+        if(s.x > game_max_x+(s.s * 1.5) || s.x < game_min_x-(s.s * 1.5)) {
+            continue;
+        }
+        if(s.y > game_max_y+(s.s * 1.5) || s.y < game_min_y-(s.s * 1.5)) {
+            continue;
+        }
+
+        //Do size calculations
+        var size = (s.s / units_per_tile) * tsize.x;
+
+        //Skip if it is too small
+        if(size < 5) {
+            continue;
+        }
+
+        //Determine location
+        var loc_tile_x = ((s.x - (s.s / 2) - game_min_x) / units_per_tile)*tsize.x;
+        var loc_tile_y = ((s.y - (s.s / 2) - game_min_y) / units_per_tile)*tsize.y;
+        
+        //Draw this
+        map.dtiles.drawRotatedImage(context, map.dtiles.assets[d.i[s.i]], loc_tile_x + globalOffsetX, loc_tile_y + globalOffsetY, s.r, size, size);
+    }
+}
 
 map.dtiles.drawRotatedImage = function(context, image, x, y, angle, width, height) { 
     var TO_RADIANS = Math.PI/180; 

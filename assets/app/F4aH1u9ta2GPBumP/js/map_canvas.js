@@ -752,6 +752,11 @@ map.canvas.onDrawBtnDown = function(d) {
         return;
     }
 
+    //If no canvas is active, stop
+    if(map.canvas.currentCanvasData == null) {
+        return;
+    }
+
     //If there is an unfinished point, finish it first
     if(map.canvas.active) {
         map.canvas.endPoint(d.latlng);
@@ -932,7 +937,9 @@ map.canvas.textMsgs = {
 //Flashes that a user did an action, temporarily obscuring the map
 map.canvas.flashDecay = function(user, text) {
     //Add flash
-    main.createDom("div", "v1_canvas_clear_flash", map.canvas.canvas.parentElement);
+    main.createDom("div", "v1_canvas_clear_flash", map.canvas.canvas.parentElement).setTimeout(function() {
+        this.remove();
+    }, 8000);
 
     //Show message
     var m = main.createDom("div", "v1_canvas_clear_prompt_container", map.canvas.canvas.parentElement);

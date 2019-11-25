@@ -1,0 +1,91 @@
+.nursery_box {
+    display: inline-block;
+    margin: 15px;
+    height: 300px;
+    width: 200px;
+    background-color: #33363c;
+    border: 1px solid #44474b;
+    border-radius: 5px;
+    position: relative;
+    font-family: 'Roboto', sans-serif;
+}
+
+.nursery_box_section {
+    padding: 0px 10px;
+    margin: 10px 0px;
+}
+
+/* Title section */
+
+.nursery_box_subtitle {
+    color: #b0b0b0;
+    font-size: 15px;
+    text-transform: uppercase;
+    line-height: 18px;
+}
+
+.nursery_box_title {
+    color: white;
+    font-size: 20px;
+}
+
+/* Maps section */
+.nursery_map_container {
+    background-color: #2c2e33;
+    border: 1px solid #44474b;
+    border-radius: 5px;
+    height:90px;
+}
+
+/* Stats section */
+
+.nursery_box_bar {
+    height: 30px;
+    border-radius: 5px;
+    background-color: #2c2e33;
+    border: 1px solid #44474b;
+    overflow: hidden;
+    position: relative;
+}
+
+.nursery_box_bar_filled {
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #d05e5e;
+    position: absolute;
+    width: 65%;
+    border-radius: 5px;
+}
+
+.nursery_box_bar_text {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    line-height: 32px;
+    color: white;
+    left: 5px;
+    z-index: 3;
+    font-size: 15px;
+}
+
+.nursery_box_bar_amount {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    line-height: 32px;
+    color: white;
+    right: 5px;
+    z-index: 3;
+    font-size: 13px;
+    text-align: right;
+}
+
+.nursery_box_bar_filled_style_incubation {
+    background-color: #28acf1;
+}
+
+.nursery_box_bar_filled_style_health {
+    background-color: #f65959;
+}

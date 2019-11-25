@@ -7,43 +7,6 @@ ark.MIN_DATA_VERSION = 2;
 
 ark.loading_status = 0; //Target: 5
 
-ark.STATUS_STATES = {
-    "PASSIVE":{
-        "color":"#5AE000",
-        "text":"Passive",
-        "modal_color":"#5AE000"
-    },
-    "NEUTRAL":{
-        "color":"#000000",
-        "text":"Neutral",
-        "modal_color":"#FFFFFF"
-    },
-    "AGGRESSIVE":{
-        "color":"#E63F19",
-        "text":"Aggressive",
-        "modal_color":"#FF7777"
-    },
-    "PASSIVE_FLEE":{
-        "color":"#E6D51C",
-        "text":"Passive Flee",
-        "modal_color":"#E6D51C"
-    },
-    "YOUR_TARGET":{
-        "color":"#1C9BE6",
-        "text":"Your Target",
-        "modal_color":"#1C9BE6"
-    }
-};
-
-ark.COLOR_TAGS = [
-    "#ff6a6a",
-    "#fff26a",
-    "#3cfa2d",
-    "#2df3fa",
-    "#2033fa",
-    "#ed32f2"
-]
-
 ark.init = function(d) {
     //Check if this server is already active
     if(main.currentServerId == d.id) {
@@ -83,7 +46,7 @@ ark.init = function(d) {
         dinosidebar.init();
 
         //Download tribes
-        ark.downloadData(s.endpoint_tribes, "tribe", {}, function(m) {
+        ark.downloadData(s.endpoint_tribes_icons, "tribe", {}, function(m) {
             map.onEnableTribeDinos(m);
             ark.loading_status += 1;
         }, ark.fatalError);
@@ -110,6 +73,12 @@ ark.verify = function(d, doShowMsg, isFirstStart, msgDismissCallback) {
 }
 
 ark.deinit = function() {
+    //Get thumbnail
+    /*map.getThumbnail(function(e) {
+        e.classList.add("debug_top_256");
+        document.body.appendChild(e);
+    }, 89214.33, -3728.693, 6000, 512, 512, 40, true);*/
+
     //Submit map settings
     main.forceSubmitUserServerPrefs();
     
@@ -234,63 +203,4 @@ ark.downloadData = function(url, offlineDataKey, args, callback, failCallback) {
     args.failOverride = fail;
     args.enforceServer = true;
     main.serverRequest(url, args, callback);
-}
-
-ark.onServerGoOffline = function() {
-    //Add HUD message
-    main.addHUDMessage("This server is offline. Data may not be up to date.", "#eb3434", "/assets/icons/baseline-offline_bolt-24px.svg", "server-offline", 2);
-    main.currentServerOnline = false;
-}
-
-ark.onServerGoOnline = function(doReload) {
-    //Remove HUD message
-    main.removeHUDMessage("server-offline");
-    main.currentServerOnline = true;
-    if(doReload) {
-        ark.prettyRefreshDefer();
-    }
-}
-
-ark.onServerStateChanged = function(id, status) {
-    if(id != main.currentServerId) { return; }
-    if(status) {
-        ark.onServerGoOnline(true);
-    } else {
-        ark.onServerGoOffline();
-    }
-}
-
-ark.isRefreshDeferred = false;
-
-ark.prettyRefreshDefer = function() {
-    //Defers to prevent agressive server load
-    if(ark.isRefreshDeferred) {return;}
-    var defer = 3000 + (Math.random() * 10000);
-    main.log("Pretty-Refresh-Defer", 2, "Deferring session reload by "+defer+"ms...");
-    ark.isRefreshDeferred = true;
-    window.setTimeout(ark.prettyRefresh, defer);
-}
-
-ark.prettyRefresh = function() {
-    //Refreshes the page in a pretty manner that doesn't interrupt the user.
-    ark.isRefreshDeferred = false;
-    ark.cachedOfflineData = null;
-    main.log("Pretty-Refresh", 2, "Refreshing all session data...");
-    main.sessionToken += 1;
-    ark.downloadData(ark.getServerData().endpoint_createsession, "session", {}, function(s) {
-        ark.session = s;
-
-        //ReDownload sidebar data
-        dinosidebar.redownload();
-
-        //Download tribes
-        ark.downloadData(s.endpoint_tribes, "tribe", {}, function(m) {
-            //Remove existing
-            map.removeMarkerLayer("players");
-            map.removeMarkerLayer("dinos");
-
-            //Add
-            map.onEnableTribeDinos(m);
-        }, ark.fatalError);
-    }, ark.fatalError);
 }

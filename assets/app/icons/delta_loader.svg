@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<svg width="240" height="80" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <g class="layer">
+  <ellipse cx="40" cy="40" fill="#2c2e3300" id="svg_1" rx="30" ry="30" stroke="#44474b" stroke-width="7">
+    <animate dur="2.5s" values="#2c2e3300; #2c2e3300; #33363cFF; #33363cFF; #2c2e3300; #2c2e3300" keyTimes="0; 0.1; 0.13; 0.37; 0.4; 1" attributeName="fill" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="120" cy="40" fill="#2c2e3300" id="svg_2" rx="30" ry="30" stroke="#44474b" stroke-width="7">
+    <animate begin="700ms" dur="2.5s" values="#2c2e3300; #2c2e3300; #33363cFF; #33363cFF; #2c2e3300; #2c2e3300" keyTimes="0; 0.1; 0.13; 0.37; 0.4; 1" attributeName="fill" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="200" cy="40" fill="#2c2e3300" id="svg_3" rx="30" ry="30" stroke="#44474b" stroke-width="7">
+    <animate begin="1400ms" dur="2.5s" values="#2c2e3300; #2c2e3300; #33363cFF; #33363cFF; #2c2e3300; #2c2e3300" keyTimes="0; 0.1; 0.13; 0.37; 0.4; 1" attributeName="fill" repeatCount="indefinite"/>
+  </ellipse>
+ </g>
+</svg>

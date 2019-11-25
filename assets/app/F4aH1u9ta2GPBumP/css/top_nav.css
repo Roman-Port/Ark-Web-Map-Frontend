@@ -581,7 +581,6 @@
     right:unset;
     left:10px;
     top: -50px;
-    right: 16px;
     height: 38px;
     z-index: 10003;
     position: absolute;
@@ -982,4 +981,11 @@
     width: 100px;
     text-align: right;
     font-size: 13px;
+}
+
+.debug_top_256 {
+    position: fixed;
+    z-index:99999999;
+    background-color:gray;
+    border:3px solid black;
 }

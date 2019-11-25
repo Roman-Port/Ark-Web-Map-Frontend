@@ -3,11 +3,14 @@ map.map = null;
 map.game_map = null; //The current map itself
 map.game_map_data = null; //Data about the current map
 map.layerList = {};
-map.onClickQueue = []; //List of events fired when a click is down. Only called once. Format: {"callback":function(ok, pos, context), "context":context}
-
-map.populationMapFilter = "";
 
 map.isInMotion = false;
+
+map.ICON_ENTRIES = {
+    "dinos":function(data, icon) {
+        icon.addEventListener('click', map.onDinoClicked);
+    }
+}
 
 map.init = function() {
     //Get prefs so we know where to spawn the map
@@ -17,7 +20,6 @@ map.init = function() {
     map.map = L.map('map_part', {
         crs: L.CRS.Simple,
         minZoom: 0,
-        /*maxBounds:L.latLngBounds(L.latLng(-256, 0), L.latLng(0, 256))*/
     }).setView([user_prefs.y, user_prefs.x], user_prefs.z);
 
     //Set background color
@@ -27,46 +29,16 @@ map.init = function() {
         map.restoreDefaultBackgroundColor();
     }
 
-    //Add click events
-    map.map.on("click", function(e) {
-        //Convert this to coords and call all of the click queue
-        var coords = map.convertFromMapPosToNormalized({
-            "x":e.latlng.lng,
-            "y":e.latlng.lat
-        });
-        coords = {
-            "x":coords[0],
-            "y":coords[1]
-        };
-
-        //Call all 
-        for(var i = 0; i<map.onClickQueue.length; i+=1) {
-            var d = map.onClickQueue[i];
-            d.callback(true, coords, d.context);
-        }
-
-        //Clear
-        map.onClickQueue = [];
-    });
-
-    //Add events for drawable
-    //map.map.on("move", draw_map.redraw);
+    //Add various events
     map.map.on('mousedown', function(e) {
         if(e.originalEvent.button == 2) {
-            //Right click
             map.map.dragging.disable();
-            //draw_map.onDrawBegin();
         }
     });
     map.map.on('mouseup', function(e) {
         if(e.originalEvent.button == 2) {
-            //Right click
             map.map.dragging.enable();
-            //draw_map.onDrawEnd();
         }
-    });
-    map.map.addEventListener('mousemove', function(e) {
-        //draw_map.onDrawMove(e.containerPoint, e.latlng);
     });
     map.map.on("contextmenu", function(){}); //Only used to prevent context menu
     map.map.on("zoomend", main.queueSubmitUserServerPrefs);
@@ -77,12 +49,10 @@ map.init = function() {
     map.map.on("zoomstart", dinopop.dismissModal);
     map.canvas.hook(map.map);
 
-    //Trigger resize of canvas
-    //draw_map.onResize();
-
     //Check btn
     map.updateReturnBtn();
 
+    //Init map plugins
     map.dtiles.init();
     map.canvas.init();
 };
@@ -90,14 +60,6 @@ map.init = function() {
 map.deinit = function() {
     //Deinit addons
     map.canvas.deinit();
-
-    //Clear all dynamic maps
-    main.foreach(map.dynamic_maps, function(m) {
-        clearInterval(m.heart);
-    });
-
-    //Clear dynamic map list
-    map.dynamic_maps = [];
 
     //Remove the map
     if(map.map != null) {
@@ -124,26 +86,10 @@ map.resetPos = function() {
     main.queueSubmitUserServerPrefs();
 }
 
-map.resetPopulationMap = function(isOn, filteredClassname) {
-    //Remove layer if needed
-    if(map.layerList["population_map"] != null) {
-        try {
-            map.layerList["population_map"].removeFrom(map.map);
-        } catch (e) {
-
-        }
-    }
-
-    //If it is on, add it
-    if(isOn) {
-        map.addPopulationMap(filteredClassname);
-    }
-}
-
 map.addGameMapLayer = function(data) {
     //Create main tile layer
     map.game_map_data = data;
-    map.game_map = L.tileLayer(data.url, {
+    var mapSettings = {
         attribution: 'Studio Wildcard',
         maxNativeZoom: data.maximumZoom,
         maxZoom:12,
@@ -151,69 +97,8 @@ map.addGameMapLayer = function(data) {
         opacity: 1,
         zIndex: 1,
         bounds:map.getBounds()
-    }).addTo(map.map);
-}
-
-map.dynamic_maps = []; //Dynamic maps we're using
-
-map.addDynamicMap = function(type, callback) {
-    //Request to begin a dynamic map
-    main.serverRequest("https://dynamic-tiles.deltamap.net/create/"+encodeURIComponent(main.currentServerId)+"/"+encodeURIComponent(type), {"enforceServer":true, "failOverride":function() {
-        main.addHUDMessage("Layer "+type+" is currently unavailable. Try again later.", "#eb3434", "/assets/icons/baseline-cloud-24px.svg", 5, 11);
-    }}, function(d) {
-        //We've created a session. Create an object to insert
-        var session = {
-            "token":d.token,
-            "heartbeat_url":d.url_heartbeat,
-            "map_url":d.url_map,
-            "expired":false,
-            "type":type
-        };
-
-        //Set a timer to heartbeat this
-        session.heart = window.setInterval(function() {
-            main.serverRequest(session.heartbeat_url, {"isJson":false, "enforceServer":true, "failOverride":function(t) {
-                if(t.status == 410) {
-                    //The resource no longer exists, as it expired. We'll recreate it
-                    main.log("dynamic-map", 3, "Session expired. Recreating dynamic map...");
-
-                    //Kill this session
-                    clearInterval(session.heart);
-                    session.expired = true;
-                    session.layer.remove();
-
-                    //Add a new one
-                    map.addDynamicMap(session.type, function(){});
-                }
-            }}, function() {});
-        }, d.heartbeat_policy_ms);
-
-        //Add map layer
-        session.layer = L.tileLayer(session.map_url, {
-            maxZoom:12,
-            id: 'dm_'+session.token,
-            opacity: 1,
-            zIndex: 1,
-            maxNativeZoom:10,
-            bounds:map.getBounds()
-        }).addTo(map.map);
-
-        //Push
-        map.dynamic_maps.push(session);
-
-        //Callback
-        callback();
-    });
-}
-
-map.onPopulationMapToggle = function(value) {
-    if(value == false) {
-        //Remove
-        map.layerList["population_map"].removeFrom(map.map);
-    } else {
-        //Add
-        map.addPopulationMap(map.populationMapFilter);
-    }
+    };
+    map.game_map = L.tileLayer(data.url, mapSettings).addTo(map.map);
 }
 
 map.getBounds = function() {
@@ -221,34 +106,6 @@ map.getBounds = function() {
         [-256, 0],
         [0, 256]
     ];
-}
-
-map.addPopulationMap = function(filter) {
-    var url = ark.session.endpoint_population_map.replace("{filter}", encodeURIComponent(filter));
-    map.layerList["population_map"] = L.tileLayer(url, {
-        maxZoom: 50,
-        id: 'ark_map',
-        opacity: 1,
-        zIndex: 2,
-        bounds: map.getBounds()
-    });
-    map.layerList["population_map"].addTo(map.map);
-}
-
-map.onChangePopulationMapFilter = function(dinoData) {
-    //Remove
-    if(map.layerList["population_map"] != null) {
-        map.layerList["population_map"].removeFrom(map.map);
-    }
-    //Activate
-    document.getElementById('population_map_check').checked = true;
-    if(dinoData == null) {
-        //No filter
-        map.addPopulationMap("");
-    } else {
-        //Dino filter
-        map.addPopulationMap(dinoData.classname);
-    }
 }
 
 //Key: Dino ID, 
@@ -259,118 +116,50 @@ map.dino_marker_list_index = 0;
 map.onEnableTribeDinos = function(d) {
     //Add to loading status
     ark.loading_status += 1;
+    ark.map_icons = d;
 
-    //Add dinos
-    for(var i = 0; i<d.dinos.length; i+=1) {
-        var dino = d.dinos[i];
-        if(dino == null) {
-            console.warn("Warning: Dino ID "+dino_id+" was not found, but was referenced.");
-        }
-        //Create marker
-        map.addDinoMarker(dino);
-    }
-
-    //Add tribemates
-    for(var i = 0; i<d.player_characters.length; i+=1) {
-        var player = d.player_characters[i];
-        var pos = map.convertFromNormalizedToMapPos(player.adjusted_map_pos);
-        var imgOverlay = null;
-        if(!player.is_alive) {
-            //Set death overlay
-            imgOverlay = "//icon-assets.deltamap.net/legacy/player_death_cache.png";
-        }
-        map.addMapIcon("players", player.profile.arkPlayerId.toString(), player, pos, player.steamProfile.avatarfull, null, null, null, true, imgOverlay );
+    //Add all map icons
+    for(var i = 0; i<d.icons.length; i+=1) {
+        var data = d.icons[i];
+        map.addDataIconToMap(data, map.map);
     }
 }
 
-map.enableStructuresLayer = function(data, structures) {
-    var StructureLayer = L.GridLayer.extend({
-        options: {
-            x_list: [],
-            x_show_list: false
-        },
-        createTile: function(coords, done){
-            // create a <canvas> element for drawing
-            var tile = L.DomUtil.create('div', 'leaflet-tile');
-            if(this.options.x_show_list) {
-                tile.classList.add("structure_layer_hp");
-            } else {
-                tile.classList.add("structure_layer_lp");
-            }
+map.addDataIconToMap = function(data, mapContainer) {
+    //Get position on the map
+    var pos = map.convertFromGamePosToMapPos(data.location.x, data.location.y);
 
-            // setup tile width and height according to the options
-            var size = this.getTileSize();
-            tile.style.width = size.x;
-            tile.style.height = size.y;
+    //Create the inner content
+    var content = main.createDom("div", "");
 
-            //Find range in this tile
-            var min = map.convertZCoordsToGameUnits(coords.x, coords.y, coords.z);
-            var max = map.convertZCoordsToGameUnits(coords.x + 1, coords.y + 1, coords.z);
-            var unitsPerTile = map.getUnitsPerTile(coords.z);
-            var tilePpm = 256 / unitsPerTile;
-            
-            //Get structures in this range
-            var count = 0;
-            for(var i = 0; i<structures.length; i+=1) {
-                if(structures[i].map_pos.x > max.x || structures[i].map_pos.x < min.x || structures[i].map_pos.y > max.y || structures[i].map_pos.y < min.y) {continue;}
-                var st = structures[i];
-                count+=1;
+    //Add color tag to content, if any
+    if(data.tag_color != null) {
+        main.createDom("div", "map_icon_tag", content).style.backgroundColor = data.tag_color;
+    } else {
+        main.createDom("div", "map_icon_tag", content).style.display = "none";
+    }
 
-                //Only show if this has an inventory
-                if(!st.hasInventory) {
-                    continue;
-                }
+    //Create the hover content, if any
+    if(data.dialog != null) {
+        content.appendChild(map.createHoverElement(data.img, data.dialog.title, data.dialog.subtitle));
+    }
 
-                //Find position inside of the structure inside of this tile
-                var adjusted = {"x":((st.map_pos.x - min.x) / unitsPerTile), "y":((st.map_pos.y - min.y) / unitsPerTile)};
-                adjusted.x -= 0.5;
-                adjusted.y -= 0.5;
+    //Create icon
+    var icon = map.addMapIcon(data.type, data.id, data.extras, pos, data.img, null, "map_icon_dino", content, mapContainer);
+    icon.x_data = data;
 
-                //Scale
-                var ppmDiff = tilePpm / st.ppm;
+    //Set border from state
+    if(data.outline_color != null) {
+        icon.style.borderColor = data.outline_color;
+    }
 
-                //Get z
-                var z = st.z - data.min_structure_z;
-                z = 20;
-                if(st.dtype == 1) {
-                    z = 21;
-                }
-
-                //Get the image name. This jank will be fixed in a future update
-                var name = data.structure_images[st.img].substr(51);
-                var size = map.structure_size_config[name];
-
-                //Skip if we failed to find the size
-                if(size == null) {
-                    continue;
-                }
-
-                //Place structure
-                var sd = main.createDom("div", "structure_img", tile);
-                sd.style.width = size.width+"px";
-                sd.style.height = size.height+"px";
-                sd.style.backgroundColor = "red";
-                sd.style.transform = "scale("+(ppmDiff).toString()+") rotate("+st.rot.toString()+"deg)";
-                sd.style.top = ((adjusted.y * 256) - 0).toString()+"px";
-                sd.style.left = ((adjusted.x * 256) - 0).toString()+"px";
-                sd.style.zIndex = z.toString();
-            }
-            
-            //Set
-            tile.style.visibility = "visible";
-
-            // return the tile so it can be rendered on screen
-            return tile;
-        }
-    });
-    var lo = new StructureLayer({
-        id: 'structure_map_hp',
-        opacity: 1,
-        zIndex: 3,
-        updateWhenZooming: false,
-        keepBuffer: 4,
-    });
-    lo.addTo(map.map);
+    //Add custom events from the type
+    if(map.ICON_ENTRIES[data.type] != null) {
+        map.ICON_ENTRIES[data.type](data, icon);
+    } else {
+        //Unexpected type.
+        console.warn("Got icon with type "+data.type+", but there was no entry for this type!");
+    }
 }
 
 map.getUnitsPerTile = function(z) {
@@ -387,34 +176,6 @@ map.convertZCoordsToGameUnits = function(x, y, z) {
         "y":(y * unitsPerTile)
     }
 }
-
-map.addDinoMarker = function(dino) {
-    //Get pos
-    var pos = map.convertFromNormalizedToMapPos(dino.adjusted_map_pos);
-
-    //Create the hover content
-    var hover = map.createDinoHoverElement(dino);
-
-    //Create inner content
-    var content = main.createDom("div", "");
-    content.appendChild(hover);
-
-    //Add tag
-    if(dino.color_tag != null) {
-        main.createDom("div", "map_icon_tag", content).style.backgroundColor = dino.color_tag;
-    } else {
-        main.createDom("div", "map_icon_tag", content).style.display = "none";
-    }
-
-    //Create icon
-    var icon = map.addMapIcon("dinos", dino.id, dino, pos, dino.imgUrl, map.onDinoClicked, "map_icon_dino", content);
-
-    //Set border from state
-    if(dino.status != null) {
-        icon.style.borderColor = ark.STATUS_STATES[dino.status].color;
-    }
-}
-
 map.markers = {};
 
 map.MARKER_Z_OFFSETS = {
@@ -422,7 +183,7 @@ map.MARKER_Z_OFFSETS = {
     "players":10000
 }; //Used to define layer priorities. If the layer name does not exist on this list, it is pushed to the bottom
 
-map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, classNames, inner) {
+map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, classNames, inner, mapContainer) {
     var icon = L.divIcon({
         iconSize:       [40, 40],
         className:      "map_icon_base "+classNames,
@@ -448,7 +209,7 @@ map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, classNames
     var dino_icon = L.marker(pos, {
         icon: icon,
         zIndexOffset:1
-    }).addTo(map.map);
+    }).addTo(mapContainer);
 
     //Add to list
     map.markers[layerId][markerId] = dino_icon;
@@ -490,21 +251,15 @@ map.removeMarkerLayer = function(layerId) {
     }
 }
 
-map.onDinoClicked = function(e) {
-    //Log
-    analytics.action("map-dino-click-online", "web-main", {
-        "dino_id":this.x_data.id,
-        "dino_classname":this.x_data.classname
-    });
-
+map.onDinoClicked = function() {
     //Get URL
-    var url = this.x_data.apiUrl;
+    var url = this.x_data.extras.url;
 
-        //Get pos
-        var rect = this._icon.getBoundingClientRect();
+    //Get pos
+    var rect = this.getBoundingClientRect();
 
     //Show
-    dinopop.downloadAndShow(rect.left - 14, rect.top - 10, url, this._icon);
+    dinopop.downloadAndShow(rect.left - 14, rect.top - 10, url, this);
 }
 
 map.setBackground = function(color) {
@@ -515,18 +270,18 @@ map.restoreDefaultBackgroundColor = function() {
     map.setBackground("#1c1d21");
 }
 
-map.createDinoHoverElement = function(data) {
+map.createHoverElement = function(iconImg, title, subtitle) {
     //Create element
     var e = main.createDom("div", "mini_modal mini_modal_anim");
 
     //Add icon
     var icon = main.createDom("img", "mini_modal_icon map_icon_base map_icon_dino", e);
-    icon.style.backgroundImage = "url("+data.imgUrl+")";
+    icon.style.backgroundImage = "url("+iconImg+")";
 
     //Create content
     var ce = main.createDom("div", "mini_modal_content", e);
-    main.createDom("div", "mini_modal_title", ce).innerText = data.tamedName;
-    main.createDom("div", "mini_modal_sub", ce).innerText = data.displayClassname+" - Lvl "+data.level;;
+    main.createDom("div", "mini_modal_title", ce).innerText = title;
+    main.createDom("div", "mini_modal_sub", ce).innerText = subtitle;
 
     return e;
 }
@@ -568,14 +323,6 @@ map.convertFromGamePosToMapPos = function(x, y) {
     return L.latLng(y, x);
 }
 
-map.addClickEvent = function(callback, context) {
-    //Push
-    map.onClickQueue.push({
-        "callback":callback,
-        "context":context
-    })
-};
-
 map.remoteUpdateDino = function(e) {
     //Get marker
     var marker = map.getMarkerByName("dinos", e.id);
@@ -603,33 +350,202 @@ map.remoteUpdateDinoPrefs = function(data) {
     }
 }
 
-//Refreshes the list of online players on the top
-map.refreshOnlinePlayersList = function(d) {
-    //Set top bar text. Only use icons if 0<x<=5
-    var sub = document.getElementsByClassName('v1_playerlist_sub')[0];
-    var icons = document.getElementsByClassName('v1_playerlist_icon_holder')[0];
-    sub.innerText = "";
-    icons.innerHTML = "";
-    if(d.players.length > 0 && d.players.length <= 5) {
-        for(var i = 0; i<d.players.length; i+=1) {
-            var ii = main.createDom("img", "v1_playerlist_icon", icons);
-            ii.src = d.players[i].icon;
-        }
-    } else if(d.players.length == 0) {
-        sub.innerText = "No Players";
-    } else {
-        sub.innerText = d.players.length+" Players";
+map.getThumbnail = function(callback, centerX, centerY, size, realWidth, realHeight, iconSize, safe, zoomLevel) {
+    //Grab external refs that might change during this
+    var structureData = map.dtiles.data;
+    var mapIcons = ark.map_icons;
+    var mapData = ark.session.mapData;
+
+    //If safe, load these
+    if(safe) {
+        //Gross, refactor please
+        structureData = JSON.parse(JSON.stringify(structureData));
+        mapIcons = JSON.parse(JSON.stringify(mapIcons));
+        mapData = JSON.parse(JSON.stringify(mapData));
     }
 
-    //Set contents of list
-    var list = document.getElementsByClassName('v1_playerlist_list')[0];
-    list.innerHTML = "";
-    for(var i = 0; i<d.players.length; i+=1) {
-        var e = main.createDom("div", "v1_playerlist_item", list);
-        main.createDom("img", "v1_playerlist_item_icon", e).src = d.players[i].icon;
-        main.createDom("div", "v1_playerlist_item_name", e).innerText = d.players[i].name;
-        if(d.tribes[d.players[i].tribe_id] != null) {
-            main.createDom("div", "v1_playerlist_icon_tribe", e).innerText = d.tribes[d.players[i].tribe_id].name;
+    //Run
+    map.dtiles.subscribeToFinished(function() {
+        //This function only supports square images. We can emulate any size, though
+        var width = Math.max(realWidth, realHeight);
+        var height = width;
+
+        //Make sure zoom level is within range. -1 sets it to auto
+        if(zoomLevel == -1 || zoomLevel == null) {
+            zoomLevel = mapData.maps[0].maximumZoom;
         }
+        zoomLevel = Math.min(mapData.maps[0].maximumZoom, zoomLevel);
+
+        //Get the game positions
+        var game_min_x = centerX - (size / 2);
+        var game_max_x = centerX + (size / 2);
+        var game_min_y = centerY - (size / 2);
+        var game_max_y = centerY + (size / 2);
+
+        //Get bounds of those
+        var exactMapTileMaxX = map._helperConvertGamePosToTileCoords(game_max_x, mapData, zoomLevel);
+        var exactMapTileMaxY = map._helperConvertGamePosToTileCoords(game_max_y, mapData, zoomLevel);
+        var exactMapTileMinX = map._helperConvertGamePosToTileCoords(game_min_x, mapData, zoomLevel);
+        var exactMapTileMinY = map._helperConvertGamePosToTileCoords(game_min_y, mapData, zoomLevel);
+
+        var mapTileMaxX = Math.ceil(exactMapTileMaxX);
+        var mapTileMaxY = Math.ceil(exactMapTileMaxY);
+        var mapTileMinX = Math.floor(exactMapTileMinX);
+        var mapTileMinY = Math.floor(exactMapTileMinY);
+
+        //Get offset and size
+        var offsetX = mapTileMinX;
+        var offsetY = mapTileMinY;
+        var sizeX = mapTileMaxX - mapTileMinX;
+        var sizeY = mapTileMaxY - mapTileMinY;
+
+        //Define after load funciton
+        var afterLoad = function(tileImgs) {
+            //Create canvas
+            var c = document.createElement("canvas");
+            c.width = realWidth;
+            c.height = realHeight;
+            var ctx = c.getContext('2d');
+
+            //Calc
+            var tileSizeX = width / (exactMapTileMaxX - exactMapTileMinX);
+            var tileSizeY = height / (exactMapTileMaxY - exactMapTileMinY);
+            var exactOffsetX = exactMapTileMinX;
+            var exactOffsetY = exactMapTileMinY;
+            var cropOffsetX = (realWidth - width) / 2;
+            var cropOffsetY = (realHeight - height) / 2;
+            var innerIconSize = iconSize - 10;
+
+            //Copy tiles
+            for(var x = 0; x<sizeX; x+=1) {
+                for(var y = 0; y<sizeY; y+=1) {
+                    var i = tileImgs["TILE@"+x.toString()+"@"+y.toString()];
+                    var posX = ((x)*tileSizeX) - ((exactOffsetX - offsetX - 0)*tileSizeX) + cropOffsetX;
+                    var posY = ((y)*tileSizeY) - ((exactOffsetY - offsetY - 0)*tileSizeY) + cropOffsetY;
+                    if(i.naturalWidth > 0) {
+                        ctx.drawImage(i, posX, posY, tileSizeX, tileSizeY);
+                    }
+                }
+            }
+
+            //Add structures
+            map.dtiles.writeToCanvas(ctx, structureData, game_min_x, game_min_y, game_max_x, game_max_y, {
+                "x":width,
+                "y":height
+            }, game_max_x - game_min_x, cropOffsetX, cropOffsetY);
+
+            //Add map icons
+            for(var i = 0; i<mapIcons.icons.length; i+=1) {
+                var ic = mapIcons.icons[i];
+
+                //Check pos
+                if(ic.location.x >= game_max_x && ic.location.x <= game_min_x) {continue;}
+                if(ic.location.y >= game_max_y && ic.location.y <= game_min_y) {continue;}
+
+                //Get pos
+                var posX = ((ic.location.x-game_min_x) / (game_max_x - game_min_x)) * width;
+                var posY = ((ic.location.y-game_min_y) / (game_max_y - game_min_y)) * height;
+                
+                //Draw circle
+                ctx.beginPath();
+                ctx.arc(posX, posY, iconSize/2, 0, 2 * Math.PI, false);
+                ctx.fillStyle = 'white';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+
+                //Draw image inside of it
+                var img = tileImgs["ICON@"+ic.img];
+                if(img.naturalWidth > 0) {
+                    ctx.drawImage(img, posX - (innerIconSize/2), posY - (innerIconSize/2), innerIconSize, innerIconSize);
+                }
+            }
+
+            //Return canvas
+            callback(c);
+        }
+
+        //Find all map icons in range
+        var mapIconsToLoad = [];
+        for(var i = 0; i<mapIcons.icons.length; i+=1) {
+            var ic = mapIcons.icons[i];
+
+            //Check pos
+            if(ic.location.x >= game_max_x && ic.location.x <= game_min_x) {continue;}
+            if(ic.location.y >= game_max_y && ic.location.y <= game_min_y) {continue;}
+
+            //Add to load list
+            if(!mapIconsToLoad.includes(ic.img)) {
+                mapIconsToLoad.push(ic.img);
+            }
+        }
+
+        //Load all images
+        var tileImgs = {};
+        var targetLoadCount = mapIconsToLoad.length+(sizeX*sizeY);
+        var currentLoadCount = 0;
+        for(var x = 0; x<sizeX; x+=1) {
+            for(var y = 0; y<sizeY; y+=1) {
+                var i = new Image();
+                i.addEventListener('load', function() {
+                    currentLoadCount+=1;
+                    if(currentLoadCount == targetLoadCount) {
+                        afterLoad(tileImgs);
+                    }
+                });
+                i.addEventListener('error', function() {
+                    currentLoadCount+=1;
+                    if(currentLoadCount == targetLoadCount) {
+                        afterLoad(tileImgs);
+                    }
+                });
+                i.src = map.game_map_data.url.replace("{z}", zoomLevel).replace("{x}", offsetX+x).replace("{y}", offsetY+y);
+                tileImgs["TILE@"+x.toString()+"@"+y.toString()] = i;
+            }
+        }
+        for(var j = 0; j<mapIconsToLoad.length; j+=1) {
+            var i = new Image();
+            i.addEventListener('load', function() {
+                currentLoadCount+=1;
+                if(currentLoadCount == targetLoadCount) {
+                    afterLoad(tileImgs);
+                }
+            });
+            i.addEventListener('error', function() {
+                currentLoadCount+=1;
+                if(currentLoadCount == targetLoadCount) {
+                    afterLoad(tileImgs);
+                }
+            });
+            i.src = mapIconsToLoad[j];
+            tileImgs["ICON@"+mapIconsToLoad[j]] = i;
+        }
+    });
+}
+
+map._helperConvertGamePosToTileCoords = function(pos, mapData, zoomLevel) {
+    var calcOffset = mapData.captureSize/2;
+    var units_per_tile = mapData.captureSize / Math.pow(2, zoomLevel);
+    return (pos + calcOffset) / units_per_tile;
+}
+
+map.getThumbnailIntoContainer = function(container, callback, centerX, centerY, size, iconSize, safe, zoomLevel, width /* optional */, height /* optional */) {
+    //Add classes to container
+    container.classList.add("thumbnail_loader_container");
+
+    //Autodetect if needed
+    if(width == null) {
+        width = container.clientWidth;
     }
+    if(height == null) {
+        height = container.clientHeight;
+    }
+
+    //Start init
+    map.getThumbnail(function(c) {
+        c.classList.add("thumbnail_loader_view");
+        container.appendChild(c);
+        callback(c);
+    }, centerX, centerY, size, width, height, iconSize, safe, zoomLevel);
 }

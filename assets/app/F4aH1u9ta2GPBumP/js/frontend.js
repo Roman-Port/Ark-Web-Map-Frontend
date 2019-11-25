@@ -70,10 +70,10 @@ frontend.refreshServerList = function() {
         main.createDom("img", "v3_nav_server_top_icon", top).src = d.image_url;
         main.createDom("span", "", top).innerText = d.display_name;
         var bottom = main.createDom("div", "v3_nav_server_bottom", e);
-        for(var j = 0; j<frontend._SERVER_NAV_OPTIONS.length; j+=1) {
+        for(var j = 0; j<statics.SERVER_NAV_OPTIONS.length; j+=1) {
             var btn = main.createDom("div", "v3_nav_server_bottom_item", bottom);
-            btn.innerText = frontend._SERVER_NAV_OPTIONS[j].name;
-            btn.x_data = frontend._SERVER_NAV_OPTIONS[j];
+            btn.innerText = statics.SERVER_NAV_OPTIONS[j].name;
+            btn.x_data = statics.SERVER_NAV_OPTIONS[j];
             btn.x_index = j;
             btn.addEventListener("click", frontend._onNavBtnClicked);
         }
@@ -132,37 +132,11 @@ frontend.setServerListOptionIndex = function(index) {
     }
 
     //Run function
-    frontend._SERVER_NAV_OPTIONS[index].open_function();
+    statics.SERVER_NAV_OPTIONS[index].open_function();
 
     //Show
-    frontend._SERVER_NAV_OPTIONS[index].tab_element.classList.add("main_tab_active");
+    statics.SERVER_NAV_OPTIONS[index].tab_element.classList.add("main_tab_active");
 }
-
-frontend._SERVER_NAV_OPTIONS = [
-    {
-        "name":"Overview",
-        "tab_element":document.getElementById('tab_map'),
-        "open_function":function() {
-            if(map.map != null) {
-                map.map._sizeChanged = true; //Fix for map resizing bug
-            }
-        }
-    },
-    {
-        "name":"Dinos",
-        "tab_element":document.getElementById('tab_dinos'),
-        "open_function":function() {
-
-        }
-    },
-    /*{
-        "name":"Tribe Log",
-        "tab_element":document.getElementById('tab_tribe'),
-        "open_function":function() {
-
-        }
-    }*/
-];
 
 frontend._onNavBtnClicked = function() {
     //Activate

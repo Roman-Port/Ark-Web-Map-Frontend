@@ -334,7 +334,7 @@ dinosidebar.addCategoryAsync = function(query, category, done, token) {
             if(category.extras.includes("DINO_STATUS")) {
                 var status = main.createDom('div', 'dino_sidebar_item_sub dino_sidebar_item_sub_state', e);
                 if(d.x_status != null) {
-                    var statusData = ark.STATUS_STATES[d.x_status];
+                    var statusData = statics.STATUS_STATES[d.x_status];
                     status.innerText = statusData.text.toUpperCase();
                     status.style.color = statusData.modal_color;
                 } else {

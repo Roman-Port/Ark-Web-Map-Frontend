@@ -1,8 +1,8 @@
 .nursery_box {
     display: inline-block;
-    margin: 15px;
-    height: 300px;
-    width: 200px;
+    margin: 5px;
+    height: 400px;
+    width: 300px;
     background-color: #33363c;
     border: 1px solid #44474b;
     border-radius: 5px;
@@ -11,8 +11,7 @@
 }
 
 .nursery_box_section {
-    padding: 0px 10px;
-    margin: 10px 0px;
+    margin: 10px;
 }
 
 /* Title section */
@@ -29,12 +28,34 @@
     font-size: 20px;
 }
 
+.nursery_box_status {
+    float: right;
+    line-height: 42px;
+    color: #a5a5a5;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size:15px;
+}
+
+.nursery_box_status_temperature {
+    font-size: 20px;
+    color: #868686;
+    font-weight: 400;
+}
+
+.nursery_box_status_temperature_warn_hot {
+    color:#f65959;
+}
+
+.nursery_box_status_temperature_warn_cold {
+    color:#28acf1;
+}
+
 /* Maps section */
 .nursery_map_container {
     background-color: #2c2e33;
-    border: 1px solid #44474b;
-    border-radius: 5px;
-    height:90px;
+    border-bottom: 1px solid #44474b;
+    height:100px;
 }
 
 /* Stats section */
@@ -46,6 +67,12 @@
     border: 1px solid #44474b;
     overflow: hidden;
     position: relative;
+    display: inline-block;
+    width: calc(50% - 4px);
+}
+
+.nursery_box_bar:first-child {
+    margin-right: 4px;
 }
 
 .nursery_box_bar_filled {
@@ -65,9 +92,9 @@
     bottom: 0;
     line-height: 32px;
     color: white;
-    left: 5px;
+    left: 10px;
     z-index: 3;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 .nursery_box_bar_amount {
@@ -75,8 +102,8 @@
     top: 0;
     bottom: 0;
     line-height: 32px;
-    color: white;
-    right: 5px;
+    color: #ffffffa8;
+    right: 10px;
     z-index: 3;
     font-size: 13px;
     text-align: right;
@@ -88,4 +115,82 @@
 
 .nursery_box_bar_filled_style_health {
     background-color: #f65959;
+}
+
+/* Temperature meter */
+.nursery_temperature {
+    background: linear-gradient(90deg, rgba(40,172,241,1) 0%, rgba(255,255,255,1) 50%, rgb(246, 89, 89) 100%);
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid #44474b;
+    position: relative;
+    margin: 5px 0;
+}
+
+.nursery_temperature_key {
+    position: absolute;
+    top: 1px;
+    color: white;
+    font-weight: 800;
+    font-size: 13px;
+    line-height: 50px;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.nursery_temperature_key_left {
+    left:5px;
+}
+
+.nursery_temperature_key_right {
+    right:5px;
+}
+
+.nursery_temperature_value_track {
+    position: absolute;
+    left: 30px;
+    right: 60px;
+    top:0;
+    bottom:0;
+}
+
+.nursery_temperature_value {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+}
+
+.nursery_temperature_value_marker_top {
+    position: absolute;
+    top: 0;
+    height: 15px;
+    background-color: #252629;
+    width: 6px;
+    left: 12px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.nursery_temperature_value_marker_bottom {
+    position: absolute;
+    bottom: 0;
+    height: 15px;
+    background-color: #252629;
+    width: 6px;
+    left: 12px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+.nursery_temperature_value_number {
+    position: absolute;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 13px;
+    line-height: 50px;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    top: 1px;
+    left: 0;
+    right: 0;
+    text-align: center;
 }

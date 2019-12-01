@@ -494,6 +494,7 @@
 
 .v3_nav_server {
     cursor:pointer;
+    position: relative;
 }
 
 .v3_nav_server_top {
@@ -573,6 +574,38 @@
     width: 100%;
     background-color: #252629;
     padding-top: 8px;
+}
+
+.v3_nav_server_alert_container {
+    position: absolute;
+    top: 0;
+    height: 40px;
+    pointer-events:none;
+}
+
+.v3_nav_server_alert {
+    padding: 10px;
+    background-color: #df4848;
+    border-radius: 5px;
+    border: 1px solid #f68585;
+    color: white;
+    font-size: 15px;
+    max-width: 300px;
+    width: max-content;
+    left: 220px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.v3_nav_server_alert::after {
+    content:"";
+    background-image: url(/assets/app/img/alert_pointer.svg);
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: -20px;
+    top: calc(50% - 10px);
 }
 
 /* Drawer */

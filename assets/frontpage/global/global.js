@@ -60,11 +60,14 @@ delta.getUserAsync = function(callback, fail_callback) {
     delta.waiting_me_fail.push(fail_callback);
 }
 
-delta.createDom = function(type, classname, parent) {
+delta.createDom = function(type, classname, parent, text) {
     var e = document.createElement(type);
     e.className = classname;
     if(parent != null) {
         parent.appendChild(e);
+    }
+    if(text != null) {
+        e.innerText = text;
     }
     return e;
 }
@@ -107,4 +110,43 @@ delta.hideBeta = function() {
     var d = JSON.stringify(new Date());
     localStorage.setItem("beta_msg_dismiss", d.substr(1, d.length - 2));
     document.getElementById('g_header_beta').remove();
+}
+
+delta.loginAndReturn = function() {
+    window.location = "https://deltamap.net/api/auth/steam_auth/?next="+encodeURIComponent(window.location);
+}
+
+delta.loginAndReturnTo = function(url) {
+    window.location = "https://deltamap.net/api/auth/steam_auth/?next="+encodeURIComponent(url);
+}
+
+delta.parseURLParams = function() { 
+	try {	
+		var query = window.location.search;
+		var objects = String(query).trim("?").split("&");
+		//Create keys and objects.
+		var i =0;
+		var keys = [];
+		var obj = {};
+		while(i<objects.length) {
+			try {
+				var o = objects[i];
+				//Trim beginning
+				o = o.replace("?","").replace("&","");
+				//Split by equals.
+				var oo = o.split("=");
+				keys.push(oo[0]);
+				//Uri decode both of these
+				var key = decodeURIComponent(oo[0]);
+				var value = decodeURIComponent(oo[1]);
+				obj[key] = value;
+			} catch (e) {
+
+			}
+			i+=1;
+		}
+		return obj;
+	} catch (ex) {
+		return {};
+	}
 }

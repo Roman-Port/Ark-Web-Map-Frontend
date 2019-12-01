@@ -197,7 +197,7 @@ ark.downloadData = function(url, offlineDataKey, args, callback, failCallback) {
             }, failCallback);
         } else {
             //Other error.
-            failCallback();
+            failCallback("There was a server error downloading resources. Try again later.");
         }
     };
     args.failOverride = fail;

@@ -369,3 +369,158 @@ if(localStorage.getItem("latest_sort_type") != null) {
         dinosidebar.sortType = 0;
     }
 }
+
+//Used for capturing screenshots of the app.
+dinosidebar.loadExampleData = function() {
+    dinosidebar.data = {
+        "tribemates":[
+           {
+              "arkName":"RomanPort",
+              "steamName":"RomanPort",
+              "arkId":"960312129",
+              "steamId":"76561198300124500",
+              "steamUrl":"https://steamcommunity.com/id/RomanPort/",
+              "img":"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/32/3212a8c5a45904e73f3b72142f9eb0c0946ba34e_full.jpg"
+           }
+        ],
+        "dinos":[
+           {
+              "displayName":"Sandy",
+              "classDisplayName":"Raptor",
+              "level":5,
+              "id":"561539911593408725",
+              "img":"https://icon-assets.deltamap.net/charlie/190C80C3F814C875462F05EC.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Red",
+              "classDisplayName":"Raptor",
+              "level":30,
+              "id":"1563867278415987223",
+              "img":"https://icon-assets.deltamap.net/charlie/190C80C3F814C875462F05EC.png",
+              "status":"PASSIVE",
+              "color_tag":null
+           },
+           {
+              "displayName":"Abyssal Jr.",
+              "classDisplayName":"Dodo",
+              "level":73,
+              "id":"1075916778298862812",
+              "img":"https://icon-assets.deltamap.net/charlie/0EB0535DBCA10E5559465E14.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"E. Rex",
+              "classDisplayName":"Rex",
+              "level":61,
+              "id":"1411546821925700271",
+              "img":"https://icon-assets.deltamap.net/charlie/7DF547E36C61578A7B657EA8.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Tegu",
+              "classDisplayName":"Megalania",
+              "level":9,
+              "id":"1326884434882602707",
+              "img":"https://icon-assets.deltamap.net/charlie/738332A237F3CB079EC7798F.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Kato",
+              "classDisplayName":"Rock Drake",
+              "level":75,
+              "id":"1207874950199271865",
+              "img":"https://icon-assets.deltamap.net/charlie/50B5A4210E5617A62C9D6348.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Fuzzy Christmas Sock",
+              "classDisplayName":"Yutyrannus",
+              "level":18,
+              "id":"48389919478367332",
+              "img":"https://icon-assets.deltamap.net/charlie/3E87882A6A75B7E66BCBF2FB.png",
+              "status":"PASSIVE",
+              "color_tag":null
+           },
+           {
+              "displayName":"Blake",
+              "classDisplayName":"Yutyrannus",
+              "level":81,
+              "id":"1368637899377035387",
+              "img":"https://icon-assets.deltamap.net/charlie/3E87882A6A75B7E66BCBF2FB.png",
+              "status":"PASSIVE",
+              "color_tag":null
+           },
+           {
+              "displayName":"Frank",
+              "classDisplayName":"Yutyrannus",
+              "level":26,
+              "id":"428714539215034174",
+              "img":"https://icon-assets.deltamap.net/charlie/3E87882A6A75B7E66BCBF2FB.png",
+              "status":"AGGRESSIVE",
+              "color_tag":null
+           },
+           {
+              "displayName":"Dream",
+              "classDisplayName":"Equus",
+              "level":2,
+              "id":"1210215982108671406",
+              "img":"https://icon-assets.deltamap.net/charlie/36C4DE96E0C436EC765BF0C4.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Delta",
+              "classDisplayName":"Velonasaur",
+              "level":86,
+              "id":"344069516976210771",
+              "img":"https://icon-assets.deltamap.net/charlie/0C0AF33DB184D6D99CBC623E.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Sir Compy",
+              "classDisplayName":"Compy",
+              "level":15,
+              "id":"790975724759274364",
+              "img":"https://icon-assets.deltamap.net/charlie/0BD4B3C918B176BD7B8A9CC3.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Pickle Juice",
+              "classDisplayName":"Pachy",
+              "level":4,
+              "id":"1004836268251108703",
+              "img":"https://icon-assets.deltamap.net/charlie/1931DBBFAA53F9BC37CC6442.png",
+              "status":"AGGRESSIVE",
+              "color_tag":null
+           },
+           {
+              "displayName":"Velvet Cake Jr",
+              "classDisplayName":"Archaeopteryx",
+              "level":14,
+              "id":"452173967967632857",
+              "img":"https://icon-assets.deltamap.net/charlie/E717974393BD3E3F8582E38D.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           },
+           {
+              "displayName":"Phil",
+              "classDisplayName":"Argentavis",
+              "level":66,
+              "id":"461391685345400189",
+              "img":"https://icon-assets.deltamap.net/charlie/70483BFBF37EB31FFAD24242.png",
+              "status":"NEUTRAL",
+              "color_tag":null
+           }
+        ],
+        "tribeName":"The TSA"
+     };
+    dinosidebar.refresh();
+}

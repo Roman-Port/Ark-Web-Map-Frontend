@@ -56,9 +56,9 @@ frontend.refreshServerList = function() {
 
     //Create clusters and add a default
     var clusters = {};
-
-    //Add default
-    clusters["DEFAULT"] = frontend._createServerListClusterLabel(c, "UNCATEGORIZED");
+    for(var i = 0; i<main.me.clusters.length; i+=1) {
+        clusters[main.me.clusters[i].id] = frontend._createServerListClusterLabel(c, main.me.clusters[i].name);
+    }
 
     //Now, loop and add servers
     for(var i = 0; i<main.me.servers.length; i+=1) {
@@ -88,6 +88,9 @@ frontend.refreshServerList = function() {
 
         //Attach
         if(d.cluster_id == null) {
+            if(clusters["DEFAULT"] == null) {
+                clusters["DEFAULT"] = frontend._createServerListClusterLabel(c, "UNCATEGORIZED");
+            }
             clusters["DEFAULT"].appendChild(e);
         } else {
             clusters[d.cluster_id].appendChild(e);

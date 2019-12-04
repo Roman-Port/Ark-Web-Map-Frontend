@@ -11,7 +11,6 @@ main.currentServerId = null;
 main.currentServerOnline = true;
 main.me = null;
 main.sessionToken = 0; //Changed every time we load a new server
-main.HUDMessages = [];
 main.isDemo = false;
 /* Tools */
 
@@ -129,13 +128,11 @@ main.foreach = function(data, loop) {
 }
 
 main.onGatewayDisconnect = function() {
-    main.log("gateway-status", 0, "Gateway disconnected.");
     main.addHUDMessage("Reconnecting...", "#4973c9", "/assets/icons/baseline-cloud-24px.svg", 2, 10);
 }
 
 main.onGatewayConnect = function() {
     main.log("gateway-status", 0, "Gateway connected.");
-    main.removeHUDMessage(2);
 }
 
 main.removeAllChildren = function(e) {
@@ -213,81 +210,6 @@ main.createCustomDinoEntry = function(img_url, title_text, sub_text, customClass
     return e;
 }
 
-main.refreshHUDMessages = function() {
-    //Find the highest priority message
-    var msg = null;
-    var priority = -1;
-    for(var i = 0; i<main.HUDMessages.length; i+=1) {
-        var m = main.HUDMessages[i];
-        if(m.priority >= priority) {
-            msg = m;
-            priority = m.priority;
-        }
-    }
-
-    //Get host
-    var b = document.getElementById('hud_bar');
-
-    //Cancel existing timers
-    if(b.x_timer != null) {
-        clearTimeout(b.x_timer);
-    }
-
-    //Show or hide
-    if(msg == null) {
-        b.classList.remove("hud_bar_active");
-        b.x_last_id = null;
-    } else {
-        //Check if this is the same ID
-        if(b.x_last_id == msg.id) {
-            return;
-        }
-        b.x_last_id = msg.id;
-
-        //If one is already displayed, set a timer before showing
-        if(b.classList.contains("hud_bar_active")) {
-            b.classList.remove("hud_bar_active");
-            b.x_timer = window.setTimeout(function() {
-                b.x_timer = null;
-                b.innerText = msg.title;
-                b.style.backgroundColor = msg.color;
-                main.createDom("img", "hub_bar_img", b).src = msg.img;
-                b.classList.add("hud_bar_active");
-            }, 200);
-        } else {
-            b.innerText = msg.title;
-            b.style.backgroundColor = msg.color;
-            main.createDom("img", "hub_bar_img", b).src = msg.img;
-            b.classList.add("hud_bar_active");
-        }
-    }
-}
-
-main.addHUDMessage = function(title, color, img, id, priority) {
-    //Create
-    var o = {
-        "title":title,
-        "color":color,
-        "img":img,
-        "id":id,
-        "priority":priority
-    };
-    main.HUDMessages.push(o);
-    main.refreshHUDMessages();
-}
-
-main.removeHUDMessage = function(id) {
-    //Find and remove
-    for(var i = 0; i<main.HUDMessages.length; i+=1) {
-        var m = main.HUDMessages[i];
-        if(m.id >= id) {
-            main.HUDMessages.splice(i, 1);
-            i--;
-        }
-    }
-    main.refreshHUDMessages();
-}
-
 main.createServer = function() {
     window.location = "/me/servers/create/";
 }
@@ -297,19 +219,6 @@ main.createLink = function(parent, text, url) {
     d.href = url;
     d.target = "_blank";
     d.innerText = text;
-}
-
-main.checkUpdates = function() {
-    main.serverRequest("https://config.deltamap.net/prod/frontend/web_version.json", {"nocreds":true, "failOverride": function() {
-        //Offline
-        main.addHUDMessage("Limited or no internet connection.", "#eb3434", "/assets/icons/baseline-signal_cellular_connected_no_internet_0_bar-24px.svg", 3, 11);
-    }}, function(d) {
-        main.removeHUDMessage(3);
-        var outdated = APP_HASH != d.latest_hash;
-        if(outdated) {
-            main.addHUDMessage("There is an update available. Reload the page to update!", "#eb3434", "/assets/icons/baseline-cloud_download-24px.svg", 4, 9);
-        }
-    });
 }
 
 main.logout = function() {
@@ -439,7 +348,6 @@ main.init = function() {
             frontend.showServerPlaceholders();
 
             if(!main.isDemo) {
-                main.addHUDMessage("Connecting...", "#4973c9", "/assets/icons/baseline-cloud-24px.svg", 2, 10);
                 main.setLoader(true);
         
                 //Now, we'll connect to the gateway

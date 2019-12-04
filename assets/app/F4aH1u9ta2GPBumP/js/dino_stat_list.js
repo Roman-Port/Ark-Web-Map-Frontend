@@ -238,7 +238,7 @@ dino_stats.createDino = function(data, container) {
 
     dino_stats.helperCreateImg(e, dino_stats.entries[data.classname].icon.image_thumb_url);
     dino_stats.helperCreateGenderIcon(e, data.is_female);
-    dino_stats.helperCreateText(e, data.tamed_name);
+    dino_stats.helperCreateText(e, data.tamed_name, "dino_stats_item_type_name");
 
     dino_stats.helperCreateText(e, dino_stats.entries[data.classname].screen_name);
     dino_stats.helperCreateText(e, data.level);
@@ -269,7 +269,7 @@ dino_stats.helperCreateImg = function(e, url) {
 }
 
 dino_stats.helperCreateGenderIcon = function(e, isFemale) {
-    var t = main.createDom("td", "dino_stats_list_item", e);
+    var t = main.createDom("td", "dino_stats_list_item dino_stats_item_type_gender", e);
     var g = main.createDom("div", "dino_stats_list_item_gender", t);
     if(isFemale) {
         g.classList.add("dino_stats_list_item_gender_male");

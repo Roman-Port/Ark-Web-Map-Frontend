@@ -114,7 +114,6 @@
                 <div class="map_part" id="map_part" style="background-color:#1c1d21;">
                     <!-- Actual map -->
                     <canvas style=" z-index: 999; background: transparent; pointer-events: none; position:absolute; top:0; left:0; right:0; bottom:0;" id="map_draw_part"></canvas>
-                    <div class="hud_bar_container"><div class="hud_bar" id="hud_bar"></div></div>
                     <div class="map_return_btn" id="map_return_btn" onclick="map.resetPos();">Return to Map</div>
                     <div class="map_structure_loader" id="map_structure_loader">
                         <div class="map_structure_loader_bar" id="map_structure_loader_bar"></div>
@@ -175,7 +174,7 @@
 
                 <!-- Data -->
                 <div class="dino_stats_container">
-                    <table style="width:100%;white-space: nowrap;">
+                    <table style="width:100%;white-space: nowrap;border-spacing: 0;">
                         <tbody id="tab_dinos_table">
                             <tr>
                                 <th class="dino_stats_list_item_title"></th>

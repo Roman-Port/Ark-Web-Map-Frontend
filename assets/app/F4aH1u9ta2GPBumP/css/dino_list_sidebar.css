@@ -408,15 +408,17 @@
     margin: 0;
     border-right: 1px solid #50545b;
     position: absolute;
-    top: -49px;
-    height: 38px;
+    top: -50px;
+    height: 26px;
     border-radius: 5px;
     background-color: #33363c;
     color: white;
     outline: none;
     border: 1px solid #50545b;
     right: 16px;
-    width: 332px;
+    width: 308px;
+    z-index: 1000;
+    font-size: 12px;
 }
 
 .dino_stats_container {
@@ -440,12 +442,13 @@
     top: -50px;
     height: 40px;
     border-radius: 5px;
-    color: white;
+    color: #ffffffb8;
     outline: none;
     left: 15px;
     line-height: 40px;
-    font-size: 15px;
+    font-size: 13px;
     font-family: 'Roboto', sans-serif;
+    z-index: 1000;
 }
 
 .dino_stats_header_sortable {
@@ -510,4 +513,15 @@
 
 .dino_stats_search_base:focus {
     outline: none;
+}
+
+.dino_stats_item_type_name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.dino_stats_item_type_gender, #stat_sort_btn_gender {
+    width: 26px;
 }

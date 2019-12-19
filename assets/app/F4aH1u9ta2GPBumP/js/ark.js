@@ -92,7 +92,6 @@ ark.deinit = function() {
     map.deinit();
 
     //Remove offline message
-    main.removeHUDMessage("server-offline");
     main.currentServerOnline = true;
 
     //Reset vars

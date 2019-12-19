@@ -128,11 +128,11 @@ main.foreach = function(data, loop) {
 }
 
 main.onGatewayDisconnect = function() {
-    main.addHUDMessage("Reconnecting...", "#4973c9", "/assets/icons/baseline-cloud-24px.svg", 2, 10);
+    
 }
 
 main.onGatewayConnect = function() {
-    main.log("gateway-status", 0, "Gateway connected.");
+    
 }
 
 main.removeAllChildren = function(e) {

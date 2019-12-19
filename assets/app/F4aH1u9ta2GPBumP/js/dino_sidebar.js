@@ -39,6 +39,10 @@ dinosidebar.makeItemDoms = function(query, done) {
                     //Dino
                     e_dom = (main.createCustomDinoEntry(inventory.img, "", inventory.displayName + " (x"+main.createNumberWithCommas(inventory_ref.count)+")", "dino_entry_offset dino_entry_mini"));
                     e_dom.x_id = inventory_ref.id;
+                } else if(inventory_ref.type == 1) {
+                    //Inventory
+                    e_dom = (main.createCustomDinoEntry(inventory.img, "", inventory.displayName + " (x"+main.createNumberWithCommas(inventory_ref.count)+")", "dino_entry_offset dino_entry_mini dino_entry_no_invert"));
+                    e_dom.x_id = inventory_ref.id;
                 } else {
                     //Character
                     e_dom = (main.createCustomDinoEntry(inventory.icon, "", inventory.name + " (x"+main.createNumberWithCommas(inventory_ref.count)+")", "dino_entry_offset dino_entry_mini dino_entry_no_invert"));

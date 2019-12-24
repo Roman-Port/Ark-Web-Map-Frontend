@@ -339,8 +339,13 @@ dinosidebar.addCategoryAsync = function(query, category, done, token) {
                 var status = main.createDom('div', 'dino_sidebar_item_sub dino_sidebar_item_sub_state', e);
                 if(d.x_status != null) {
                     var statusData = statics.STATUS_STATES[d.x_status];
-                    status.innerText = statusData.text.toUpperCase();
-                    status.style.color = statusData.modal_color;
+                    if (statusData != null) {
+                        status.innerText = statusData.text.toUpperCase();
+                        status.style.color = statusData.modal_color;
+                    } else {
+                        status.innerText = d.x_status;
+                        status.style.color = "#E0E0E0";
+                    }
                 } else {
                     status.innerText = "UNKNOWN";
                     status.style.color = "#E0E0E0";

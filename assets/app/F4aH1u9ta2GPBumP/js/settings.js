@@ -147,7 +147,7 @@ usettings.createDom = function (view) {
     main.createDom("div", "master_btn master_btn_blue settings_bottom_save_btn", bottom, "Save").addEventListener("click", view.callback);
     if(view.show_terms) {
         var bottomleft = main.createDom("div", "settings_bottom_terms", bottom);
-        main.createDom("span", "", main.createDom("div", "", bottomleft), "© Delta Web Map 2019");
+        main.createDom("span", "", main.createDom("div", "", bottomleft), "© Delta Web Map 2019 • " + main.getVersionString());
         var terms = main.createDom("div", "", bottomleft);
         main.createLink(terms, "Privacy", "/privacy/");
         main.createDom("span", "", terms, " • ");

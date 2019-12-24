@@ -7,7 +7,6 @@ var blocked_words = [
 "shitty",
 "headass",
 "dumbass",
-"frick",
 "bitch",
 "motherfucker",
 "cunt",

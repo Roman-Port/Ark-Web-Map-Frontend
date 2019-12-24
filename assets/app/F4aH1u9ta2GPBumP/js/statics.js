@@ -72,3 +72,97 @@ statics.SERVER_NAV_OPTIONS = [
         }
     },
 ];
+
+statics.CLOSE_REASONS = {
+    32: "The ARK map this server is using is currently unsupported.",
+    33: "This server is temporarily unavailable. It will return soon.",
+    34: "You do not have a tribe on this server.",
+
+    0: "Server is still getting ready, try again shortly.",
+    1: "The owner of this server has locked it. You cannot access it until they choose to unlock it.",
+    2: "This server has been temporarily suspended by Delta Web Map from reports of abuse."
+}
+
+statics.ARK_DINO_STAT = {
+    Health: 0,
+    Stamina: 1,
+    Torpidity: 2,
+    Oxygen: 3,
+    Food: 4,
+    Water: 5,
+    Temperature: 6,
+    Weight: 7,
+    MeleeDamageMultiplier: 8,
+    SpeedMultiplier: 9,
+    TemperatureFortitude: 10,
+    CraftingSpeedMultiplier: 11
+}
+
+statics.STATUS_ENTRIES = [
+    {
+        "icon": "/assets/ui/status/health.png",
+        "name": "Health",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/stamina.png",
+        "name": "Stamina",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/unknown1.png",
+        "name": "Torpidity",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/oxygen.png",
+        "name": "Oxygen",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/food.png",
+        "name": "Food",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/water.png",
+        "name": "Water",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/unknown2.png",
+        "name": "Temperature",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/inventoryWeight.png",
+        "name": "Weight",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/meleeDamageMult.png",
+        "name": "Melee Damage",
+        "formatString": function (value) {
+            var v = Math.round((value + 1) * 100);
+            return (v).toString() + "%";
+        }
+    },
+    {
+        "icon": "/assets/ui/status/movementSpeedMult.png",
+        "name": "Movement Speed",
+        "formatString": function (value) {
+            var v = Math.round((value + 1) * 100);
+            return (v).toString() + "%";
+        }
+    },
+    {
+        "icon": "/assets/ui/status/unknown3.png",
+        "name": "Temperature Fortitude",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/unknown3.png",
+        "name": "Crafting Speed Multiplier",
+        "formatString": function (value) { return value; }
+    }
+];

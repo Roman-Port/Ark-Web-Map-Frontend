@@ -3,6 +3,9 @@ var ROOT_URL = "https://deltamap.net/api/";
 var APP_HASH = "2185ee3957de4f8d9ea23f6f4c5cf8535cff89d1";
 var CONFIG_URL = "https://config.deltamap.net/prod/app_config.json";
 var dconfig = null;
+var VERSION_MAJOR = 0;
+var VERSION_MINOR = 1;
+var VERSION_BUGFIX = 2;
 
 var main = {};
 
@@ -125,6 +128,10 @@ main.foreach = function(data, loop) {
     for(var i = 0; i<data.length; i+=1) {
         loop(data[i], i);
     }
+}
+
+main.getVersionString = function() {
+    return "v" + VERSION_MAJOR + "." + VERSION_MINOR + "." + VERSION_BUGFIX;
 }
 
 main.onGatewayDisconnect = function() {

@@ -145,6 +145,7 @@ map.addDataIconToMap = function(data, mapContainer) {
     }
 
     //Create icon
+    data.extras._id = data.id;
     var icon = map.addMapIcon(data.type, data.id, data.extras, pos, data.img, null, "map_icon_dino", content, mapContainer);
     icon.x_data = data;
 
@@ -252,14 +253,13 @@ map.removeMarkerLayer = function(layerId) {
 }
 
 map.onDinoClicked = function() {
-    //Get URL
-    var url = this.x_data.extras.url;
-
     //Get pos
     var rect = this.getBoundingClientRect();
 
     //Show
-    dinopop.downloadAndShow(rect.left - 14, rect.top - 10, url, this);
+    xpopout.createDino(this.x_data.extras._id, function () {
+        console.log("failed!");
+    }, xpopout.anchors.fixedAnchor(rect.left - 14, rect.top - 10));
 }
 
 map.setBackground = function(color) {

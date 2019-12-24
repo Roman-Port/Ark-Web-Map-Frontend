@@ -1,68 +1,73 @@
 var dinopop = {};
 
-dinopop.statusEntries = {
-    "water": {
-        "icon":"/assets/ui/status/water.png",
-        "name":"Water",
-        "formatString":function(value) {return value;}
+dinopop.statusEntries = [
+    {
+        "icon": "/assets/ui/status/health.png",
+        "name": "Health",
+        "formatString": function (value) { return value; }
     },
-    "unknown3": {
-        "icon":"/assets/ui/status/unknown3.png",
-        "name":"UNKNOWN 3",
-        "formatString":function(value) {return value;}
+    {
+        "icon": "/assets/ui/status/stamina.png",
+        "name": "Stamina",
+        "formatString": function (value) { return value; }
     },
-    "unknown2": {
-        "icon":"/assets/ui/status/unknown2.png",
-        "name":"UNKNOWN 2",
-        "formatString":function(value) {return value;}
+    {
+        "icon": "/assets/ui/status/unknown1.png",
+        "name": "Torpidity",
+        "formatString": function (value) { return value; }
     },
-    "unknown1": {
-        "icon":"/assets/ui/status/unknown1.png",
-        "name":"UNKNOWN 1",
-        "formatString":function(value) {return value;}
+    {
+        "icon": "/assets/ui/status/oxygen.png",
+        "name": "Oxygen",
+        "formatString": function (value) { return value; }
     },
-    "stamina": {
-        "icon":"/assets/ui/status/stamina.png",
-        "name":"Stamina",
-        "formatString":function(value) {return value;}
+    {
+        "icon": "/assets/ui/status/food.png",
+        "name": "Food",
+        "formatString": function (value) { return value; }
     },
-    "oxygen": {
-        "icon":"/assets/ui/status/oxygen.png",
-        "name":"Oxygen",
-        "formatString":function(value) {return value;}
+    {
+        "icon": "/assets/ui/status/water.png",
+        "name": "Water",
+        "formatString": function (value) { return value; }
     },
-    "movementSpeedMult": {
-        "icon":"/assets/ui/status/movementSpeedMult.png",
-        "name":"Movement Speed",
-        "formatString":function(value) {
+    {
+        "icon": "/assets/ui/status/unknown2.png",
+        "name": "Temperature",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/inventoryWeight.png",
+        "name": "Weight",
+        "formatString": function (value) { return value; }
+    },
+    {
+        "icon": "/assets/ui/status/meleeDamageMult.png",
+        "name": "Melee Damage",
+        "formatString": function (value) {
             var v = Math.round((value + 1) * 100);
-            return (v).toString()+"%";
+            return (v).toString() + "%";
         }
     },
-    "meleeDamageMult": {
-        "icon":"/assets/ui/status/meleeDamageMult.png",
-        "name":"Melee Damage",
-        "formatString":function(value) {
+    {
+        "icon": "/assets/ui/status/movementSpeedMult.png",
+        "name": "Movement Speed",
+        "formatString": function (value) {
             var v = Math.round((value + 1) * 100);
-            return (v).toString()+"%";
+            return (v).toString() + "%";
         }
     },
-    "inventoryWeight": {
-        "icon":"/assets/ui/status/inventoryWeight.png",
-        "name":"Weight",
-        "formatString":function(value) {return value;}
+    {
+        "icon": "/assets/ui/status/unknown3.png",
+        "name": "Temperature Fortitude",
+        "formatString": function (value) { return value; }
     },
-    "health": {
-        "icon":"/assets/ui/status/health.png",
-        "name":"Health",
-        "formatString":function(value) {return value;}
-    },
-    "food": {
-        "icon":"/assets/ui/status/food.png",
-        "name":"Food",
-        "formatString":function(value) {return value;}
-    },
-};
+    {
+        "icon": "/assets/ui/status/unknown3.png",
+        "name": "Crafting Speed Multiplier",
+        "formatString": function (value) { return value; }
+    }
+];
 
 dinopop.downloadAndShow = function(x, y, url, ele) {
     //Stop if we're already loading
@@ -183,10 +188,10 @@ dinopop.uploadNewDinoPrefs = function(data) {
 
 dinopop.createStatsBox = function(data, parent) {
     var statusesToUse = [
-        "health",
-        "stamina",
-        "inventoryWeight",
-        "food"
+        statics.ARK_DINO_STAT.Health,
+        statics.ARK_DINO_STAT.Stamina,
+        statics.ARK_DINO_STAT.Weight,
+        statics.ARK_DINO_STAT.Food
     ];
 
     var statsContainer = main.createDom("div", "", parent);
@@ -194,7 +199,7 @@ dinopop.createStatsBox = function(data, parent) {
         //Get the status entry and dino data
         var statName = statusesToUse[i];
         var statusEntry = dinopop.statusEntries[statName];
-        var maxStat = data.max_stats[statName];
+        var maxStat = data.dino.max_stats[statName];
         var currentStat = data.dino.current_stats[statName];
 
         //Create a DOM element
@@ -226,9 +231,9 @@ dinopop.createStatsBox = function(data, parent) {
 
 dinopop.createStaticStatsBox = function(data, parent) {
     var statusesToUse = [
-        "meleeDamageMult",
-        "oxygen",
-        "movementSpeedMult"
+        statics.ARK_DINO_STAT.MeleeDamageMultiplier,
+        statics.ARK_DINO_STAT.Oxygen,
+        statics.ARK_DINO_STAT.SpeedMultiplier
     ];
 
     var container = main.createDom("ul", "popout_staticstats_container", parent);

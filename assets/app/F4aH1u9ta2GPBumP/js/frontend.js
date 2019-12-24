@@ -2,24 +2,15 @@ var frontend = {};
 //Allows easy editing of UI
 
 frontend.setUserData = function(d) {
-    /*document.getElementById('me_badge_title').innerText = d.screen_name;
-    frontend.toolSetBackgroundImage(document.getElementById('my_badge'), d.profile_image_url);
-    frontend.setTribeName("");*/
 }
 
 frontend.setTribeName = function(name) {
-    //document.getElementById('me_badge_tribe').innerText = name;
 }
 
 frontend.toolSetBackgroundImage = function(e, img) {
-    //e.style.backgroundImage = "url('"+img+"')";
 }
 
 frontend.setServerData = function(d) {
-    /*document.getElementById('map_title').innerText = d.display_name;
-    document.getElementById('map_sub_title').innerText = d.map_name;
-    frontend.setTribeName(d.tribeName);*/
-    return;
 }
 
 frontend.showServerPlaceholders = function() {
@@ -36,8 +27,8 @@ frontend.showServerPlaceholders = function() {
         var sub = main.createDom('div', 'dino_sidebar_item_sub', e);
         
         //Fill with templates
-        name.appendChild(main.generateTextTemplate(16, "#404144", 250));
-        sub.appendChild(main.generateTextTemplate(12, "#37383a", 150));
+        name.appendChild(main.generateTextTemplate(16, "#404144", 150));
+        sub.appendChild(main.generateTextTemplate(12, "#37383a", 80));
     }
 }
 

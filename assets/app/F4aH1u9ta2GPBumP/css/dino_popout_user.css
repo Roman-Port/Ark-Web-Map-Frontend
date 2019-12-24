@@ -23,10 +23,11 @@
 }
 
 .popout_name {
-    margin-left: 65px;
-    margin-top: 13px;
+    padding-left: 65px;
+    padding-top: 13px;
     margin-bottom: 10px;
-    margin-right: 10px;
+    padding-right: 10px;
+    position: relative;
 }
 
 .popout_name_title {

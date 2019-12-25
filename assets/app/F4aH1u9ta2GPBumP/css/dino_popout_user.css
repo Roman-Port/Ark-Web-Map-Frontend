@@ -22,12 +22,28 @@
     height: 40px;
 }
 
+.popout_icon_v2 {
+    position: absolute;
+    top: 6px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    border: 2px solid black;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 30px;
+}
+
 .popout_name {
     padding-left: 65px;
-    padding-top: 13px;
+    margin-top: 13px;
     margin-bottom: 10px;
     padding-right: 10px;
     position: relative;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .popout_name_title {
@@ -105,18 +121,18 @@
 
 /* Item */
 .popout_stats_item {
-    width:74px;
-    height:74px;
-    margin:2px;
-    border:1px solid #45484e;
-    border-radius:5px;
+    width: 74px;
+    height: 74px;
+    margin: 2px;
+    border: 1px solid #45484e;
+    border-radius: 5px;
     position: relative;
     background-color: #33363c;
-
-    background-image:url('https://ark.romanport.com/assets/img_failed.png');
     background-position: center;
     background-size: 42px;
     background-repeat: no-repeat;
+    background-position-x: 27px;
+    background-position-y: 27px;
 }
 
 .popout_stats_item_area {
@@ -138,13 +154,28 @@
 }
 
 .popout_stats_item_text_topleft {
-    top:5px;
-    left:5px;
+    top: 0;
+    left: 0;
+    padding: 5px;
+    background-color: #2b2d32;
+    border-bottom-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border: 1px solid #45484e;
+    border-top: none;
+    border-left: none;
 }
 
 .popout_stats_item_text_bottomright {
-    bottom:5px;
-    right:5px;
+    bottom: 0;
+    right: 0;
+    padding: 5px;
+    background-color: #2b2d32;
+    border-bottom-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border: 1px solid #45484e;
+    border-right: none;
+    border-bottom: none;
+    display: none;
 }
 
 .popout_staticstats_container {

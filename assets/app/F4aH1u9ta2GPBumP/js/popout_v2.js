@@ -21,7 +21,7 @@ xpopout._features = {
         main.createDom("div", "popout_name_sub", ce).innerText = args.adapter.getSubtext(data);
 
         //Add icon
-        var icon = main.createDom("img", "mini_modal_icon map_icon_base map_icon_dino", ce);
+        var icon = main.createDom("img", "popout_icon_v2", ce);
         icon.style.backgroundImage = "url(" + args.adapter.getIcon(data) + ")";
 
         //Add color picker
@@ -157,6 +157,7 @@ xpopout._features = {
     },
     "inventory": function (data, args) {
         /* ARGS:
+         * rows (int) (OPTIONAL)
          * adapter (adapter)
          * 
          * ADAPTER:
@@ -174,6 +175,8 @@ xpopout._features = {
             var item = inventory.inventory_items[i];
             var itemClass = inventory.item_class_data[item.classname];
             var entry = main.createDom("li", "popout_stats_item", e);
+            entry.x_item = item;
+            entry.x_item_class = itemClass;
             if (itemClass == null) {
                 //Fallback
                 main.createDom("div", "popout_stats_item_text popout_stats_item_text_topleft", entry).innerText = "x" + item.stack_size.toString();
@@ -190,8 +193,96 @@ xpopout._features = {
                 main.createDom("div", "popout_stats_item_text popout_stats_item_text_topleft", entry).innerText = "x" + item.stack_size.toString();
                 main.createDom("div", "popout_stats_item_text popout_stats_item_text_bottomright", entry).innerText = name;
             }
+            xpopout._inventory_type_items[item.type](entry, item, itemClass);
+            entry.addEventListener("mouseover", function () {
+                if (this.x_mo != null) {
+                    return;
+                }
+                var mo = main.createDom("div", "popout_v2_inventory_label_container", this);
+                this.x_mo = mo;
+                var rect = this.getBoundingClientRect();
+                mo.style.top = (rect.top + 78).toString() + "px";
+                mo.style.left = (rect.left - 36).toString() + "px";
+
+                xpopout._inventory_type_tooltips[this.x_item.type](mo, this.x_item, this.x_item_class);
+            });
+            entry.addEventListener("mouseout", function () {
+                if (this.x_mo == null) {
+                    return;
+                }
+                this.x_mo.remove();
+                this.x_mo = null;
+            });
         }
+        e.addEventListener("scroll", function () {
+            //Move any tooltip boxes with the scrolling
+            for (var i = 0; i < this.children.length; i += 1) {
+                var o = this.children[i];
+                if (o.x_mo != null) {
+                    var mo = o.x_mo;
+                    var rect = o.getBoundingClientRect();
+                    mo.style.top = (rect.top + 78).toString() + "px";
+                    mo.style.left = (rect.left - 36).toString() + "px";
+                }
+            }
+        });
+
+        //Set rows if specified
+        if (args.rows != null) {
+            e.style.maxHeight = (80 * args.rows).toString() + "px";
+        }
+
         return ce;
+    },
+    "map_header": function (data, args) {
+        /* ARGS:
+         * width (int)
+         * height (int)
+         * adapter (adapter)
+         * 
+         * ADAPTER:
+         * getLocation(d)
+         */
+        var co = main.createDom("div", "popout_content");
+        var mapS = main.createDom("div", "popout_v2_map_container", co);
+        var location = args.adapter.getLocation(data);
+        window.requestAnimationFrame(function () {
+            map.getThumbnailIntoContainer(mapS, function () { }, location.x, location.y, 4000, 30, false, -1);
+        });
+        return co;
+    }
+}
+
+//Run for each inventory tooltip for their type
+xpopout._inventory_type_tooltips = {
+    "GENERIC": function (e, item, itemClass) {
+        var moo = main.createDom("div", "popout_v2_inventory_label_content_generic", e);
+        if (itemClass != null)
+            moo.innerText = itemClass.name;
+        else
+            moo.innerText = "This item isn't yet supported.";
+    },
+    "CRYOPOD": function (e, item, itemClass) {
+        var moo = main.createDom("div", "popout_v2_inventory_label_content_generic popout_v2_inventory_label_content_cryopod", e);
+        var top = main.createDom("div", "popout_v2_inventory_label_content_cryopod_top", moo);
+        top.style.backgroundImage = "url(" + item.extras.img + ")";
+        var mid = main.createDom("div", "popout_v2_inventory_label_content_cryopod_species", moo);
+        mid.innerText = item.extras.species;
+        var bot = main.createDom("div", "popout_v2_inventory_label_content_cryopod_name", moo);
+        bot.innerText = item.extras.name;
+        //moo.style.innerText = item.extras.name;
+        //item.extras.species;
+    }
+}
+
+//Run for each inventory item for their type
+xpopout._inventory_type_items = {
+    "GENERIC": function (e, item, itemClass) {
+        
+    },
+    "CRYOPOD": function (e, item, itemClass) {
+        var i = main.createDom("div", "popout_v2_inventory_extra_icon popout_v2_inventory_extra_icon_invert", e);
+        i.style.backgroundImage = "url(" + item.extras.img + ")";
     }
 }
 
@@ -290,6 +381,30 @@ xpopout.createDino = function (id, failCallback, anchor) {
             }
         },
         "inventory": {
+            "adapter": {
+                "getInventory": function (d) { return d.inventory; }
+            }
+        }
+    });
+}
+
+xpopout.createStructure = function (id, failCallback, anchor) {
+    xpopout.createDownloadablePopout(ark.session.endpoint_tribes_structure.replace("{structure}", id), failCallback, anchor, {
+        "map_header": {
+            "adapter": {
+                "getLocation": function (d) { return d.location; }
+            }
+        },
+        "name_top": {
+            "showColorPicker": false,
+            "adapter": {
+                "getName": function (d) { return d.name; },
+                "getSubtext": function (d) { return "Currently contains " + d.current_item_count + "/" + d.max_item_count+" items"; },
+                "getIcon": function (d) { return d.icon; },
+            }
+        },
+        "inventory": {
+            "rows":4,
             "adapter": {
                 "getInventory": function (d) { return d.inventory; }
             }

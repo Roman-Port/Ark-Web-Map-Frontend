@@ -2139,3 +2139,72 @@ a {
     z-index:9999;
     position: fixed;
 }
+
+.popout_v2_map_container {
+    background-color: #2c2e33;
+    border-bottom: 1px solid #44474b;
+    height: 100px;
+    border-radius: 5px;
+}
+
+.popout_v2_inventory_label_container {
+    position: fixed;
+    z-index: 999;
+    width: 148px;
+    pointer-events:none;
+    /* offset 36px */
+}
+
+.popout_v2_inventory_label_content_generic {
+    border-radius: 5px;
+    border: 1px solid black;
+    background-color: #151619;
+    max-width:100%;
+    margin:auto;
+    padding:10px 5px;
+    color:white;
+    font-size:15px;
+    text-align:center;
+    overflow:hidden;
+}
+
+.popout_v2_inventory_label_content_cryopod {
+    
+}
+
+.popout_v2_inventory_label_content_cryopod_top {
+    height:30px;
+    background-size:30px;
+    margin-bottom:7px;
+    background-position:center;
+    background-repeat:no-repeat;
+    filter:invert();
+}
+
+.popout_v2_inventory_extra_icon {
+    position:absolute;
+    top:3px;
+    right:3px;
+    width:20px;
+    height:20px;
+    background-size:20px;
+    background-repeat:no-repeat;
+    background-position:center;
+}
+
+.popout_v2_inventory_extra_icon_invert {
+    filter:invert();
+}
+
+.popout_v2_inventory_label_content_cryopod_species {
+    font-size: 13px;
+    color: gray;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 3px;
+}
+
+.popout_v2_inventory_label_content_cryopod_name {
+    font-size:15px;
+    color:white;
+}

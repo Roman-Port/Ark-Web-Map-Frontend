@@ -182,8 +182,29 @@ map.dtiles.addClickRegions = function (found, parent) {
         e.style.height = d.s + "px";
         e.style.width = d.s + "px";
         e.x_id = d.id;
+
+        //The following are just to detect clicks and get rid of accidental "clicks" triggered by the user scrolling
+        e.addEventListener("mousedown", function () {
+            this.x_fcc = map.map.getCenter();
+        });
+        e.addEventListener("mouseup", function () {
+            if (this.x_fcc == null) {
+                return;
+            }
+            var d = map.map.distance(this.x_fcc, map.map.getCenter());
+            if (d < 0.1) {
+                map.dtiles.onClickStructure(this);
+            }
+        });
     }
 };
+
+map.dtiles.onClickStructure = function (t) {
+    var rect = t.getBoundingClientRect();
+    xpopout.createStructure(t.x_id.toString(), function () {
+
+    }, xpopout.anchors.fixedAnchor(rect.left, rect.top));
+}
 
 map.dtiles.writeToCanvas = function (context, d, game_min_x, game_min_y, game_max_x, game_max_y, tsize, units_per_tile, globalOffsetX, globalOffsetY) {
     var found = [];

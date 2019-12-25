@@ -259,7 +259,7 @@ map.onDinoClicked = function() {
     //Show
     xpopout.createDino(this.x_data.extras._id, function () {
         console.log("failed!");
-    }, xpopout.anchors.fixedAnchor(rect.left - 14, rect.top - 10));
+    }, xpopout.anchors.fixedAnchor(rect.left - 14, rect.top - 18));
 }
 
 map.setBackground = function(color) {
@@ -438,6 +438,9 @@ map.getThumbnail = function(callback, centerX, centerY, size, realWidth, realHei
             for(var i = 0; i<mapIcons.icons.length; i+=1) {
                 var ic = mapIcons.icons[i];
 
+                //THIS FEATURE IS DISABLED TEMPORARILY BECAUSE THERE WERE SOME MISPLACEMENT PROBLEMS ------------------------------------------------------------------------
+                continue;
+
                 //Check pos
                 if(ic.location.x >= game_max_x && ic.location.x <= game_min_x) {continue;}
                 if(ic.location.y >= game_max_y && ic.location.y <= game_min_y) {continue;}
@@ -470,6 +473,9 @@ map.getThumbnail = function(callback, centerX, centerY, size, realWidth, realHei
         var mapIconsToLoad = [];
         for(var i = 0; i<mapIcons.icons.length; i+=1) {
             var ic = mapIcons.icons[i];
+
+            //THIS FEATURE IS DISABLED TEMPORARILY BECAUSE THERE WERE SOME MISPLACEMENT PROBLEMS ------------------------------------------------------------------------
+            continue;
 
             //Check pos
             if(ic.location.x >= game_max_x && ic.location.x <= game_min_x) {continue;}

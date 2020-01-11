@@ -18,71 +18,6 @@
     z-index: 1000;
 }
 
-.loader_view {
-    position: fixed;
-    top:0;
-    height:100vh;
-    width:100vw;
-    left:0;
-    z-index:99999;
-    background-color:#252629;
-    transition: opacity 200ms;
-    animation-timing-function: cubic-bezier(0.61, 0.4, 0.29, 0.99);
-}
-
-.loader_view_hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.loader_view_text {
-    font-size:18px;
-    color:white;
-    padding:10px;
-    max-width:600px;
-    text-align: center;
-    margin: auto;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 100;
-}
-
-.loader_view_text_extra {
-    font-weight: 800;
-}
-
-.warning_top {
-    background-color:#f44242;
-    color:white;
-    height:50px;
-    overflow:hidden;
-    position:fixed;
-    top:-50px;
-    right:0;
-    left:0;
-    text-align: center;
-    vertical-align: middle;
-    font-size:15px;
-    font-family: 'Roboto', sans-serif;
-    z-index: 99999;
-    transition:top 200ms;
-    animation-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
-}
-
-.warning_top_close {
-    position: absolute;
-    right:13px;
-    top:13px;
-    bottom:13px;
-    width:24px;
-    height:24px;
-    z-index:999;
-    cursor: pointer;
-}
-
-.warning_top_active {
-    top:0px;
-}
-
 .sidebar_part {
     position: absolute;
     top:0px;
@@ -324,6 +259,30 @@
     color: #cbcbcb;
 }
 
+.error_box_generic {
+    padding: 15px;
+    background-color: #ff5757;
+    color: white;
+    border-radius: 5px;
+    background-image: url(/assets/app/icons/warning_white.svg);
+    background-repeat: no-repeat;
+    background-position-y: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    padding-left: 54px;
+    background-position-x: 15px;
+    background-size: 24px;
+}
+
+.error_box_fixed_top_banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    display: none;
+}
+
 .main_view {
     transition:all 200ms;
     top: 0;
@@ -333,6 +292,14 @@
     position:fixed;
     animation-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
     overflow: hidden;
+}
+
+.global_error_banner .main_view {
+    top:48px;
+}
+
+.global_error_banner .error_box_fixed_top_banner {
+    display:block;
 }
 
 .main_view_warningbar {
@@ -2208,3 +2175,4 @@ a {
     font-size:15px;
     color:white;
 }
+

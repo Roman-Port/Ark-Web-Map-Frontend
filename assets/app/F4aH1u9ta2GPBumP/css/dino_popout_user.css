@@ -301,3 +301,11 @@
     border-color: #686a6d;
     background-color: #45484e;
 }
+
+.popout_infobar {
+    padding: 15px;
+    font-size: 13px;
+    color: #b5b5b5;
+    border-top: 1px solid #45484d;
+    background-color: #252629;
+}

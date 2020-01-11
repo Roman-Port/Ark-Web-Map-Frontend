@@ -48,26 +48,41 @@ statics.SERVER_NAV_OPTIONS = [
             if(map.map != null) {
                 map.map._sizeChanged = true; //Fix for map resizing bug
             }
+        },
+        "init": function () {
+
+        },
+        "deinit": function () {
+
         }
     },
     {
         "name":"Dinos",
         "tab_element":document.getElementById('tab_dinos'),
         "open_function":function() {
-
+            //Download the data if needed
+            if (!dino_stats.loading && dino_stats.dinos.length == 0) {
+                dino_stats.load(ark.session.endpoint_tribes_dino_stats, dino_stats.container);
+            }
+        },
+        "init": function () {
+            dino_stats.init();
+        },
+        "deinit": function () {
+            dino_stats.loading = false;
+            dino_stats.dinos = [];
         }
     },
-    /*{
-        "name":"Tribe Log",
-        "tab_element":document.getElementById('tab_tribe'),
-        "open_function":function() {
-
-        }
-    }*/
     {
         "name":"Nursery",
         "tab_element":document.getElementById('tab_nursery'),
         "open_function":function() {
+
+        },
+        "init": function () {
+
+        },
+        "deinit": function () {
 
         }
     },
@@ -166,3 +181,12 @@ statics.STATUS_ENTRIES = [
         "formatString": function (value) { return value; }
     }
 ];
+
+statics.ERROR_BANNER_PACKS = {
+    "ERROR_RPC_DISCONNECTED": {
+        "text": "Having troubles connecting. Some features may be unavailable.",
+        "id": 0,
+        "priority": 10,
+        "actions":[]
+    }
+}

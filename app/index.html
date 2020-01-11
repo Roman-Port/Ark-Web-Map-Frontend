@@ -15,7 +15,6 @@
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/popup_form.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/form.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/settings.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/tribelogs.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/nursery.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
         <style>
@@ -58,35 +57,6 @@
         <meta property="og:image" content="https://deltamap.net/android-chrome-192x192.png" />
     </head>
     <body>
-        <div class="loader_view" id="loader_view">
-            <table style="width: 100%; height:100%;">
-                <tr>
-                    <td style="text-align: center; vertical-align: middle;">
-                        <img src="/assets/icon_hires.png" height="90" width="90" style="margin-bottom:30px;">
-                        <div class="loader_view_text"><span class="loader_view_text_extra">Delta</span>WebMap</div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="warning_top" id="warning_top">
-            <table style="width: 100%; height:100%;">
-                <tr>
-                    <td style="text-align: center; vertical-align: middle; color:white;" id="warning_top_content">
-                        
-                    </td>
-                </tr>
-            </table>
-            <img src="/assets/icons/baseline-close-24px.svg" class="warning_top_close" onclick="collap.setState('warning_banner', false);">
-        </div>
-        <div class="pform_area" id="pform_area">
-            <table style="width: 100%; height:100%;">
-                <tr>
-                    <td style="text-align: center; vertical-align: middle;" id="pform_area_link">
-                    </td>
-                </tr>
-            </table>
-        </div>
-
         <!-- Form area -->
         <div id="xform_area" class="xform_area">
             <!-- No script error -->
@@ -94,6 +64,9 @@
                 <div class="xform_element xform_element_shown"><div class="xform_element_box"><div class="xform_element_nav"></div><div class="xform_element_body"><div class="xform_e_title">JavaScript Required</div><div class="xform_e_text">Sorry, JavaScript is required to load this app. Enable it or upgrade your browser.</div></div></div></div>
             </noscript>
         </div>
+
+        <!-- Error banner -->
+        <div class="error_box_generic error_box_fixed_top_banner">Can't connect. Some features may be unavailable.</div>
 
         <div id="main_view" class="main_view">
             <!-- Top nav -->
@@ -240,10 +213,8 @@
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/map.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/map_dtiles.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/map_canvas.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_popout.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/dinolib.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_stat_list.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/tribelogs.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/nursery.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/popout_v2.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/settings.js"></script>

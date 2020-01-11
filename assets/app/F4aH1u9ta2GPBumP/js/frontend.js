@@ -152,3 +152,72 @@ frontend._createServerListClusterLabel = function(container, name) {
     //Now, create the container
     return main.createDom("div", "", container);
 }
+
+/* Error messages */
+frontend._error_msgs = [];
+
+frontend.addErrorBannerPack = function (pck) {
+    //Add
+    frontend._error_msgs.push(pck);
+
+    //Refresh
+    frontend._refresh();
+}
+
+frontend.addErrorBanner = function (text, id, priority, actions) {
+    //Params:
+    //text (string)
+    //id (*)
+    //priority (int)
+    //actions (array of object:)
+    //      -> name (string)
+    //      -> type (enum_string:)
+    //          -> ACTION
+    //          -> CLOSE
+    //      -> callback (function)
+
+    //Pack
+    var pck = {
+        "text": text,
+        "id": id,
+        "priority": priority,
+        "actions": actions
+    };
+
+    //Send
+    frontend.addErrorBannerPack(pck);
+}
+
+frontend.removeErrorBanner = function (id) {
+    for (var i = 0; i < frontend._error_msgs.length; i += 1) {
+        if (frontend._error_msgs[i].id == id) {
+            frontend._error_msgs.splice(i, 1);
+            i--;
+        }
+    }
+    frontend._refresh();
+}
+
+frontend.removeErrorBannerPacked = function (pck) {
+    frontend.removeErrorBanner(pck.id);
+}
+
+frontend._refresh = function () {
+    //Find topmost
+    var t = null;
+    for (var i = 0; i < frontend._error_msgs.length; i += 1) {
+        if (t == null) {
+            t = frontend._error_msgs[i];
+        } else if (frontend._error_msgs[i].priority >= t.priority) {
+            t = frontend._error_msgs[i];
+        }
+    }
+
+    //Set (if any)
+    if (t == null) {
+        document.body.classList.remove("global_error_banner");
+    } else {
+        document.body.classList.add("global_error_banner");
+        document.getElementsByClassName('error_box_fixed_top_banner')[0].innerText = t.text;
+    }
+}

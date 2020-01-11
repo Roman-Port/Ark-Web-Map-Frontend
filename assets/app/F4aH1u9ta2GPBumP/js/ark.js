@@ -51,11 +51,10 @@ ark.init = function(d) {
             ark.loading_status += 1;
         }, ark.fatalError);
 
-        //Load dino stats data
-        dino_stats.init(s.endpoint_tribes_dino_stats);
-
-        //Load tribe logs
-        tribelogs.stream (s.endpoint_tribes_log);
+        //Run init on all
+        for (var i = 0; i < statics.SERVER_NAV_OPTIONS.length; i += 1) {
+            statics.SERVER_NAV_OPTIONS[i].init();
+        }
     }, ark.fatalError);
 }
 
@@ -90,6 +89,11 @@ ark.deinit = function() {
 
     //Kill map
     map.deinit();
+
+    //Run init on all
+    for (var i = 0; i < statics.SERVER_NAV_OPTIONS.length; i += 1) {
+        statics.SERVER_NAV_OPTIONS[i].deinit();
+    }
 
     //Remove offline message
     main.currentServerOnline = true;

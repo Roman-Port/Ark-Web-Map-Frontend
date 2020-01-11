@@ -135,11 +135,11 @@ main.getVersionString = function() {
 }
 
 main.onGatewayDisconnect = function() {
-    
+    frontend.addErrorBannerPack(statics.ERROR_BANNER_PACKS.ERROR_RPC_DISCONNECTED);
 }
 
 main.onGatewayConnect = function() {
-    
+    frontend.removeErrorBannerPacked(statics.ERROR_BANNER_PACKS.ERROR_RPC_DISCONNECTED);
 }
 
 main.removeAllChildren = function(e) {
@@ -154,10 +154,6 @@ main.setClass = function(e, name, status) {
     } else {
         e.classList.remove(name);
     }
-}
-
-main.setLoader = function(status) {
-    main.setClass(document.getElementById('loader_view'), "loader_view_hidden", status);
 }
 
 main.createDom = function(type, classname, parent, text) {
@@ -355,7 +351,6 @@ main.init = function() {
             frontend.showServerPlaceholders();
 
             if(!main.isDemo) {
-                main.setLoader(true);
         
                 //Now, we'll connect to the gateway
                 gateway.create(function() {
@@ -369,7 +364,6 @@ main.init = function() {
                 //main.pushNotificationToken();
             } else {
                 //Show just the demo server
-                main.setLoader(true);
                 ark.init(main.me.servers[0]);
             }
         });
@@ -521,7 +515,6 @@ main.beginUploadScreenshot = function(callback) {
         "onclone":function(a) {
             //Remove loader popup
             a.getElementById('xform_area').remove();
-            a.getElementById('loader_view').remove();
         }
     }).then(canvas => {
         var d = canvas.toDataURL("image/png");

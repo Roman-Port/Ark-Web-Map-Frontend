@@ -66,7 +66,7 @@ map.dtiles.loadAssets = function(callback) {
                 var m = this.x_data;
 
                 //Log
-                console.log("[Dynamic Tiles] Asset store tile '"+m.img+"' loaded; "+map.dtiles.loaded_assets+"/"+map.dtiles.metadata.length+" - "+((map.dtiles.loaded_assets / map.dtiles.metadata.length) * 100)+"%");
+                console.log("[Dynamic Tiles] Asset store tile '" + m.img + "' loaded; " + map.dtiles.loaded_assets + "/" + map.dtiles.metadata.length + " - " + Math.round((map.dtiles.loaded_assets / map.dtiles.metadata.length) * 100) + "%");
 
                 //Update loader
                 map.dtiles.updateLoader((map.dtiles.loaded_assets+1) / map.dtiles.metadata.length);

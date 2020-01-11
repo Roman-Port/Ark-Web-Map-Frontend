@@ -250,6 +250,16 @@ xpopout._features = {
             map.getThumbnailIntoContainer(mapS, function () { }, location.x, location.y, 4000, 30, false, -1);
         });
         return co;
+    },
+    "bottom_infobar": function (data, args) {
+        /* ARGS:
+         * adapter(adapter)
+         * 
+         * ADAPTER:
+         * getLastUpdated(d);
+         * 
+         */
+        var co = main.createDom("div");
     }
 }
 

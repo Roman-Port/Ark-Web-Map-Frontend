@@ -145,16 +145,9 @@ dino_stats.changeSortStat = function(statName) {
     dino_stats.refresh();
 }
 
-dino_stats.init = function(url) {
-    //Unload any old data
-    dino_stats.dinos = [];
-    dino_stats.loading = true;
-    
+dino_stats.init = function() {   
     //Set sort mode. This'll also trigger a refresh
     dino_stats.changeSort("species");
-
-    //Fetch new data
-    dino_stats.load(url, dino_stats.container);
 }
 
 dino_stats.load = function(url, container) {
@@ -244,15 +237,17 @@ dino_stats.createDino = function(data, container) {
     dino_stats.helperCreateText(e, data.level);
     dino_stats.helperCreateText(e, data.base_level);
     dino_stats.helperCreateColors(e, data.colors);
-    dino_stats.helperCreateText(e, main.convertFromWorldToGamePosDisplay(data.location.x).toString()+", "+main.convertFromWorldToGamePosDisplay(data.location.y).toString())
-
-    dino_stats.helperCreateStat(e, data, "health");
-    dino_stats.helperCreateStat(e, data, "stamina");
-    dino_stats.helperCreateStat(e, data, "food");
-    dino_stats.helperCreateStat(e, data, "inventoryWeight");
-    dino_stats.helperCreateStat(e, data, "oxygen");
-    dino_stats.helperCreateStat(e, data, "movementSpeedMult");
-    dino_stats.helperCreateStat(e, data, "meleeDamageMult");
+    if (data.is_cryo)
+        dino_stats.helperCreateText(e, "(Cryopod)");
+    else
+        dino_stats.helperCreateText(e, main.convertFromWorldToGamePosDisplay(data.location.x).toString() + ", " + main.convertFromWorldToGamePosDisplay(data.location.y).toString());
+    dino_stats.helperCreateStat(e, data, statics.ARK_DINO_STAT.Health);
+    dino_stats.helperCreateStat(e, data, statics.ARK_DINO_STAT.Stamina);
+    dino_stats.helperCreateStat(e, data, statics.ARK_DINO_STAT.Food);
+    dino_stats.helperCreateStat(e, data, statics.ARK_DINO_STAT.Weight);
+    dino_stats.helperCreateStat(e, data, statics.ARK_DINO_STAT.Oxygen);
+    dino_stats.helperCreateStat(e, data, statics.ARK_DINO_STAT.SpeedMultiplier);
+    dino_stats.helperCreateStat(e, data, statics.ARK_DINO_STAT.MeleeDamageMultiplier);
 
     return true;
 }

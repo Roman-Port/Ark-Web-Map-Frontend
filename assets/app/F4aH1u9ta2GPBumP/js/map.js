@@ -46,7 +46,7 @@ map.init = function() {
     map.map.on("move", map.updateReturnBtn);
     map.map.on("movestart", function(){map.isInMotion = true;});
     map.map.on("moveend", function(){map.isInMotion = false;});
-    map.map.on("zoomstart", dinopop.dismissModal);
+    //map.map.on("zoomstart", dinopop.dismissModal);
     map.canvas.hook(map.map);
 
     //Check btn

@@ -92,6 +92,7 @@ gateway.onMsg = function(evt) {
         case 3: map.canvas.onGatewayUpdate(d.payload); break;
         case 4: break;
         case 5: map.remoteUpdateDinoPrefs(d.payload); break;
+        case 7: map.onLiveUpdate(d.payload); break;
     }
 }
 

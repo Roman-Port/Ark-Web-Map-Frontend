@@ -150,3 +150,13 @@ delta.parseURLParams = function() {
 		return {};
 	}
 }
+
+delta.loopElementsByClassname = function(classname, exec, container) {
+    if (container == null) {
+        container = document.body;
+    }
+    var c = container.getElementsByClassName(classname);
+    for (var i = 0; i < c.length; i += 1) {
+        exec(c[i]);
+    }
+}

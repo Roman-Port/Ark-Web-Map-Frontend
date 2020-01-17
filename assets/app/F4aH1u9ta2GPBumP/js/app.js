@@ -20,6 +20,7 @@ main.isDemo = false;
 main.serverRequest = function(url, args, callback) {
     var xmlhttp = new XMLHttpRequest();
     var startId = main.sessionToken;
+    xmlhttp.timeout = 30 * 1000;
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             //Get reply

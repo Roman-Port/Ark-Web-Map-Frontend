@@ -41,7 +41,7 @@ map.dtiles.switchServer = function() {
     }
 
     //Activate server
-    main.serverRequest(ark.session.endpoint_tribes_structures, {}, function(d) {
+    main.serverRequest(ark.getEndpoint("tribes_structures"), {}, function(d) {
         map.dtiles.data = d;
         map.dtiles.addLayer();
     });
@@ -50,7 +50,7 @@ map.dtiles.switchServer = function() {
 map.dtiles.loadAssets = function(callback) {
     //Load metadata
     console.log("[Structure Tiles] Loading asset metadata...");
-    main.serverRequest(ark.session.endpoint_tribes_structures_metadata, {}, function(d) {
+    main.serverRequest(ark.getEndpoint("tribes_structures_metadata"), {}, function(d) {
         //Set
         map.dtiles.metadata = d.metadata;
 

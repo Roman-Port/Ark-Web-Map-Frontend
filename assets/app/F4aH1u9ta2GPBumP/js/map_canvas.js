@@ -111,7 +111,7 @@ map.canvas.init = function() {
     map.canvas.preview_point.style.backgroundColor = map.canvas.COLORS[map.canvas.currentBrushSettings.brushColor];
 
     //Refresh user maps
-    main.serverRequest(ark.session.endpoint_canvases, {}, function(d) {
+    main.serverRequest(ark.getEndpoint("canvases"), {}, function(d) {
         map.canvas.user_maps = d;
         map.canvas.refreshMapList();
         map.canvas.reconnect();
@@ -339,7 +339,7 @@ map.canvas.onRenameCanvas = function() {
 //Adds a canvas
 map.canvas.createCanvas = function(name) {
     map.canvas.creatingCanvas = true;
-    main.serverRequest(ark.session.endpoint_canvases, {
+    main.serverRequest(ark.getEndpoint("canvases"), {
         "type":"POST",
         "body":JSON.stringify({
             "color":"#3DC3F2",

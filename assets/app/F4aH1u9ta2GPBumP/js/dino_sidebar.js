@@ -9,7 +9,7 @@ dinosidebar.sortType = 0;
 
 dinosidebar.makeItemDoms = function(query, done) {
     //Fetch data
-    main.serverRequest(ark.session.endpoint_tribes_itemsearch.replace("{query}", encodeURIComponent(query)), {"failOverride": function() {
+    main.serverRequest(ark.getEndpoint("tribes_itemsearch").replace("{query}", encodeURIComponent(query)), {"failOverride": function() {
         //Error. Make fake one to keep it happy
         done(main.createDom("div", ""), false);
     }, "enforceServer":true}, function(d) {
@@ -149,7 +149,7 @@ dinosidebar.SORT_FUNCTIONS = [
 
 dinosidebar.init = function() {
     //Loads initial data, then starts this
-    ark.downloadData(ark.session.endpoint_tribes_overview, "overview", {}, function(d) {
+    ark.downloadData(ark.getEndpoint("tribes_overview"), "overview", {}, function(d) {
         dinosidebar.data = d;
         dinosidebar.ready = true;
         ark.loading_status += 1;
@@ -165,7 +165,7 @@ dinosidebar.deinit = function() {
 }
 
 dinosidebar.redownload = function() {
-    ark.downloadData(ark.session.endpoint_tribes_overview, "overview", {}, function(d) {
+    ark.downloadData(ark.getEndpoint("tribes_overview"), "overview", {}, function(d) {
         dinosidebar.data = d;
         dinosidebar.ready = true;
         main.log("Dino Sidebar", 0, "Dino sidebar data reloaded.");

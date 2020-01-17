@@ -62,7 +62,7 @@ statics.SERVER_NAV_OPTIONS = [
         "open_function":function() {
             //Download the data if needed
             if (!dino_stats.loading && dino_stats.dinos.length == 0) {
-                dino_stats.load(ark.session.endpoint_tribes_dino_stats, dino_stats.container);
+                dino_stats.load(ark.getEndpoint("tribes_dino_stats"), dino_stats.container);
             }
         },
         "init": function () {

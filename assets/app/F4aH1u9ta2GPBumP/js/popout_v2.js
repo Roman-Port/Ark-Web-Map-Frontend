@@ -364,7 +364,7 @@ xpopout.createPopout = function (data, anchor, features) {
 }
 
 xpopout.createDino = function (id, failCallback, anchor) {
-    xpopout.createDownloadablePopout(ark.session.endpoint_tribes_dino.replace("{dino}", id), failCallback, anchor, {
+    xpopout.createDownloadablePopout(ark.getEndpoint("tribes_dino").replace("{dino}", id), failCallback, anchor, {
         "name_top": {
             "showColorPicker": true,
             "adapter": {
@@ -375,7 +375,7 @@ xpopout.createDino = function (id, failCallback, anchor) {
                 "getColor": function (d) { return d.prefs.color_tag; },
                 "setColor": function (d, c) {
                     d.prefs.color_tag = c;
-                    var url = ark.session.endpoint_put_dino_prefs.replace("{dino}", d.dino_id);
+                    var url = ark.getEndpoint("put_dino_prefs").replace("{dino}", d.dino_id);
                     main.serverRequest(url, {
                         "type": "POST",
                         "body": JSON.stringify(d.prefs)
@@ -399,7 +399,7 @@ xpopout.createDino = function (id, failCallback, anchor) {
 }
 
 xpopout.createStructure = function (id, failCallback, anchor) {
-    xpopout.createDownloadablePopout(ark.session.endpoint_tribes_structure.replace("{structure}", id), failCallback, anchor, {
+    xpopout.createDownloadablePopout(ark.getEndpoint("tribes_structure").replace("{structure}", id), failCallback, anchor, {
         "map_header": {
             "adapter": {
                 "getLocation": function (d) { return d.location; }

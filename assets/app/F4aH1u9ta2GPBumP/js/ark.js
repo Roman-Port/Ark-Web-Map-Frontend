@@ -2,6 +2,7 @@ var ark = {};
 
 ark.cachedOfflineData = null;
 ark.session = null;
+ark.targetTribe = "*";
 
 ark.MIN_DATA_VERSION = 2;
 
@@ -37,6 +38,11 @@ ark.init = function(d) {
     ark.downloadData(d.endpoint_createsession, "session", {}, function(s) {
         ark.session = s;
         ark.loading_status += 1;
+        if (ark.session.target_tribe != null) {
+            ark.targetTribe = ark.session.target_tribe.tribe_id.toString();
+        } else {
+            ark.targetTribe = "*";
+        }
 
         //Init map
         map.init();
@@ -46,7 +52,7 @@ ark.init = function(d) {
         dinosidebar.init();
 
         //Download tribes
-        ark.downloadData(s.endpoint_tribes_icons, "tribe", {}, function(m) {
+        ark.downloadData(ark.getEndpoint("tribes_icons"), "tribe", {}, function(m) {
             map.onEnableTribeDinos(m);
             ark.loading_status += 1;
         }, ark.fatalError);
@@ -102,6 +108,11 @@ ark.deinit = function() {
     main.currentServerId = null;
     ark.cachedOfflineData = null;
     ark.session = null;
+}
+
+ark.getEndpoint = function (name) {
+    var url = ark.session["endpoint_" + name];
+    return url.replace("{tribe_id}", ark.targetTribe);
 }
 
 ark.showServerPicker = function() {

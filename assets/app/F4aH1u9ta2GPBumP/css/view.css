@@ -2176,3 +2176,52 @@ a {
     color:white;
 }
 
+.map_icon_rotor {
+    border-radius: 50%;
+    border-top: 7px solid #000000;
+    position: absolute;
+    top: -7px;
+    left: -1px;
+    right: -1px;
+    bottom: -7px;
+}
+
+.map_damage_indicator {
+    position: absolute;
+    font-size: 25px;
+    z-index: 99999;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    padding-top: 30px;
+    opacity: 0;
+    pointer-events: none;
+    animation-name: map_damage_indicator_animation;
+    animation-duration: 4s;
+    width:800px;
+    text-align:center;
+}
+
+@keyframes map_damage_indicator_animation {
+    from {
+        padding-top: 25px;
+        opacity: 0;
+    }
+
+    5% {
+        padding-top: 30px;
+        opacity: 1;
+    }
+
+    85% {
+        padding-top: 30px;
+        opacity: 1;
+    }
+
+    to {
+        padding-top: 20px;
+        opacity: 0;
+    }
+}
+
+.map_icon_animating {
+    transition: transform 500ms linear 0s;
+}

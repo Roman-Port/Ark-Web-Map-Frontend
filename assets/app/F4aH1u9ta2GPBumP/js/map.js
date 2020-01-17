@@ -9,6 +9,9 @@ map.isInMotion = false;
 map.ICON_ENTRIES = {
     "dinos":function(data, icon) {
         icon.addEventListener('click', map.onDinoClicked);
+    },
+    "players": function (data, icon) {
+        icon.style.backgroundSize = "cover";
     }
 }
 
@@ -145,8 +148,10 @@ map.addDataIconToMap = function(data, mapContainer) {
     }
 
     //Create icon
-    data.extras._id = data.id;
-    var icon = map.addMapIcon(data.type, data.id, data.extras, pos, data.img, null, "map_icon_dino", content, mapContainer);
+    if (data.extras != null) {
+        data.extras._id = data.id;
+    }
+    var icon = map.addMapIcon(data.type, data.id, data.extras, pos, data.img, null, "map_icon_dino", content, mapContainer, data.location.yaw);
     icon.x_data = data;
 
     //Set border from state
@@ -184,7 +189,7 @@ map.MARKER_Z_OFFSETS = {
     "players":10000
 }; //Used to define layer priorities. If the layer name does not exist on this list, it is pushed to the bottom
 
-map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, classNames, inner, mapContainer) {
+map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, classNames, inner, mapContainer, rotation) {
     var icon = L.divIcon({
         iconSize:       [40, 40],
         className:      "map_icon_base "+classNames,
@@ -224,6 +229,13 @@ map.addMapIcon = function(layerId, markerId, data, pos, img, onclick, classNames
     //Set image
     dino_icon._icon.style.backgroundImage = "url("+img+")";
     dino_icon._icon.style.zIndex = null;
+
+    //Add rotation
+    if (rotation != null) {
+        var rotor = main.createDom("div", "map_icon_rotor", dino_icon._icon);
+        dino_icon.x_rotor = rotor;
+        rotor.style.transform = "rotate(" + rotation + "deg)";
+    }
 
     return dino_icon._icon;
 }
@@ -554,4 +566,75 @@ map.getThumbnailIntoContainer = function(container, callback, centerX, centerY, 
         container.appendChild(c);
         callback(c);
     }, centerX, centerY, size, width, height, iconSize, safe, zoomLevel);
+}
+
+map.onLiveUpdate = function (d) {
+    for (var i = 0; i < d.updates.length; i += 1) {
+        var u = d.updates[i];
+
+        //Get the pin
+        var PIN_NAME_MAP = {
+            1: "dinos",
+            0: "players"
+        };
+        if (PIN_NAME_MAP[u.type] == null) {
+            continue; //This is an unsupported type
+        }
+        var pin = map.getMarkerByName(PIN_NAME_MAP[u.type], u.id);
+        if (pin == null) {
+            continue; //Pin not found!
+        }
+
+        //Update the pin location
+        if (u.x != null && u.y != null && u.z != null) {
+            /*pin._icon.classList.add("map_icon_animating");
+            window.requestAnimationFrame(function () {
+                pin.setLatLng(map.convertFromGamePosToMapPos(u.x, u.y));
+            });
+            window.setTimeout(function (pp) {
+                pp._icon.classList.remove("map_icon_animating");
+            }, 600, pin);*/
+            // ^ buggy at best
+
+            pin.setLatLng(map.convertFromGamePosToMapPos(u.x, u.y));
+        }
+
+        //Show hitmaker
+        if (u.health != null && pin.x_last_health != null) {
+            //Get this in screen pos
+            var px = map.map.latLngToLayerPoint(pin.getLatLng(), map.map.getZoom());
+
+            //Create the string to display
+            var offset = u.health - pin.x_last_health;
+            var text = Math.abs(Math.round(offset));
+            var textColor = "#e0e019";
+            if (offset > 0) {
+                text = "+" + text;
+                textColor = "#44e019";
+            } else if (offset < 0) {
+                text = "-" + text;
+                textColor = "#e8482c";
+            }
+
+            //Create the dialog to attach
+            var dialog = main.createDom("div", "map_damage_indicator", document.getElementById('map_part'));
+            dialog.innerText = text;
+            dialog.style.color = textColor;
+            dialog.style.left = (px.x - 400 - 22).toString() + "px";
+            dialog.style.top = (px.y - 40 - 50).toString() + "px";
+            window.setTimeout(function (dialogT) {
+                dialogT.remove();
+            }, 8000, dialog);
+        }
+
+        //Update local pin health
+        if (u.health != null) {
+            pin.x_last_health = u.health;
+        }
+
+        //Update pin rotation
+        if (u.rot != null) {
+            pin.x_rotor.style.transform = "rotate(" + u.rot + "deg)";
+        }
+    }
 }

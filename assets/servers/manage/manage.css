@@ -46,7 +46,7 @@ html, body {
     font-family: 'Open Sans', sans-serif;
     overflow:hidden;
     box-shadow: 2px 0px 10px 0px rgba(0,0,0,0.1);
-    z-index:1;
+    z-index:2;
 }
 
 .left_sidebar_top {
@@ -58,7 +58,6 @@ html, body {
     padding:15px;
     height:45px;
     box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.1);
-    font-size:
 }
 
 .left_sidebar_top_image {
@@ -119,18 +118,123 @@ html, body {
     background-color:#292d4c !important;
 }
 
+/* Status bar */
+.statusbar_content {
+    background-color: white;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 250px;
+    padding: 15px;
+    font-family: 'Open Sans', sans-serif;
+    height: 40px;
+    border-bottom: 1px solid #d3d3d3;
+    box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.12);
+    z-index: 1;
+    overflow-y:hidden;
+    overflow-x:auto;
+}
+
+.statusbar_icon {
+    height:40px;
+    width:40px;
+    margin-right:12px;
+    border-radius:5px;
+    float:left;
+}
+
+.statusbar_name {
+    font-size: 20px;
+    color: black;
+    font-weight: 700;
+    height:20px;
+    line-height:20px;
+}
+
+.statusbar_subtitle {
+    font-size: 15px;
+    color: gray;
+    font-weight: 500;
+    height: 20px;
+    line-height: 20px;
+}
+
+.statusbar_status_container {
+    float: right;
+    border-left: 1px solid #d3d3d3;
+    padding-left:15px;
+}
+
+.statusbar_status_icon {
+    width:10px;
+    height:10px;
+    border-radius:5px;
+    margin: 16px 0;
+    margin-right:10px;
+    float:left;
+}
+
+.statusbar_status_icon__offline {
+    background-color: #eb3734;
+}
+
+.statusbar_status_icon__alert {
+    background-color: #ebd634;
+}
+
+.statusbar_status_icon__online {
+    background-color: #3deb34;
+}
+
+.statusbar_status_text {
+    font-size: 15px;
+    color: gray;
+    font-weight: 500;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+}
+
 /* Right content */
 
 .right_content {
     background-color: #f2f2f2;
     position: fixed;
-    top:0;
+    top:71px;
     right:0;
     bottom:0;
     left:250px;
     padding:15px;
     overflow-y:auto;
     font-family: 'Open Sans', sans-serif;
+    padding-top:0;
+}
+
+.right_content_nav {
+    position:absolute;
+    top:15px;
+    left:15px;
+    width:140px;
+}
+
+.right_content_nav_option {
+    margin-bottom: 4px;
+    color: #999;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.right_content_nav_option:hover {
+    color: #676767;
+}
+
+.right_content_nav_option_selected {
+    color: #2152ea !important;
+}
+
+.right_content_tab {
+    margin-left:140px;
+    margin-top:15px;
 }
 
 .delta_tab_content {
@@ -223,6 +327,255 @@ dbtn:active {
     cursor: no-drop;
 }
 
+.clist {
+    margin: 0;
+    list-style: none;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    justify-content: center;
+    padding: 0;
+}
+
+/* Server Create Dialog */
+.serverdialog_box_container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 80px);
+    background-color: #0000007d;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 220ms cubic-bezier(0.37, -0.05, 0.11, 1.34);
+    z-index: 99;
+}
+
+.serverdialog_box {
+    width: calc(100% - 40px);
+    max-width: 600px;
+    background-color: white;
+    font-family: 'Open Sans', sans-serif;
+    margin: auto;
+    text-align: left;
+    border: 1px solid #d3d3d3;
+    border-radius: 5px;
+    position: relative;
+    background-color: #f2f2f2;
+    height: calc(100% - 40px);
+    max-height: 600px;
+}
+
+.serverdialog_box_bottom {
+    border-top: 1px solid #d3d3d3;
+    padding:15px;
+    height:38px;
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    background-color:white;
+}
+
+.serverdialog_box_bottom_bar {
+    border-radius: 5px;
+    height: 10px;
+    margin: 13px 0px;
+    border: 1px solid #d3d3d3;
+    background-color: #f2f2f2;
+    display: flex;
+    max-width: 200px;
+}
+
+.serverdialog_box_bottom_bar_filling {
+    background-color: rgb(58, 65, 111);
+    border-radius: 5px;
+    height: 10px;
+    min-width: 10px;
+    max-width: 100%;
+    transition: width 230ms cubic-bezier(0.57, 1.15, 0.56, 1.1);
+}
+
+.serverdialog_box_bottom_btn {
+    float:right;
+    margin-left:10px;
+}
+
+.serveridalog_box_top {
+    border-bottom: 1px solid #d3d3d3;
+    padding: 15px;
+    font-weight: 800;
+    color: black;
+    top: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    background-color: white;
+}
+
+.serveridalog_box_content {
+    margin-top: 53px;
+    margin-bottom: 69px;
+    overflow-y: auto;
+    max-height: calc(100% - 53px - 69px);
+}
+
+.serveridalog_box_tab {
+    padding:0 15px;
+    display:none;
+}
+
+.serveridalog_box_tab_active {
+    display: block;
+}
+
+.serverctab_welcome_step {
+    padding: 15px;
+    position: relative;
+    font-size: 15px;
+    padding-left: 50px;
+}
+
+.serverctab_welcome_step_bubble {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px;
+    background-color: #d6d6d6;
+    border-radius: 50%;
+    width: 20px;
+    text-align: center;
+    height: 20px;
+    color: black;
+}
+
+.serverctab_provider_div {
+    width: 100px;
+    background-color: #d3d3d3;
+    height:1px;
+    margin:15px auto;
+}
+
+.serverctab_btn_generic {
+    padding: 10px 15px;
+    height: 18px;
+    line-height: 18px;
+    background-color: rgb(58, 65, 111);
+    border: 1px solid #292d4c;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.1);
+}
+
+.serverctab_btn_provider {
+    width: 148px;
+    height: 30px;
+    line-height: 30px;
+    margin: 5px;
+    background-size: 140px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.serverctab_steps_step {
+    padding: 15px 10px;
+    position: relative;
+    font-size: 15px;
+    padding-left: 50px;
+    padding-right: 80px;
+}
+
+.serverctab_steps_bubble {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    padding: 5px;
+    background-color: #d6d6d6;
+    border-radius: 50%;
+    width: 20px;
+    text-align: center;
+    height: 20px;
+    color: black;
+}
+
+.serverctab_steps_bubble_thumb {
+    width: 50px;
+    height: 50px;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 5px;
+    border: 1px solid #cecece;
+    position: absolute;
+    right: 15px;
+    top: 8px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.12);
+    cursor:pointer;
+}
+
+.serverctab_steps_codeblock {
+    background-color: #353b63;
+    padding: 10px;
+    overflow-x: auto;
+    color: white;
+    font-family: 'Source Code Pro', monospace;
+    margin-top: 15px;
+    border: 1px solid #141626;
+    border-radius: 5px;
+}
+
+.serverctab_lock_btn {
+    background-color: rgb(58, 65, 111);
+    border: 1px solid #292d4c;
+    padding:15px;
+    color:white;
+    font-size:15px;
+    margin-bottom:15px;
+    border-radius:5px;
+    position:relative;
+    padding-left:50px;
+    cursor: pointer;
+}
+
+.serverctab_lock_btn_light {
+    position:absolute;
+    top:18px;
+    left:15px;
+    width:19px;
+    height:19px;
+    border:2px solid white;
+    border-radius:50%;
+}
+
+.serverctab_lock_btn_active .serverctab_lock_btn_light {
+    background-color:white;
+}
+
+.mediabox_container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 80px);
+    background-color: #0000007d;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 220ms cubic-bezier(0.37, -0.05, 0.11, 1.34);
+    z-index: 99;
+}
+
+.mediabox_content {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: calc(100% - 140px);
+    width: calc(100% - 80px);
+    margin:auto;
+    max-width:1400px;
+}
+
 /* States (MUST BE AT BOTTOM) */
 .state_loading .loaderbar {
     display:block;
@@ -230,4 +583,16 @@ dbtn:active {
 
 .state_hide .attrib_loaded_content {
     display:none;
+}
+
+.state_add .serverdialog_box_container {
+    opacity:1;
+    pointer-events:all;
+    top:-40px;
+}
+
+.state_media .mediabox_container {
+    opacity: 1;
+    pointer-events: all;
+    top: -40px;
 }

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/assets/servers/manage/manage.css">
 	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
 </head>
-<body class="">
+<body class="state_noauth">
     <div class="loaderbar"><div class="loaderbar_bar"></div></div>
     <div class="left_sidebar">
         <!--<div class="left_sidebar_top attrib_loaded_content">

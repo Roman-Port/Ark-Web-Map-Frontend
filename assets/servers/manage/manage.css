@@ -596,3 +596,15 @@ dbtn:active {
     pointer-events: all;
     top: -40px;
 }
+
+.state_noauth .left_sidebar {
+    display:none;
+}
+
+.state_noauth .statusbar_content {
+    display: none;
+}
+
+.state_noauth .right_content {
+    display: none;
+}

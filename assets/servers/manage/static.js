@@ -57,7 +57,7 @@ var PROVIDER_SETUPS = {
     }
 };
 
-var FLOW_MAX_STEPS = 6;
+var FLOW_MAX_STEPS = 8;
 
 var FLOWS = [
     {
@@ -74,6 +74,71 @@ var FLOWS = [
         }
     },
     {
+        "title": "choose-platform",
+        "nextEnabled": false,
+        "oncreate": function (e, context) {
+
+        },
+        "onnext": function (next, to, context) {
+            next();
+        },
+        "getProgress": function (context) {
+            return 1 / FLOW_MAX_STEPS;
+        }
+    },
+    {
+        "title": "platform-not-supported",
+        "nextEnabled": false,
+        "oncreate": function (e, context) {
+
+        },
+        "onnext": function (next, to, context) {
+            next();
+        },
+        "getProgress": function (context) {
+            return 1 / FLOW_MAX_STEPS;
+        }
+    },
+    {
+        "title": "choose-map",
+        "nextEnabled": false,
+        "oncreate": function (e, context) {
+
+        },
+        "onnext": function (next, to, context) {
+            next();
+        },
+        "getProgress": function (context) {
+            return 2 / FLOW_MAX_STEPS;
+        }
+    },
+    {
+        "title": "request-map",
+        "nextEnabled": false,
+        "oncreate": function (e, context) {
+
+        },
+        "onnext": function (next, to, context) {
+            next();
+        },
+        "getProgress": function (context) {
+            return 2 / FLOW_MAX_STEPS;
+        }
+    },
+    {
+        "title": "login",
+        "nextEnabled": false,
+        "oncreate": function (e, context) {
+
+        },
+        "onnext": function (next, to, context) {
+            next();
+        },
+        "getProgress": function (context) {
+            return 3 / FLOW_MAX_STEPS;
+        }
+    },
+    {
         "title": "provider",
         "nextEnabled": false,
         "oncreate": function (e, context) {
@@ -83,7 +148,7 @@ var FLOWS = [
             next(0);
         },
         "getProgress": function (context) {
-            return 1 / FLOW_MAX_STEPS;
+            return 3 / FLOW_MAX_STEPS;
         }
     },
     {
@@ -96,7 +161,7 @@ var FLOWS = [
             next(0);
         },
         "getProgress": function (context) {
-            return 2 / FLOW_MAX_STEPS;
+            return 5 / FLOW_MAX_STEPS;
         }
     },
     {
@@ -109,11 +174,11 @@ var FLOWS = [
             if (context >= PROVIDER_SETUPS[savedSetupServerConfig[KEY_SERVERSETUP_PROVIDER]].instructions.length - 1) {
                 next();
             } else {
-                to(3, context + 1);
+                to(8, context + 1);
             }
         },
         "getProgress": function (context) {
-            return (3 + context) / FLOW_MAX_STEPS;
+            return (5 + context) / FLOW_MAX_STEPS;
         }
     },
     {
@@ -126,7 +191,7 @@ var FLOWS = [
             next();
         },
         "getProgress": function (context) {
-            return 5 / FLOW_MAX_STEPS;
+            return 7 / FLOW_MAX_STEPS;
         }
     }
 ]

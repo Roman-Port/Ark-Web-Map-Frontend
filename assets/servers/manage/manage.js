@@ -2,40 +2,158 @@ var serverdata = null;
 var clusters = null;
 var serversme = null;
 var permissionsconfig = null;
+var permissionstoggles = {}; //Holds refs to permission switches generated at startup
+var serverid = "5e181ab86853fe2f04d60b49";
+var isauth = false; //Is this user authenticated or signed in?
+var maplist = null; //List of compatible maps
+var params = {}; //URL params
 
 var savedSetupServerConfig = {};
 
 function Init() {
-    //Get server ID
-    //Todo...
+    //Parse URL params
+    params = delta.parseURLParams();
 
     //Request all resources
-    delta.serverRequest("https://config.deltamap.net/prod/permission_indexes.json", {"nocreds":true}, function(pc) {
+    delta.serverRequest("https://config.deltamap.net/prod/permission_indexes.json", { "nocreds": true, "failOverride": OnInitFailure}, function(pc) {
         permissionsconfig = pc;
-        delta.serverRequest("https://deltamap.net/api/users/@me/clusters", {}, function(c) {
-            clusters = c;
-            delta.serverRequest("https://deltamap.net/api/users/@me/servers", {}, function (sc) {
-                serversme = sc;
-                SetPageFlag("state_hide", false);
-                SetPageFlag("state_loading", false);
-                OpenCreateServerDialog();
+        CreatePermissions();
+        delta.serverRequest("https://deltamap.net/api/config/maps.json", { "nocreds": true, "failOverride": OnInitFailure }, function (maps) {
+            maplist = maps;
+            delta.serverRequest("https://deltamap.net/api/users/@me/clusters", { "failOverride": OnInitFailure }, function (c) {
+                clusters = c;
+                delta.serverRequest("https://deltamap.net/api/users/@me/servers", { "failOverride": OnInitFailure }, function (sc) {
+                    serversme = sc;
+                    SetPageFlag("state_hide", false);
+                    SetPageFlag("state_loading", false);
+                    isauth = true;
+
+                    if (sc.servers.length == 0) {
+                        OpenCreateServerDialog();
+                    } else {
+                        //Show server setup prompt if that's what we were doing
+                        if (params.postlogin != null) {
+                            if (params.postlogin == "true") {
+                                OpenCreateServerDialog();
+                            }
+                        }
+
+                        //Init behind
+                        SetPageFlag("state_noauth", false);
+                        InitServer(serverid);
+                    }
+                });
             });
         });
     });
 }
 
-function InitDebug() {
-    delta.serverRequest("https://config.deltamap.net/prod/permission_indexes.json", { "nocreds": true }, function (pc) {
-        permissionsconfig = pc;
-        clusters = [];
-        serversme = {
-            "token": "[SESSION RUNNING IN DEBUG MODE; NO TOKEN]",
-            "servers": [
-            ]
-        };
+function OnInitFailure(c) {
+    if (c.status == 401 || c.status == 403) {
+        //Not authenticated! Show the setup window
         SetPageFlag("state_hide", false);
         SetPageFlag("state_loading", false);
         OpenCreateServerDialog();
+    }
+}
+
+function InitServer(id) {
+    //Set loader
+    SetPageFlag("state_hide", true);
+    SetPageFlag("state_loading", true);
+
+    //Download
+    delta.serverRequest("https://deltamap.net/api/servers/" + id + "/manage", {}, function (c) {
+        serverdata = c;
+
+        //Set content
+        SetServerContent();
+
+        //Show
+        SetPageFlag("state_hide", false);
+        SetPageFlag("state_loading", false);
+    });
+}
+
+function SetServerContent() {
+    SetServerHeader();
+    SetServerAdminList();
+    SetPermissionValues();
+}
+
+function SetServerHeader() {
+    //Set icon and title
+    document.getElementById('server_title_icon').src = serverdata.icon;
+    document.getElementById('server_title_title').innerText = serverdata.name;
+
+    //Set the text under the title
+    var s = document.getElementById('server_title_subtitle');
+    s.innerHTML = "";
+    if (serverdata.map_name != null) {
+        delta.createDom("span", "", s, serverdata.map_name);
+    } else {
+        delta.createDom("i", "", s, "Incompatible Map");
+    }
+    delta.createDom("span", "", s).innerHTML = " &#183; ";
+    if (serverdata.cluster != null) {
+        delta.createDom("span", "", s, serverdata.cluster.name);
+    } else {
+        delta.createDom("i", "", s, "No Cluster");
+    }
+
+    //Set status light
+    var light = document.getElementById('server_status_icon');
+    light.className = "statusbar_status_icon";
+    switch (serverdata.status) {
+        case "ONLINE": light.classList.add("statusbar_status_icon__online"); break;
+        case "ALERT": light.classList.add("statusbar_status_icon__alert"); break;
+        case "OFFLINE": light.classList.add("statusbar_status_icon__offline"); break;
+    }
+
+    //Set status text
+    document.getElementById('server_status_text').innerText = serverdata.alert;
+}
+
+function SetServerAdminList() {
+    //Get container
+    var container = document.getElementById('tab_admin_list_listview');
+    container.innerHTML = "";
+
+    //Add admins
+    for (var i = 0; i < serverdata.admins.length; i += 1) {
+        var a = serverdata.admins[i];
+        CreateSeamlistEntry(a.icon, a.name, "Steam ID: " + a.steamId, container);
+    }
+}
+
+function SetPermissionValues() {
+    //Loop through switches and set them
+    var keys = Object.keys(permissionstoggles);
+    for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var s = permissionstoggles[k];
+        var v = serverdata.permissions[k];
+        if (v) {
+            s.classList.add("switch_active");
+        } else {
+            s.classList.remove("switch_active");
+        }
+    }
+}
+
+function PushUpdate() {
+    //Pushes update data, then refreshes
+    SetPageFlag("state_loading", true);
+    delta.serverRequest("https://deltamap.net/api/servers/" + serverid + "/manage", {
+        "type": "POST",
+        "body": JSON.stringify(serverdata),
+        "failOverride": function () {
+            window.location.reload();
+        }
+    }, function (s) {
+        serverdata = s;
+        SetPageFlag("state_loading", false);
+        SetServerContent();
     });
 }
 
@@ -66,6 +184,27 @@ function SetServerInfo(d) {
     }
 }
 
+function CreatePermissions() {
+    //Create the permissions list
+    var l = document.getElementById('permissions_list');
+    l.innerHTML = "";
+    permissionstoggles = {};
+
+    //Add each
+    for (var i = 0; i < permissionsconfig.length; i += 1) {
+        var p = permissionsconfig[i];
+        if (p.visibility != "UNUSED") {
+            var t = CreatePermissionsSwitch(l, p.name, p.description, false, p.index, OnTogglePermission);
+        }
+    }
+}
+
+function OnTogglePermission(state, id) {
+    //Sent when we change one of the permissions switches
+    serverdata.permissions[id] = state;
+    PushUpdate();
+}
+
 function OnSwitchTab(c) {
     //Disable all other buttons
     var t = document.getElementsByClassName("right_content_nav_option_selected");
@@ -84,6 +223,14 @@ function OnSwitchTab(c) {
 
     //Find and activate new frame
     document.getElementById('tab_'+c.getAttribute("data-tab")).classList.add("active_delta_tab");
+}
+
+function OnMapChosen() {
+    if (isauth) {
+        ShowSlide(6, null);
+    } else {
+        ShowSlide(5, null);
+    }
 }
 
 function ShowCustomModStep(data) {
@@ -152,7 +299,11 @@ function ShowSlide(index, context) {
 
 function OnPickSetupProvider(id) {
     savedSetupServerConfig[KEY_SERVERSETUP_PROVIDER] = id;
-    ShowSlide(2, 0);
+    ShowSlide(7, 0);
+}
+
+function LoginSetupBox() {
+    delta.loginAndReturnTo("https://" + window.location.host + window.location.pathname + "?postlogin=true");
 }
 
 function SetServerLockStatus(isLocked) {
@@ -184,9 +335,59 @@ function OnSlideNextBtn() {
 }
 
 function OpenCreateServerDialog() {
+    //Reset settings
     savedSetupServerConfig = {};
-    ShowSlide(0, 0);
+
+    //Check if this is a postlogin
+    var isPost = false;
+    if (params.postlogin != null) {
+        isPost = params.postlogin == "true";
+    }
+    if (isPost && isauth) {
+        ShowSlide(6, 0);
+    } else {
+        ShowSlide(0, 0);
+    }
+
+    //Show
     document.body.classList.add("state_add");
 }
 
-InitDebug();
+function CreateSeamlistEntry(img, title, subtitle, container) {
+    var e = delta.createDom("seamlist", "", container);
+    delta.createDom("img", "seamlist_image", e).src = img;
+    delta.createDom("div", "seamlist_top_text", e).innerText = title;
+    delta.createDom("div", "seamlist_bottom_text", e).innerText = subtitle;
+    return e;
+}
+
+function CreatePermissionsSwitch(container, title, subtitle, state, id, callback) {
+    var e = delta.createDom("div", "permissions_item", container);
+    CreateSwitch(state, id, callback, e).classList.add("permissions_item_switch");
+    delta.createDom("div", "permissions_item_title", e, title);
+    delta.createDom("div", "permissions_item_text", e, subtitle);
+    return e;
+}
+
+function CreateSwitch(state, id, callback, container) {
+    var e = delta.createDom("switch", "", container);
+    if (state) {
+        e.classList.add("switch_active");
+    }
+    e.x_id = id;
+    e.x_callback = callback;
+    e.addEventListener('click', function () {
+        //Toggle
+        this.classList.toggle("switch_active");
+
+        //Get state
+        var nState = this.classList.contains("switch_active");
+
+        //Trigger callback
+        this.x_callback(nState, this.x_id);
+    });
+    permissionstoggles[id] = e;
+    return e;
+}
+
+Init();

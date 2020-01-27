@@ -1,0 +1,128 @@
+.dino_stats_container {
+    overflow-y: scroll;
+    overflow-x:auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-right: 3px;
+    padding: 0;
+}
+
+.dino_stats_container {
+
+}
+
+.v2tab_dinos_row {
+    display: flex;
+    width: fit-content;
+    padding: 0 10px;
+    min-width: -webkit-fill-available; /* Just so that the background shading will reach the edge of the screen */
+}
+
+.v2tab_dinos_row_standard:hover {
+    background-color:#424449;
+}
+
+.v2tab_dinos_row_item {
+    padding: 5px 5px;
+    padding-left: 8px;
+    padding-right: 2px;
+    color: #ffffffcc;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-flex;
+    height: 20px;
+    line-height: 20px;
+    margin-right: 1px;
+}
+
+.v2tab_dinos_row_header {
+    
+}
+
+.v2tab_dinos_row_header_stat {
+    background-size:20px;
+    width:20px;
+    background-repeat:no-repeat;
+    background-position-y:center;
+}
+
+.v2tab_dinos_row_item_header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: white;
+    background-size: 15px;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 0;
+}
+
+.v2tab_dinos_row_item_header_hold {
+    margin-right: 0;
+    border-right: 1px solid #424449;
+}
+
+.v2tab_dinos_row_item_header_sortable:hover {
+    cursor:pointer;
+}
+
+.v2tab_dinos_row_item_header_sortable:hover {
+    background-color: #424449;
+}
+
+.v2tab_dinos_row_item_icon {
+    background-size: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: invert(1);
+}
+
+.v2tab_dinos_row_item_innercolor {
+    border: 1px solid gray;
+    height: 18px;
+    width: 18px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background-color: #2c2e33;
+}
+
+.v2tab_dinos_row_item_status {
+    text-align: center;
+    margin: 0;
+    width: inherit;
+    margin-right: 6px;
+    display: block;
+}
+
+.v2tab_dinos_row_item_stat_box {
+    padding: 0px 5px;
+    border: 1px solid white;
+    border-radius: 4px;
+    line-height: 19px;
+    margin-right: 5px;
+}
+
+.v2tab_dinos_row_item_sex {
+    background-color: #4793ff;
+    width: inherit;
+    border-radius: 5px;
+    height: 20px;
+    margin-right:3px;
+    text-align:center;
+}
+
+.v2tab_dinos_row_item_sex_female {
+    background-color: #d45bd7;
+}
+
+.v2tab_dinos_row_item_sex_unknown {
+    background-color: #555862;
+}

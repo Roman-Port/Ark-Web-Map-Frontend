@@ -421,16 +421,6 @@
     font-size: 12px;
 }
 
-.dino_stats_container {
-    overflow-y: scroll;
-    position: absolute;
-    top: 5px;
-    bottom: 5px;
-    left: 8px;
-    right: 5px;
-    padding-right: 3px;
-}
-
 .dino_stats_column_odd {
     background-color: #34363a;
 }

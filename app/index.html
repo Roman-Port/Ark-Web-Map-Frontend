@@ -12,10 +12,10 @@
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/hub.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/user_settings.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/dino_popout_user.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/popup_form.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/form.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/settings.css">
         <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/nursery.css">
+        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/v2_tab_dinos.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
         <style>
             .leaflet-left {
@@ -86,16 +86,12 @@
             </div>
 
             <!-- Actual tabs -->
-            <div class="main_tab main_tab_active" id="tab_map">
+            <div class="main_tab" id="tab_map">
                 <!-- Map area -->
                 <div class="map_part" id="map_part" style="background-color:#1c1d21;">
                     <!-- Actual map -->
                     <canvas style=" z-index: 999; background: transparent; pointer-events: none; position:absolute; top:0; left:0; right:0; bottom:0;" id="map_draw_part"></canvas>
                     <div class="map_return_btn" id="map_return_btn" onclick="map.resetPos();">Return to Map</div>
-                    <div class="map_structure_loader" id="map_structure_loader">
-                        <div class="map_structure_loader_bar" id="map_structure_loader_bar"></div>
-                        <div class="map_structure_loader_text">Preparing Structures...</div>
-                    </div>
                 </div>
 
                 <!-- Sidebar dino list -->
@@ -107,7 +103,7 @@
 
                 <!-- Sidebar search -->
                 <div class="dino_stats_search_box">
-                    <input type="text" class="dino_stats_search_base dino_stats_search_text" placeholder="Search Tribe" id="ui_tribe_search" oninput="dinosidebar.query(this.value);">
+                    <input type="text" class="dino_stats_search_base dino_stats_search_text" placeholder="Search Tribe" id="ui_tribe_search">
                     <select class="dino_stats_search_base dino_stats_search_sort" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
                         <option value="-1">All</option>
                         <option value="1">Tribemembers</option>
@@ -150,28 +146,8 @@
                 <input type="text" class="dino_stats_search" id="dino_stats_search" placeholder="Search" oninput="dino_stats.refresh();">
 
                 <!-- Data -->
-                <div class="dino_stats_container">
-                    <table style="width:100%;white-space: nowrap;border-spacing: 0;">
-                        <tbody id="tab_dinos_table">
-                            <tr>
-                                <th class="dino_stats_list_item_title"></th>
-                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_gender" onclick="dino_stats.changeSort('gender');"></th>
-                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_name" onclick="dino_stats.changeSort('name');">Name</th>
-                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_species" onclick="dino_stats.changeSort('species');">Class</th>
-                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_level" onclick="dino_stats.changeSort('level');">Level</th>
-                                <th class="dino_stats_list_item_title dino_stats_header_sortable" id="stat_sort_btn_base_level" onclick="dino_stats.changeSort('base_level');">Base Level</th>
-                                <th class="dino_stats_list_item_title">Colors</th>
-                                <th class="dino_stats_list_item_title">Coordinates</th>
-                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_health" onclick="dino_stats.changeSortStat('health')" style="background-image:url(/assets/ui/status/health.png);"></th>
-                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_stamina" onclick="dino_stats.changeSortStat('stamina')" style="background-image:url(/assets/ui/status/stamina.png);"></th>
-                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_food" onclick="dino_stats.changeSortStat('food')" style="background-image:url(/assets/ui/status/food.png);"></th>
-                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_inventoryWeight" onclick="dino_stats.changeSortStat('inventoryWeight')" style="background-image:url(/assets/ui/status/inventoryWeight.png);"></th>
-                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_oxygen" onclick="dino_stats.changeSortStat('oxygen')" style="background-image:url(/assets/ui/status/oxygen.png);"></th>
-                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_movementSpeedMult" onclick="dino_stats.changeSortStat('movementSpeedMult')" style="background-image:url(/assets/ui/status/movementSpeedMult.png);"></th>
-                                <th class="dino_stats_list_item_title dino_stats_list_item_title_img dino_stats_header_sortable" id="stat_sort_btn_stat_meleeDamageMult" onclick="dino_stats.changeSortStat('meleeDamageMult')" style="background-image:url(/assets/ui/status/meleeDamageMult.png);"></th>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="dino_stats_container" id="dino_stats_container">
+                    
                 </div>
             </div>
 
@@ -201,7 +177,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-messaging.js"></script>
 
-    <!-- Scripts -->
+    <!-- Scripts 
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/statics.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/analytics.js"></script>
     <script src="/assets/app/external/leaflet.js"></script>
@@ -217,8 +193,32 @@
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_stat_list.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/nursery.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/popout_v2.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/settings.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/settings.js"></script>-->
 
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/ark.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/app.js"></script>
+    <script src="/assets/app/external/leaflet.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/statics.js"></script>
+
+    <script src="/assets/app/v2/deltawebmap/DeltaApp.js"></script>
+    <script src="/assets/app/v2/deltawebmap/framework/R.js"></script>
+    <script src="/assets/app/v2/deltawebmap/framework/DeltaUser.js"></script>
+    <script src="/assets/app/v2/deltawebmap/framework/DeltaServer.js"></script>
+    <script src="/assets/app/v2/deltawebmap/framework/DeltaTools.js"></script>
+    <script src="/assets/app/v2/deltawebmap/framework/DeltaServerTab.js"></script>
+    <script src="/assets/app/v2/deltawebmap/framework/DeltaRPC.js"></script>
+    <script src="/assets/app/v2/deltawebmap/tabs/TabMap.js"></script>
+    <script src="/assets/app/v2/deltawebmap/tabs/TabDinos.js"></script>
+    <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonStructures.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/PopoutModalView.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitle.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitleColorPicker.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartStats.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartInventory.js"></script>
+
+    <!--<script src="/assets/app/F4aH1u9ta2GPBumP/js/ark.js"></script>
+    <script src="/assets/app/F4aH1u9ta2GPBumP/js/app.js"></script>-->
+
+    <script>
+        var app = new DeltaApp();
+        app.Init();
+    </script>
 </html>

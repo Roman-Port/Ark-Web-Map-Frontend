@@ -1,10 +1,29 @@
+.server_mountpoint {
+    display:none;
+}
+
+.server_mountpoint_active {
+    display:block;
+}
+
 .map_part {
     position: absolute;
-    top:0;
-    left:0;
-    right:360px;
-    bottom:0;
-    background-color:#ddd;
+    top: 0;
+    left: 0;
+    right: 360px;
+    bottom: 0;
+    background-color: #1c1d21;
+}
+
+.map_part_canvas {
+    z-index: 999;
+    background: transparent;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .leaflet-control-zoom {
@@ -2201,42 +2220,6 @@ a {
     bottom: -7px;
 }
 
-.map_damage_indicator {
-    position: absolute;
-    font-size: 25px;
-    z-index: 99999;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-    padding-top: 30px;
-    opacity: 0;
-    pointer-events: none;
-    animation-name: map_damage_indicator_animation;
-    animation-duration: 4s;
-    width:800px;
-    text-align:center;
-}
-
-@keyframes map_damage_indicator_animation {
-    from {
-        padding-top: 25px;
-        opacity: 0;
-    }
-
-    5% {
-        padding-top: 30px;
-        opacity: 1;
-    }
-
-    85% {
-        padding-top: 30px;
-        opacity: 1;
-    }
-
-    to {
-        padding-top: 20px;
-        opacity: 0;
-    }
-}
-
 .map_icon_animating {
     transition: transform 500ms linear 0s;
 }
@@ -2264,4 +2247,58 @@ a {
     left: -16px;
     z-index: 99999;
     line-height: 20px;
+}
+
+.map_damage_indicator_v2 {
+    position: absolute;
+    font-size: 25px;
+    z-index: 99999;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    opacity: 0;
+    pointer-events: none;
+    animation-name: map_damage_indicator_animation;
+    animation-duration: 2s;
+    animation-timing-function:ease-out;
+    width: 200px;
+    left:-85px;
+    text-align: center;
+}
+
+@keyframes map_damage_indicator_animation {
+    from {
+        top:-42px;
+        opacity: 1;
+    }
+
+    75% {
+        top: -42px;
+        opacity: 1;
+    }
+
+    to {
+        top:-31px;
+        opacity: 0;
+    }
+}
+
+.leaflet-left {
+    left: 13px;
+    transition: all 150ms;
+    animation-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
+}
+
+.nav_offset {
+    top: 120px;
+}
+
+.leaflet-marker-icon {
+    /*transition:transform 400ms;*/
+}
+
+.leaflet-control-attribution {
+    display: none;
+}
+
+.leaflet-tile-container {
+    pointer-events: unset;
 }

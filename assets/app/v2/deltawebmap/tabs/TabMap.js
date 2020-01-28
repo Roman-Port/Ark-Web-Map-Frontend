@@ -2,8 +2,8 @@
 
 class TabMap extends DeltaServerTab {
 
-    constructor(server, mountpoint) {
-        super(server, mountpoint);
+    constructor(server) {
+        super(server);
 
         this.MARKER_Z_OFFSETS = {
             "dinos": 10,
@@ -49,6 +49,10 @@ class TabMap extends DeltaServerTab {
         return "Overview";
     }
 
+    GetId() {
+        return "overview";
+    }
+
     CloseAllPopouts() {
         if (this.activePopout != null) {
             this.activePopout.mount.parentNode.style.zIndex = "unset";
@@ -61,22 +65,40 @@ class TabMap extends DeltaServerTab {
         this._dmap.CloseAllPopouts();
     }
 
-    async OnInit() {
-        this.searchBar = document.getElementById('ui_tribe_search');
-        this.searchBar.x_t = this;
-        this.searchBar.addEventListener("input", TabMap.OnSidebarQueryChangedStatic);
+    async OnInit(mountpoint) {
+        //Create DOM
+        this.LayoutDom(mountpoint);
+
+        //Subscribe RPC events
+        this.server.SubscribeRPCEvent("tab.map", 7, (m) => this.OnRPCLiveUpdate(m)); 
     }
 
-    static OnSidebarQueryChangedStatic() {
-        this.x_t.OnSidebarQueryChanged();
+    LayoutDom(mountpoint) {
+        this.mountpoint = mountpoint;
+
+        //Create DOM layout
+        this.mapContainer = DeltaTools.CreateDom("div", "map_part", this.mountpoint);
+        var mapCanvas = DeltaTools.CreateDom("div", "map_part_canvas", this.mapContainer);
+
+        var sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
+        this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper", sidebarContainer);
+
+        var sidebarSearchContainer = DeltaTools.CreateDom("div", "dino_stats_search_box", this.mountpoint);
+        this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text", sidebarSearchContainer);
+        this.searchBar.type = "text";
+        this.searchBar.placeholder = "Search Tribe";
+        this.searchBar.addEventListener("input", () => this.OnSidebarQueryChanged());
+        var sidebarSort = DeltaTools.CreateDom("select", "dino_stats_search_base dino_stats_search_sort", sidebarSearchContainer);
+        //TODO: Add options to this
     }
 
     async OnFirstOpen() {
+
         //Get prefs so we know where to spawn the map
         var user_prefs = this.server.info.user_prefs;
 
         //Create map
-        this.map = L.map(this.mountpoint.getElementsByClassName("map_part")[0], {
+        this.map = L.map(this.mapContainer, {
             crs: L.CRS.Simple,
             minZoom: 0,
             maxBounds: [
@@ -134,6 +156,9 @@ class TabMap extends DeltaServerTab {
         this.map.remove();
         this.searchBar.removeEventListener("input", TabMap.OnSidebarQueryChangedStatic);
         this.queryCancel++;
+
+        //Unsubscribe app RPC events
+        this.server.UnsubscribeRPCEvent("tab.map");
     }
 
     SwitchGameLayer(layer) {
@@ -341,7 +366,7 @@ class TabMap extends DeltaServerTab {
         var token = this.queryCancel;
 
         //Get container
-        var container = document.getElementById('dino_sidebar');
+        var container = this.sidebarContent;
         container.innerHTML = "";
 
         //Get results for all
@@ -380,6 +405,59 @@ class TabMap extends DeltaServerTab {
         container.appendChild(this.SIDEBAR_SOURCES[index].DisplayResults(data));
 
         return true;
+    }
+
+    /*
+     * RPC EVENTS
+     */
+
+    OnRPCLiveUpdate(payload) {
+        /* This handles opcode 7, LiveUpdate */
+        //Run all updates
+        for (var i = 0; i < payload.updates.length; i += 1) {
+            this.HandleRPCLiveUpdate(payload.updates[i]);
+        }
+    }
+
+    HandleRPCLiveUpdate(update) {
+        //Find the map target
+        var target = null;
+        switch (update.type) {
+            case 0: if (this.markers["players"] != null) { target = this.markers["players"][update.id]; } break;
+            case 1: if (this.markers["dinos"] != null) { target = this.markers["dinos"][update.id]; } break;
+        }
+        if (target == null) { return; }
+
+        //Run updates
+        if (update.x != null && update.y != null && update.z != null) {
+            target.setLatLng(TabMap.ConvertFromGamePosToMapPos(this.server.session, update.x, update.y));
+        }
+
+        //Show damage indicator, if any
+        if (target.x_last_health != null && update.health != null) {
+            this.CreateHitIndicator(target, update.health - target.x_last_health);
+        }
+
+        //Set last stats
+        if (update.health != null) {
+            target.x_last_health = update.health;
+        }
+    }
+
+    CreateHitIndicator(target, amount) {
+        var e = DeltaTools.CreateDom("div", "map_damage_indicator_v2", target._icon);
+        var text = Math.round(amount).toString();
+        var color = "#ff5338";
+        if (amount > 0) {
+            text = "+" + text;
+            color = "#6fe84a";
+        }
+        if (amount == 0) {
+            color = "#ffcf40";
+        }
+        e.style.color = color;
+        e.innerText = text;
+        return e;
     }
 }
 

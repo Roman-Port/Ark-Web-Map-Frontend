@@ -2,9 +2,10 @@
 
 class TabDinos extends DeltaServerTab {
 
-    constructor(server, mountpoint) {
-        super(server, mountpoint);
+    constructor(server) {
+        super(server);
         this.dinos = [];
+        this.dinoViews = {};
         this.species = {};
         this.loaded = false;
         this.sortMode = 1;
@@ -308,9 +309,25 @@ class TabDinos extends DeltaServerTab {
         return "Dinos";
     }
 
-    async OnInit() {
+    GetId() {
+        return "dinos";
+    }
+
+    async OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
-        
+        this.LayoutDom(mountpoint);
+
+        this.server.SubscribeRPCEvent("tab.dinos", 1, (m) => this.OnDinoFullRefreshed(m));
+        this.server.SubscribeEvent("tab.dinos", R.server_events.EVT_SERVER_MY_LOCATION_UPDATE, (d) => this.RefreshView());
+    }
+
+    LayoutDom(mountpoint) {
+        this.mountpoint = mountpoint;
+        var search = DeltaTools.CreateDom("input", "dino_stats_search", this.mountpoint);
+        search.type = "text";
+        search.placeholder = "Search Tribe Dinos";
+
+        this.dataContainer = DeltaTools.CreateDom("div", "dino_stats_container", this.mountpoint);
     }
 
     async OnFirstOpen() {
@@ -331,7 +348,8 @@ class TabDinos extends DeltaServerTab {
 
     async OnDeinit() {
         /* Called when this tab (and thus, the server) is closed */
-        
+        this.server.UnsubscribeRPCEvent("tab.dinos");
+        this.server.UnsubscribeEvent("tab.dinos");
     }
 
 
@@ -352,7 +370,7 @@ class TabDinos extends DeltaServerTab {
 
             //Write
             for (var i = 0; i < r.dinos.length; i += 1) {
-                this.dinos.push(r.dinos[i]);
+                this.UpdateOrReplaceDino(r.dinos[i]);
             }
             var keys = Object.keys(r.dino_entries);
             for (var i = 0; i < keys.length; i += 1) {
@@ -387,7 +405,7 @@ class TabDinos extends DeltaServerTab {
 
     RefreshView() {
         //Redraw the view entirely; Clear
-        var holder = document.getElementById('dino_stats_container');
+        var holder = this.dataContainer;
         holder.innerHTML = "";
 
         //Add title row
@@ -422,7 +440,7 @@ class TabDinos extends DeltaServerTab {
                 }
                 e.style.backgroundImage = "url(" + sortUrl + ")";
             }
-        }, "v2tab_dinos_row_header", "v2tab_dinos_row_item_header");
+        }, "v2tab_dinos_row_header", "v2tab_dinos_row_item_header", null);
 
         //Sort dinos
         this.dinos.sort(this.SORT_COLUMNS[this.sortMode].sort_modes[this.sortModeIndex]);
@@ -432,11 +450,11 @@ class TabDinos extends DeltaServerTab {
             var d = this.dinos[i];
             this.CreateRow(holder, (e, info, width, arrayIndex, index) => {
                 info.render(e, d, 0, this.species[d.dino.classname], width, arrayIndex);
-            }, "v2tab_dinos_row_standard", "v2tab_dinos_row_item_standard");
+            }, "v2tab_dinos_row_standard", "v2tab_dinos_row_item_standard", d.dino_id);
         }
     }
 
-    CreateRow(holder, render, extraRowClassname, extraItemClassname) {
+    CreateRow(holder, render, extraRowClassname, extraItemClassname, cacheTag) {
         //Create row
         var row = DeltaTools.CreateDom("div", "v2tab_dinos_row " + extraRowClassname, holder);
 
@@ -448,6 +466,52 @@ class TabDinos extends DeltaServerTab {
                 e.style.width = d.size_default.toString() + "px";
                 render(e, d, d.size_default, j, i);
             }
+        }
+
+        //Add to the list of elements
+        if (cacheTag != null) {
+            this.dinoViews[cacheTag] = row;
+        }
+    }
+
+    OnDinoFullRefreshed(m) {
+        //Add all
+        for (var i = 0; i < m.dinos.length; i += 1) {
+            this.UpdateFullDino(m.dinos[i]);
+        }
+
+        //Refresh
+        this.RefreshView();
+    }
+
+    UpdateFullDino(m) {
+        //Set the updated species
+        this.species[m.species.classname] = m.species;
+
+        //Create replacement data
+        var replacement = {
+            "dino": m.dino,
+            "prefs": m.prefs,
+            "dino_id": m.dino_id
+        };
+
+        //Update
+        this.UpdateOrReplaceDino(replacement);
+    }
+
+    UpdateOrReplaceDino(replacement) {
+        //Find and replace (or add) this dino
+        var exists = false;
+        for (var i = 0; i < this.dinos.length; i += 1) {
+            if (this.dinos[i].dino_id == replacement.dino_id) {
+                exists = true;
+                this.dinos[i] = replacement;
+            }
+        }
+
+        //Add it if needed
+        if (!exists) {
+            this.dinos.push(replacement);
         }
     }
 

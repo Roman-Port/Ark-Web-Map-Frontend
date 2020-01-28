@@ -9,5 +9,8 @@ var R = {
         "TAB_DINOS_TBL_DISTANCE":       11007,
         "TAB_DINOS_TBL_COLORS":         11008,
         "TAB_DINOS_TBL_STATUS":         11009
+    },
+    "server_events": {
+        "EVT_SERVER_MY_LOCATION_UPDATE":"EVT_SERVER_MY_LOCATION_UPDATE"
     }
 };

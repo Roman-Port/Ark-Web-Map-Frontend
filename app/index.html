@@ -1,224 +1,69 @@
 ﻿<!DOCTYPE html>
 <html id="html">
-    <head>
-        <meta charset="UTF-8">
-        <title>Delta Web Map</title>
-        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/view.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/bottom_modal.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/dino_list_sidebar.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/top_nav.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/mini_map_modal.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/hub.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/user_settings.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/dino_popout_user.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/form.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/settings.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/nursery.css">
-        <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/v2_tab_dinos.css">
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
-        <style>
-            .leaflet-left {
-                left: 13px;
-                transition: all 150ms;
-                animation-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
-            }
+<head>
+    <meta charset="UTF-8">
+    <title>Delta Web Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/view.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/bottom_modal.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/dino_list_sidebar.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/top_nav.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/mini_map_modal.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/hub.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/user_settings.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/dino_popout_user.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/form.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/settings.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/nursery.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/v2_tab_dinos.css">
 
-            .nav_offset {
-                top: 120px;
-            }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=m2RndGLnzl">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=m2RndGLnzl">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=m2RndGLnzl">
+    <link rel="manifest" href="/site.webmanifest?v=m2RndGLnzl">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=m2RndGLnzl" color="#5585e6">
+    <link rel="shortcut icon" href="/favicon.ico?v=m2RndGLnzl">
+    <meta name="msapplication-TileColor" content="#5585e6">
+    <meta name="theme-color" content="#5585e6">
 
-            .leaflet-marker-icon {
-                /*transition:transform 400ms;*/
-            }
-
-            .leaflet-control-attribution {
-                display:none;
-            }
-
-            .leaflet-tile-container {
-                pointer-events: unset;
-            }
-        </style>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=m2RndGLnzl">
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=m2RndGLnzl">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=m2RndGLnzl">
-        <link rel="manifest" href="/site.webmanifest?v=m2RndGLnzl">
-        <link rel="mask-icon" href="/safari-pinned-tab.svg?v=m2RndGLnzl" color="#5585e6">
-        <link rel="shortcut icon" href="/favicon.ico?v=m2RndGLnzl">
-        <meta name="msapplication-TileColor" content="#5585e6">
-        <meta name="theme-color" content="#5585e6">
-
-        <meta property="og:site_name" content="Delta Web Map for Ark"/>
-        <meta property="og:title" content="Manage your Ark: Survival Evolved tribe with Delta Web Map"/>
-        <meta property="og:description" content="Delta Web Map is a PVP-safe tool to view your ARK: Survival Evolved tribe on your PC servers."/>
-        <meta property="og:image" content="https://deltamap.net/android-chrome-192x192.png" />
-    </head>
+    <meta property="og:site_name" content="Delta Web Map for Ark" />
+    <meta property="og:title" content="Manage your Ark: Survival Evolved tribe with Delta Web Map" />
+    <meta property="og:description" content="Delta Web Map is a PVP-safe tool to view your ARK: Survival Evolved tribe on your PC servers." />
+    <meta property="og:image" content="https://deltamap.net/android-chrome-192x192.png" />
+</head>
     <body>
-        <!-- Form area -->
-        <div id="xform_area" class="xform_area">
-            <!-- No script error -->
-            <noscript>
-                <div class="xform_element xform_element_shown"><div class="xform_element_box"><div class="xform_element_nav"></div><div class="xform_element_body"><div class="xform_e_title">JavaScript Required</div><div class="xform_e_text">Sorry, JavaScript is required to load this app. Enable it or upgrade your browser.</div></div></div></div>
-            </noscript>
-        </div>
-
-        <!-- Error banner -->
-        <div class="error_box_generic error_box_fixed_top_banner">Can't connect. Some features may be unavailable.</div>
-
-        <div id="main_view" class="main_view">
-            <!-- Top nav -->
-            <div class="top_nav"></div>
-
-            <!-- V3 left sidebar -->
-            <div class="dino_sidebar smooth_anim dino_sidebar_open v3_nav_area">
-                <div class="v3_nav_server_area" id="server_list_v3"></div>
-                <div class="v3_nav_bottom">
-                    <div class="v3_nav_server">
-                        <div class="v3_nav_server_top"><img class="v3_nav_server_top_icon" src="/assets/app/icons/left_nav_v3/add_server.svg">Add Server</div>
-                    </div>
-                    <div class="v3_nav_server" onclick="usettings.openUserSettings();">
-                        <div class="v3_nav_server_top"><img class="v3_nav_server_top_icon" src="/assets/app/icons/left_nav_v3/user_settings.svg">User Settings</div>
-                    </div>
-                </div>
+        <noscript>
+            <div style="color:white;">
+                <h1>JavaScript Required</h1>
+                <p>JavaScript is required to use Delta Web Map. You'll need to enable it or upgrade your browser to continue. Sorry about that.</p>
             </div>
+        </noscript>
 
-            <!-- Actual tabs -->
-            <div class="main_tab" id="tab_map">
-                <!-- Map area -->
-                <div class="map_part" id="map_part" style="background-color:#1c1d21;">
-                    <!-- Actual map -->
-                    <canvas style=" z-index: 999; background: transparent; pointer-events: none; position:absolute; top:0; left:0; right:0; bottom:0;" id="map_draw_part"></canvas>
-                    <div class="map_return_btn" id="map_return_btn" onclick="map.resetPos();">Return to Map</div>
-                </div>
+        <script src="/assets/app/external/leaflet.js"></script>
+        <script src="/assets/app/F4aH1u9ta2GPBumP/js/statics.js"></script>
 
-                <!-- Sidebar dino list -->
-                <div class="dino_sidebar smooth_anim dino_sidebar_open" id="dino_sidebar_container">
-                    <div id="dino_sidebar" class="dino_sidebar_helper">
+        <script src="/assets/app/v2/deltawebmap/DeltaApp.js"></script>
+        <script src="/assets/app/v2/deltawebmap/framework/R.js"></script>
+        <script src="/assets/app/v2/deltawebmap/framework/DeltaUser.js"></script>
+        <script src="/assets/app/v2/deltawebmap/framework/DeltaServer.js"></script>
+        <script src="/assets/app/v2/deltawebmap/framework/DeltaTools.js"></script>
+        <script src="/assets/app/v2/deltawebmap/framework/DeltaServerTab.js"></script>
+        <script src="/assets/app/v2/deltawebmap/framework/DeltaEventDispatcher.js"></script>
+        <script src="/assets/app/v2/deltawebmap/framework/DeltaRPC.js"></script>
+        <script src="/assets/app/v2/deltawebmap/tabs/TabMap.js"></script>
+        <script src="/assets/app/v2/deltawebmap/tabs/TabDinos.js"></script>
+        <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonStructures.js"></script>
+        <script src="/assets/app/v2/deltawebmap/views/PopoutModalView.js"></script>
+        <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitle.js"></script>
+        <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitleColorPicker.js"></script>
+        <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartStats.js"></script>
+        <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartInventory.js"></script>
 
-                    </div>
-                </div>
-
-                <!-- Sidebar search -->
-                <div class="dino_stats_search_box">
-                    <input type="text" class="dino_stats_search_base dino_stats_search_text" placeholder="Search Tribe" id="ui_tribe_search">
-                    <select class="dino_stats_search_base dino_stats_search_sort" onchange="dinosidebar.filter = parseInt(this.value); dinosidebar.refresh();">
-                        <option value="-1">All</option>
-                        <option value="1">Tribemembers</option>
-                        <option value="2">Items</option>
-                        <option value="3">Dinos</option>
-                        <option value="4">Baby Dinos</option>
-                    </select>
-                </div>
-
-                <!-- Drawers -->
-                <div class="v1_top_drawer">
-                    
-                    <!-- Canvas options -->
-                    <div class="v1_top_drawer_box">
-                        <div class="v1_canvas_picker_container v1_top_drawer_container">
-                            <div class="v1_top_drawer_title v1_canvas_title">
-                                    <span class="v1_canvas_picker_title v1_top_drawer_title_main">CANVAS</span>
-                                    <span class="v1_top_drawer_title_sub v1_canvas_picker_name v1_canvas_picker_name_none">Not Active</span>
-                                </div>
-                            <div class="v1_canvas_picker_size"><div class="v1_canvas_picker_size_dot"></div></div>
-                            <div class="v1_top_drawer_board_container">
-                                <div class="v1_top_drawer_board">
-                                    <div class="v1_canvas_colorpicker"><!-- Will be filled automatically --></div>
-                                    <div class="v1_canvas_help">Hold right click on the map to draw. It'll be synced to tribemembers in real-time!</div>
-                                    <div class="v1_canvas_help v1_canvas_options">
-                                        <div class="v1_canvas_options_select v1_canvas_options_select_delete v1_canvas_options_select_disabled" onclick="map.canvas.deleteCanvas();">Delete</div>
-                                        <div class="v1_canvas_options_select v1_canvas_options_select_clear v1_canvas_options_select_disabled" onclick="map.canvas.clearCanvas();">Clear</div>
-                                    </div>
-                                    <div class="v1_canvas_content"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End canvas options -->
-                </div>
-            </div>
-
-            <div class="main_tab" id="tab_dinos">
-                <div class="dino_stats_title" id="dino_stats_title"></div>
-                <input type="text" class="dino_stats_search" id="dino_stats_search" placeholder="Search" oninput="dino_stats.refresh();">
-
-                <!-- Data -->
-                <div class="dino_stats_container" id="dino_stats_container">
-                    
-                </div>
-            </div>
-
-            <!-- Tribe Log -->
-            <div class="main_tab main_tab_scrollable" id="tab_tribe">
-                <div class="tribelog_container" id="tribelog_container"></div>
-            </div>
-
-            <!-- Nursery Tab -->
-            <div class="main_tab" id="tab_nursery">
-                
-            </div>
-        </div>
+        <script>
+            var app = new DeltaApp();
+            app.Init();
+        </script>
     </body>
-
-    <!--
-
-        /* TODO: Switch to this */
-    <script>
-        var CONFIG_ROOT = "https://config.deltamap.net/";
-        var CONFIG_ENVIORNMENT = "prod";
-    </script>
-    <script src="/assets/app/boot.js"></script>
-    -->
-
-    <!-- Google Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-messaging.js"></script>
-
-    <!-- Scripts 
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/statics.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/analytics.js"></script>
-    <script src="/assets/app/external/leaflet.js"></script>
-    <script src="/assets/app/external/html2canvas.min.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/gateway.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/form.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/frontend.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_sidebar.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/map.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/map_dtiles.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/map_canvas.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dinolib.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/dino_stat_list.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/nursery.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/popout_v2.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/settings.js"></script>-->
-
-    <script src="/assets/app/external/leaflet.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/statics.js"></script>
-
-    <script src="/assets/app/v2/deltawebmap/DeltaApp.js"></script>
-    <script src="/assets/app/v2/deltawebmap/framework/R.js"></script>
-    <script src="/assets/app/v2/deltawebmap/framework/DeltaUser.js"></script>
-    <script src="/assets/app/v2/deltawebmap/framework/DeltaServer.js"></script>
-    <script src="/assets/app/v2/deltawebmap/framework/DeltaTools.js"></script>
-    <script src="/assets/app/v2/deltawebmap/framework/DeltaServerTab.js"></script>
-    <script src="/assets/app/v2/deltawebmap/framework/DeltaRPC.js"></script>
-    <script src="/assets/app/v2/deltawebmap/tabs/TabMap.js"></script>
-    <script src="/assets/app/v2/deltawebmap/tabs/TabDinos.js"></script>
-    <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonStructures.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/PopoutModalView.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitle.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitleColorPicker.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartStats.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartInventory.js"></script>
-
-    <!--<script src="/assets/app/F4aH1u9ta2GPBumP/js/ark.js"></script>
-    <script src="/assets/app/F4aH1u9ta2GPBumP/js/app.js"></script>-->
-
-    <script>
-        var app = new DeltaApp();
-        app.Init();
-    </script>
 </html>

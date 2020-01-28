@@ -4,9 +4,8 @@ class DeltaServerTab {
 
     /* This is an abstract class that defines a tab shown to the user */
 
-    constructor(server, mountpoint) {
+    constructor(server) {
         this.server = server;
-        this.mountpoint = mountpoint; //Mountpoint is a DOM element in which all of this tab's data will be. There may already be content in it
         this.openCount = 0;
         this.menu = null;
     }
@@ -16,7 +15,12 @@ class DeltaServerTab {
         throw new Error("DeltaServerTab cannot be constructed; Please implement it!");
     }
 
-    async OnInit() {
+    GetId() {
+        /* Returns the display name as a string */
+        throw new Error("DeltaServerTab cannot be constructed; Please implement it!");
+    }
+
+    async OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
         throw new Error("DeltaServerTab cannot be constructed; Please implement it!");
     }

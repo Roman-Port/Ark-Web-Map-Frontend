@@ -6,89 +6,33 @@ class DeltaRPC {
         this.subscriptions = [];
         this.fails = 0;
         this.connectTimeout = null;
+        this.dispatcher = new DeltaEventDispatcher();
         this.OpenConnection();
     }
 
     FireSubscription(msg) {
-        //Find all subscriptions to this event
-        var subs = this.FindSubscriptions({
+        this.dispatcher.FireSubscription({
             "server": msg.target_server,
             "opcode": msg.opcode
-        });
-
-        //Fire all
-        for (var i = 0; i < subs.length; i += 1) {
-            subs[i].action(msg.payload);
-        }
-    }
-
-    FindSubscriptions(params) {
-        //Key keys of params
-        var k = Object.keys(params);
-
-        //Create output holder
-        var o = [];
-
-        //Search subscriptions for these params
-        for (var i = 0; i < this.subscriptions.length; i += 1) {
-            var s = this.subscriptions[i];
-            var failed = false;
-            for (var j = 0; j < k.length; j += 1) {
-                //Check key
-                if (s[k[j]] != params[k[j]]) {
-                    failed = true;
-                    break;
-                }
-            }
-            if (!failed) {
-                o.push(s);
-            }
-        }
-
-        return o;
-    }
-
-    RemoveSubscriptions(params) {
-        //Find all
-        var subs = this.FindSubscriptions(params);
-
-        //Remove all
-        for (var i = 0; i < subs.length; i += 1) {
-            this.subscriptions.splice(this.subscriptions.indexOf(subs[i]), 1);
-        }
+        }, msg.payload);
     }
 
     SubscribeServer(serverId, tagId, opcode, callback) {
         /* This will subscribe a server to events. TagID is used for unsubscribing, and should be unique to the part of the program (but not the server). */
-        this.subscriptions.push({
-            "server": serverId,
-            "tag": tagId,
-            "opcode": opcode,
-            "action": callback
-        });
+        this.dispatcher.PushSubscription(serverId, tagId, opcode, callback);
     }
 
     SubscribeGlobal(tagId, opcode, callback) {
         /* This will subscribe globally to an opcode. This will only trigger if server == null. TagID is used for unsubscribing, and should be unique to the part of the program. */
-        this.subscriptions.push({
-            "server": null,
-            "tag": tagId,
-            "opcode": opcode,
-            "action": callback
-        });
+        this.dispatcher.PushSubscription(null, tagId, opcode, callback);
     }
 
     UnsubscribeServer(serverId, tagId) {
-        this.RemoveSubscriptions({
-            "server": serverId,
-            "tag": tagId
-        });
+        this.dispatcher.UnsubscribeServer(serverId, tagId);
     }
 
     UnsubscribeTag(tagId) {
-        this.RemoveSubscriptions({
-            "tag": tagId
-        });
+        this.dispatcher.UnsubscribeTag(tagId);
     }
 
     OpenConnection() {

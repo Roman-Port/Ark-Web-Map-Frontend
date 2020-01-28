@@ -52,6 +52,9 @@ class DeltaTools {
         if (text !== undefined) {
             e.innerText = text;
         }
+        /*if (true) {
+            e.style.backgroundColor = "rgb(" + (Math.random() * 254) + ", " + (Math.random() * 254) + ", " + (Math.random() * 254) + ")";
+        }*/
         return e;
     }
 

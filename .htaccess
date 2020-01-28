@@ -11,4 +11,4 @@ Redirect /d/win https://github.com/deltawebmap/DeltaClientServer/releases/downlo
 Redirect /d/linux https://github.com/deltawebmap/DeltaClientServer/releases/download/v0.1/linux.zip
 
 RewriteEngine on
-RewriteRule ^/?app/(.+)/$ /app/ [PT]
+RewriteRule ^/?app/(.+)$ /app.html [PT]

@@ -12,3 +12,4 @@ Redirect /d/linux https://github.com/deltawebmap/DeltaClientServer/releases/down
 
 RewriteEngine on
 RewriteRule ^/?app/(.+)$ /app.html [PT]
+RewriteRule ^/?app/ /app.html [PT]

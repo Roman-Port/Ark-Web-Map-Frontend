@@ -1,0 +1,12 @@
+.vf_fullscreen_container {
+    /* Holds a fullscreen container and cuts down it's size to a reasonable width */
+    max-width:500px;
+}
+
+.vf_container_box {
+    margin: 15px;
+    background-color: #33363c;
+    padding: 15px;
+    border: 1px solid #45484d;
+    border-radius: 5px;
+}

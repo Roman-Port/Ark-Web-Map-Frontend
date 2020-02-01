@@ -8,16 +8,17 @@ class DeltaApp {
         this.servers = {};
         this.rpc = null;
         this.user = null;
-        this.lastServerId = null;
+        this.lastServer = null;
+        this.viewUserSettings = new DeltaUserSettingsTabView(this);
         this.SIDEBAR_OPTIONS = [
             {
                 "name": "Add Server",
-                "action": function () { },
+                "view": new DeltaUserSettingsTabView(this),
                 "icon": "/assets/app/icons/left_nav_v3/add_server.svg"
             },
             {
                 "name": "User Settings",
-                "action": function () { },
+                "view": this.viewUserSettings,
                 "icon": "/assets/app/icons/left_nav_v3/user_settings.svg"
             }
         ];
@@ -28,6 +29,12 @@ class DeltaApp {
 
         //Create DOM
         this.LayoutDom(document.body);
+
+        //Create message views
+        this.msgViewNoServers = this.CreateMessageView("", "No Servers", "Sorry, you don't seem to have any servers. Join an ARK server with Delta Web Map to get started.");
+        this.msgViewActiveServerErr = this.CreateMessageView("", "D'oh!", "D'oh!<br><br>Looks like the current ARK server has become unavailable. Check back soon!");
+        this.msgViewServerNotFound = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>You don't have access to this ARK server, the server was removed, or it never existed to begin with.");
+        this.msgViewServerRequestedNotOk = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>The server you attempted to access is unavailable. Try again later.");
 
         //Set up the user
         this.user = await this.InitUser();
@@ -47,21 +54,26 @@ class DeltaApp {
 
         //Boot up servers
         for (var i = 0; i < this.user.data.servers.length; i += 1) {
-            //Create server
+            //Get server info
             var info = this.user.data.servers[i];
-            var server = new DeltaServer(this, info);
-            var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
-            var canSwitch = await server.Init(m); //TODO: Handle this returning false
 
             //Create the server on the sidebar
             var menu = DeltaTools.CreateDom("div", "v3_nav_server");
             var top = DeltaTools.CreateDom("div", "v3_nav_server_top", menu);
             DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top).src = info.image_url;
+            var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
+            menu.alertBadge = alertBadge;
             DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
             var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
+
+            //Create server
+            var server = new DeltaServer(this, info, menu);
+            var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
+            var canSwitch = await server.Init(m); //TODO: Handle this returning false
+
+            //Finish creating menu
             for (var j = 0; j < server.tabs.length; j += 1) {
-                var btn = DeltaTools.CreateDom("div", "v3_nav_server_bottom_item", bottom);
-                btn.innerText = server.tabs[j].GetDisplayName();
+                var btn = server.tabs[j].CreateMenuItem(bottom);
                 btn.x_index = j;
                 btn.x_server = server;
                 server.tabs[j].menu = btn;
@@ -74,7 +86,7 @@ class DeltaApp {
             top.x_id = info.id;
             top.x_app = this;
             top.addEventListener("click", function () {
-                this.x_app.SwitchServer(this.x_id);
+                this.x_app.SwitchServer(this.x_app.servers[this.x_id]);
             });
 
             //Mount the server menu to the sidebar
@@ -92,7 +104,7 @@ class DeltaApp {
         }
 
         //Swtich to the default server
-        this.SwitchServer(this.GetDefaultServer().id);
+        this.SwitchServer(this.GetDefaultServer());
     }
 
     LayoutDom(mount) {
@@ -107,7 +119,8 @@ class DeltaApp {
         var mount = DeltaTools.CreateDom("div", "main_view", parent);
         this.mainHolder = mount;
 
-        DeltaTools.CreateDom("div", "top_nav", mount); //Top strip. Pretty much has no use except to show a darker color at this point, though
+        var top = DeltaTools.CreateDom("div", "top_nav", mount); //Top strip. Pretty much has no use except to show a darker color at this point, though
+        DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap");
 
         var leftSidebar = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open v3_nav_area", mount);
         this.serverListHolder = DeltaTools.CreateDom("div", "v3_nav_server_area", leftSidebar);
@@ -116,11 +129,23 @@ class DeltaApp {
         //Add bottom options
         for (var i = 0; i < this.SIDEBAR_OPTIONS.length; i += 1) {
             var o = this.SIDEBAR_OPTIONS[i];
+
+            //Create view
+            var view = o.view;
+            var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
+            view.Init(m);
+
+            //Create menu
             var c = DeltaTools.CreateDom("div", "v3_nav_server", bottom);
             var cc = DeltaTools.CreateDom("div", "v3_nav_server_top", c);
             DeltaTools.CreateDom("img", "v3_nav_server_top_icon", cc).src = o.icon;
             DeltaTools.CreateDom("span", "", cc).innerText = o.name;
-            c.addEventListener("click", o.action);
+            view.menu = c;
+            c.x_app = this;
+            c.x_view = view;
+            c.addEventListener("click", function () {
+                this.x_app.SwitchServer(this.x_view);
+            });
         }
     }
 
@@ -138,28 +163,31 @@ class DeltaApp {
         return user;
     }
 
-    SwitchServer(id) {
+    SwitchServer(server) {
         /* This will switch to a new server, switching away from the last one */
         
         //Check if we're already on this server
-        if (this.lastServerId == id) {
+        if (this.lastServer == server) {
             return;
         }
 
-        //Switch away from the last server, if any
-        if (this.lastServerId != null) {
-            this.servers[this.lastServerId].OnSwitchedAway();
+        //Check status (if needed)
+        var status = null;
+        if (server.CheckStatus != null) {
+            status = server.CheckStatus();
         }
-
-        //Switch to this server
-        console.log("About to switch to server ID " + id);
-        var server = this.servers[id];
-        var status = server.CheckStatus();
         if (status != null) {
             console.log("Failed to switch with error " + status);
             return status;
         }
-        this.lastServerId = id;
+
+        //Switch away from the last server, if any
+        if (this.lastServer != null) {
+            this.lastServer.OnSwitchedAway();
+        }
+
+        //Switch to this server
+        this.lastServer = server;
         server.OnSwitchedTo();
         this.RefreshBrowserMetadata();
         return null;
@@ -168,10 +196,42 @@ class DeltaApp {
     GetDefaultServer() {
         /* This will get the default server, used when running the app. If no servers can be switched to, this will display a generic error screen */
 
-        //Check the latest server
-        var id = localStorage.getItem("latest_server");
+        var id = null;
         var server = null;
         var status = null;
+
+        //Check the url
+        var urlParts = window.location.pathname.split('/');
+        if (urlParts.length >= 3) {
+            id = urlParts[2];
+
+            //Check ID length to see if this is a server ID
+            if (id.length == 24) {
+                //This is a server ID. Try to see if this server exists
+                server = this.servers[id];
+                if (server != null) {
+                    status = server.CheckStatus();
+                    if (status == null) {
+                        return server;
+                    } else {
+                        return this.msgViewServerRequestedNotOk;
+                    }
+                } else {
+                    return this.msgViewServerNotFound;
+                }
+            }
+
+            //Check if this is a special ID
+            if (id == "settings") {
+                //Open settings
+                return this.viewUserSettings; //TODO
+            }
+        }
+
+        //Check the latest server
+        id = localStorage.getItem("latest_server");
+        server = null;
+        status = null;
         if (id != null) {
             server = this.servers[id];
             if (server != null) {
@@ -183,8 +243,8 @@ class DeltaApp {
         }
 
         //If we have a server, use it
-        for (var i = 0; i < app.user.data.servers.length; i += 1) {
-            server = user.data.servers[i];
+        for (var i = 0; i < this.user.data.servers.length; i += 1) {
+            server = this.servers[this.user.data.servers[i].id];
             status = server.CheckStatus();
             if (status == null) {
                 return server;
@@ -192,35 +252,25 @@ class DeltaApp {
         }
 
         //No default to load!
-        return null; //TODO!
-    }
-
-    GetCurrentUrl() {
-        /* Gets the current url, relative to the project. Generated on the fly */
-        if (this.lastServerId == null) {
-            return "/app/";
-        }
-        var s = this.servers[this.lastServerId];
-        if (s.activeTab == -1) {
-            return "/app/" + s.id;
-        }
-        return "/app/" + s.id + "/" + s.tabs[s.activeTab].GetId();
+        return this.msgViewNoServers;
     }
 
     RefreshBrowserMetadata() {
         /* Refreshes native browser stuff, like tab title and URL*/
 
-        //Get the tab name
-        var name = "Delta Web Map";
-        if (this.lastServerId != null) {
-            name = this.servers[this.lastServerId].info.display_name + " - " + name;
+        if (this.lastServer != null) {
+            document.title = this.lastServer.GetDisplayName() + " - Delta Web Map";
+            history.replaceState(null, name, "/app/" + this.lastServer.GetUrl());
+        } else {
+            document.title = "Delta Web Map";
+            history.replaceState(null, name, "/app/");
         }
+    }
 
-        //Update title
-        document.title = name;
-
-        //Update URL
-        history.replaceState(null, name, this.GetCurrentUrl());
+    CreateMessageView(url, title, message) {
+        var e = new DeltaHtmlTabView(this, title, url, message);
+        e.Init(DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder));
+        return e;
     }
 
 }

@@ -7,7 +7,7 @@ class DeltaUser {
     }
 
     async RefreshData() {
-        this.data = await DeltaTools.WebRequest("https://deltamap.net/api/users/@me/", {});
+        this.data = await DeltaTools.WebRequest("https://deltamap.net/api/users/@me/", {}, null);
     }
 
 }

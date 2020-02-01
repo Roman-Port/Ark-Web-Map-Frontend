@@ -8,6 +8,7 @@ class DeltaServerTab {
         this.server = server;
         this.openCount = 0;
         this.menu = null;
+        this.token = new DeltaCancellationToken(server.token);
     }
 
     GetDisplayName() {
@@ -18,6 +19,16 @@ class DeltaServerTab {
     GetId() {
         /* Returns the display name as a string */
         throw new Error("DeltaServerTab cannot be constructed; Please implement it!");
+    }
+
+    CreateMenuItem(container) {
+        var btn = DeltaTools.CreateDom("div", "v3_nav_server_bottom_item", container);
+        btn.innerText = this.GetDisplayName();
+        return btn;
+    }
+
+    async RedownloadData() {
+        /* Used when tribes are changing */
     }
 
     async OnInit(mountpoint) {

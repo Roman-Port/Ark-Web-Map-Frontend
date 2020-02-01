@@ -1,11 +1,13 @@
 "use strict";
 
-class DeltaServer {
+class DeltaServer extends DeltaTabView {
 
-    constructor(app, info) {
+    constructor(app, info, menu) {
+        super(app);
+
         //Set vars
-        this.app = app;
         this.info = info;
+        this.menu = menu;
         this.mountpoint = null; //This is the main location where we will be able to attach our own stuff
         this.dispatcher = new DeltaEventDispatcher();
         this.id = info.id;
@@ -17,17 +19,34 @@ class DeltaServer {
         this.first = true; //Set to false after this is opened for the first time
         this.myLocation = null; //May or may not be null
         this.downloadTask = null; //Task that is run to create a session on this server
+        this.error = null;
+        this.token = new DeltaCancellationToken(null);
 
         //Create tabs
         this.tabs = [
             new TabMap(this),
-            new TabDinos(this)
+            new TabDinos(this),
+            new TabAdmin(this)
         ];
 
         //Cached info
         this.icons = null;
         this.overview = null;
         this.structures = null;
+
+        
+    }
+
+    GetDisplayName() {
+        return this.info.display_name;
+    }
+
+    GetUrl() {
+        if (this.activeTab == -1) {
+            return this.info.id;
+        } else {
+            return this.info.id + "/" + this.tabs[this.activeTab].GetId();
+        }
     }
 
     SubscribeRPCEvent(tag, opcode, event) {
@@ -38,43 +57,49 @@ class DeltaServer {
         app.rpc.UnsubscribeServer(this.info.id, tag);
     }
 
-    async ChangeTribeToDefault() {
-        await this.ChangeTribe(this.nativeTribe);
+    ForceAbort(error) {
+        /* Aborts a server and triggers the error badge */
+
+        //Set state
+        this.error = error;
+        this.menu.alertBadge.classList.add("sidebar_server_error_badge_active");
+
+        //If we are the active server, boot the user out
+        if (this.app.lastServer == this) {
+            console.log("Kicking the user out of the active server due to an error.");
+            this.app.SwitchServer(this.app.msgViewActiveServerErr);
+        }
     }
 
-    async ChangeTribe(tribeId) {
-        //Check
-        if (this.tribe == tribeId) {
-            return;
+    CancelTokens() {
+        this.token.Cancel();
+        this.token = new DeltaCancellationToken(null);
+        for (var i = 0; i < this.tabs.length; i += 1) {
+            this.tabs[i].token = new DeltaCancellationToken(this.token);
         }
+    }
 
-        //Update
-        this.tribe = tribeId;
+    async OnChangedTribe() {
+        //Cancel token
+        this.CancelTokens();
 
-        //Deinit all tabs
-        for (var i = 0; i < this.tabs.length; i++) {
-            await this.tabs[i].OnDeinit();
-            this.tabs[i].openCount = 0;
-        }
-
-        //Clear saved data
+        //Cached info
         this.icons = null;
         this.overview = null;
         this.structures = null;
-        this.activeTab = -1;
 
-        //Reinit
-        await this.Deinit();
-        await this.Init(this.mountpoint);
-        await this.OnSwitchedTo();
+        //Run on all
+        var t = [];
+        for (var i = 0; i < this.tabs.length; i += 1) {
+            t.push(this.tabs[i].RedownloadData());
+        }
+        await Promise.all(t);
     }
 
     async Init(mountpoint) {
         /* Called when we are adding this server to the list of servers. */
         /* Returns null if we can load this server, or else it will return a string that will be displayed as an error. */
-
-        //Create primary mountpoint
-        this.mountpoint = mountpoint;
+        await super.Init(mountpoint);
 
         //Init our tabs
         for (var i = 0; i < this.tabs.length; i++) {
@@ -93,10 +118,14 @@ class DeltaServer {
 
     CheckStatus() {
         /* Returns null if all is OK to change to this server, else returns a string */
-        return null;
+
+        return this.error;
     }
 
     async Deinit() {
+        //Cancel
+        this.token.Cancel();
+
         //Deinit our tabs
         for (var i = 0; i < this.tabs.length; i++) {
             await this.tabs[i].OnDeinit();
@@ -119,7 +148,7 @@ class DeltaServer {
                 url = url.replace(keys[i], replacements[keys[i]]);
             }
         }
-        return await DeltaTools.WebRequest(url, args);
+        return await DeltaTools.WebRequest(url, args, this.token);
     }
 
     async DownloadData() {
@@ -129,9 +158,10 @@ class DeltaServer {
         //Load session
         if (this.session == null) {
             try {
-                this.session = await DeltaTools.WebRequest(this.info.endpoint_createsession, {});
+                this.session = await DeltaTools.WebRequest(this.info.endpoint_createsession, {}, null);
                 this.myLocation = this.session.my_location;
             } catch (e) {
+                this.ForceAbort("Couldn't download server information.");
                 return false;
             }
 
@@ -145,21 +175,33 @@ class DeltaServer {
 
     async GetIconsData() {
         if (this.icons == null) {
-            this.icons = await this.WebRequestToEndpoint("tribes_icons", {});
+            try {
+                this.icons = await this.WebRequestToEndpoint("tribes_icons", {});
+            } catch (e) {
+                this.ForceAbort("Couldn't download server information.");
+            }
         }
         return this.icons;
     }
 
     async GetStructuresData() {
         if (this.structures == null) {
-            this.structures = await this.WebRequestToEndpoint("tribes_structures", {});
+            try {
+                this.structures = await this.WebRequestToEndpoint("tribes_structures", {});
+            } catch (e) {
+                this.ForceAbort("Couldn't download server information.");
+            }
         }
         return this.structures;
     }
 
     async GetOverviewData() {
         if (this.overview == null) {
-            this.overview = await this.WebRequestToEndpoint("tribes_overview", {});
+            try {
+                this.overview = await this.WebRequestToEndpoint("tribes_overview", {});
+            } catch (e) {
+                this.ForceAbort("Couldn't download server information.");
+            }
         }
         return this.overview;
     }
@@ -167,11 +209,7 @@ class DeltaServer {
     OnSwitchedTo() {
         /* Called when this server is switched to */
 
-        //Show
-        this.mountpoint.classList.add("server_mountpoint_active");
-
-        //Expand on the sidebar
-        this.menu.classList.add("v3_nav_server_active");
+        super.OnSwitchedTo();
 
         //If this hasn't been used yet, init the first tab
         if (this.first) {
@@ -183,15 +221,16 @@ class DeltaServer {
     OnSwitchedAway() {
         /* Called when this server is switched away from */
 
-        //Hide
-        this.mountpoint.classList.remove("server_mountpoint_active");
-
-        //Hide on the sidebar
-        this.menu.classList.remove("v3_nav_server_active");
+        super.OnSwitchedAway();
     }
 
     async OnSwitchTab(index) {
         /* Called when we switch tabs */
+
+        //Check to make sure this isn't the active tab
+        if (this.activeTab == index) {
+            return;
+        }
 
         //Verify that we have downloaded initial session data
         await this.downloadTask;

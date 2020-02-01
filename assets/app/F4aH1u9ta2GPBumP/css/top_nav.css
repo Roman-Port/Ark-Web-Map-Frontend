@@ -540,6 +540,8 @@
 
     margin-left: 29px;
     padding-left: 10px;
+
+    position:relative;
 }
 
 .v3_nav_server_bottom_item:last-child {

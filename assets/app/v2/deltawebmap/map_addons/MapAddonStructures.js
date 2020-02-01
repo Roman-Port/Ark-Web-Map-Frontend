@@ -36,6 +36,10 @@ class MapAddonStructures extends TabMapAddon {
         this.layer.addTo(this.map.map);
     }
 
+    async OnUnload(container) {
+        this.map.map.removeLayer(this.layer);
+    }
+
     ProcessTile(et, e, coords, tsize) {
         //Get context
         var d = this.tiles;
@@ -169,7 +173,7 @@ class MapAddonStructures extends TabMapAddon {
         /* This promise should be assigned to STRUCTURE_TILES_CACHE_TASK */
 
         //Request an index of all structures
-        var index = await DeltaTools.WebRequest("https://echo-content.deltamap.net/structure_metadata.json", {});
+        var index = await DeltaTools.WebRequest("https://echo-content.deltamap.net/structure_metadata.json", {}, null);
 
         //Load all
         var promises = [];

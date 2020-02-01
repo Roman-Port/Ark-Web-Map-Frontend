@@ -144,6 +144,34 @@ class TabMap extends DeltaServerTab {
         });
     }
 
+    async RedownloadData() {
+        /* Used when tribes are changing */
+
+        //Add addons
+        for (var i = 0; i < this.addons.length; i += 1) {
+            await this.addons[i].OnUnload(this.map);
+            await this.addons[i].OnLoad(this.map);
+        }
+
+        //Remove all current items
+        var k = Object.keys(this.markers);
+        for (var i = 0; i < k.length; i += 1) {
+            var kk = Object.keys(this.markers[k[i]]);
+            for (var j = 0; j < kk.length; j += 1) {
+                this.map.removeLayer(this.markers[k[i]][kk[j]]);
+            }
+        }
+
+        //Add icons
+        await this.EnableTribeDinos();
+
+        //Load overview
+        this.server.GetOverviewData().then((e) => {
+            this.overview = e;
+            this.RefreshSidebar();
+        });
+    }
+
     async OnOpen() {
         this.map._onResize();
     }
@@ -476,6 +504,10 @@ class TabMapAddon {
 
     async OnLoad(container) {
         /* Called when we load the map */
+    }
+
+    async OnUnload(container) {
+        /* Called when we unload the map */
     }
 
 }

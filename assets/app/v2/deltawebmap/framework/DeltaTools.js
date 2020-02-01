@@ -6,7 +6,12 @@ class DeltaTools {
 
     }
 
-    static async WebRequest(url, args) {
+    static async WebRequest(url, args, token) {
+        if (token === undefined || token == null) {
+            console.warn("WARNING: WebRequest launched without a DeltaCancellationToken!");
+            token = new DeltaCancellationToken(null);
+        }
+        
         return new Promise(function (resolve, reject) {
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function () {
@@ -18,11 +23,15 @@ class DeltaTools {
                     }
 
                     //Callback
-                    resolve(reply);
+                    if (token.IsValid()) {
+                        resolve(reply);
+                    }
                 } else if (this.readyState === 4) {
-                    reject({
-                        status: this.status
-                    });
+                    if (token.IsValid()) {
+                        reject({
+                            status: this.status
+                        });
+                    }
                 }
             }
             if (args.type === undefined) {

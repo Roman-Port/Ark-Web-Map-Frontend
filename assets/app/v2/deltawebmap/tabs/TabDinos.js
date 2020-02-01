@@ -313,12 +313,26 @@ class TabDinos extends DeltaServerTab {
         return "dinos";
     }
 
+    async RedownloadData() {
+        /* Used when tribes are changing */
+
+        //Clear
+        this.dinos = [];
+        this.dinoViews = {};
+        this.species = {};
+
+        //Redownload
+        await this.LoadDinos();
+    }
+
     async OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
         this.LayoutDom(mountpoint);
 
         this.server.SubscribeRPCEvent("tab.dinos", 1, (m) => this.OnDinoFullRefreshed(m));
         this.server.SubscribeEvent("tab.dinos", R.server_events.EVT_SERVER_MY_LOCATION_UPDATE, (d) => this.RefreshView());
+
+        this.RefreshView();
     }
 
     LayoutDom(mountpoint) {
@@ -359,7 +373,7 @@ class TabDinos extends DeltaServerTab {
         var url = this.server.GetEndpointUrl("tribes_dino_stats");
         while (url != null) {
             //Fetch
-            var r = await DeltaTools.WebRequest(url, {});
+            var r = await DeltaTools.WebRequest(url, {}, this.token);
 
             //Check end behavior
             if (r.dinos.length == 0) {
@@ -471,6 +485,30 @@ class TabDinos extends DeltaServerTab {
         //Add to the list of elements
         if (cacheTag != null) {
             this.dinoViews[cacheTag] = row;
+        }
+    }
+
+    SortRows() {
+        //Will sort existing rows (or add new ones) in the DOM
+        var holder = this.dataContainer;
+
+        //Sort dinos
+        this.dinos.sort(this.SORT_COLUMNS[this.sortMode].sort_modes[this.sortModeIndex]);
+
+        //Add all rows
+        for (var i = 0; i < this.dinos.length; i += 1) {
+            var d = this.dinos[i];
+
+            //Check if this already exists
+            if (this.dinoViews[d.dino_id] != null) {
+                //Does exist
+                holder.appendChild(this.dinoViews[d.dino_id]);
+            } else {
+                //Does not exist
+                this.CreateRow(holder, (e, info, width, arrayIndex, index) => {
+                    info.render(e, d, 0, this.species[d.dino.classname], width, arrayIndex);
+                }, "v2tab_dinos_row_standard", "v2tab_dinos_row_item_standard", d.dino_id);
+            }
         }
     }
 

@@ -63,6 +63,8 @@ class DeltaApp {
             DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top).src = info.image_url;
             var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
             menu.alertBadge = alertBadge;
+            var loaderBadge = DeltaTools.CreateDom("div", "loading_spinner server_loader", top, "");
+            menu.loaderBadge = loaderBadge;
             DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
             var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
 

@@ -10,6 +10,8 @@ class TabDinos extends DeltaServerTab {
         this.loaded = false;
         this.sortMode = 1;
         this.sortModeIndex = 0;
+        this.dinoLoadTask = null;
+        this.dinosLoaded = false;
         this.SORT_COLUMNS = [
             {
                 "name": "",
@@ -320,9 +322,11 @@ class TabDinos extends DeltaServerTab {
         this.dinos = [];
         this.dinoViews = {};
         this.species = {};
+        this.dinosLoaded = false;
+        this.dinoLoadTask = null;
 
-        //Redownload
-        await this.LoadDinos();
+        //Show default
+        this.ShowDefaultLoader();
     }
 
     async OnInit(mountpoint) {
@@ -342,17 +346,29 @@ class TabDinos extends DeltaServerTab {
         search.placeholder = "Search Tribe Dinos";
 
         this.dataContainer = DeltaTools.CreateDom("div", "dino_stats_container", this.mountpoint);
+
+        this.ShowDefaultLoader();
+    }
+
+    ShowDefaultLoader() {
+        this.dataContainer.innerHTML = "";
+        var spinnerContainer = DeltaTools.CreateDom("div", "dinos_loader_holder", this.dataContainer);
+        DeltaTools.CreateDom("div", "loading_spinner", spinnerContainer);
+        this.loadInfo = DeltaTools.CreateDom("div", "dinos_loader_subtext", this.dataContainer, "");
     }
 
     async OnFirstOpen() {
         /* Called when this tab is opened for the first time */
-        this.LoadDinos();
         
     }
 
     async OnOpen() {
         /* Called when this tab is switched to */
-        
+
+        //Check if we need to load dinos
+        if (this.dinoLoadTask == null) {
+            this.dinoLoadTask = this.LoadDinos();
+        }
     }
 
     async OnClose() {
@@ -366,11 +382,11 @@ class TabDinos extends DeltaServerTab {
         this.server.UnsubscribeEvent("tab.dinos");
     }
 
-
-
     async LoadDinos() {
         /* Load dinos until we reach a blank page */
+        this.dinosLoaded = false;
         var url = this.server.GetEndpointUrl("tribes_dino_stats");
+        var loaded = 0;
         while (url != null) {
             //Fetch
             var r = await DeltaTools.WebRequest(url, {}, this.token);
@@ -385,18 +401,23 @@ class TabDinos extends DeltaServerTab {
             //Write
             for (var i = 0; i < r.dinos.length; i += 1) {
                 this.UpdateOrReplaceDino(r.dinos[i]);
+                loaded++;
             }
             var keys = Object.keys(r.dino_entries);
             for (var i = 0; i < keys.length; i += 1) {
                 this.species[keys[i]] = r.dino_entries[keys[i]];
             }
 
-            //Refresh
-            this.RefreshView();
+            //Update
+            if (this.loadInfo != null) {
+                var percent = Math.round((loaded / r.total) * 100);
+                this.loadInfo.innerText = loaded.toString() + "/" + r.total.toString() + " (" + percent.toString() + "%)";
+            }
         }
 
         //Finish
         this.loaded = true;
+        this.dinosLoaded = true;
         this.RefreshView();
     }
 
@@ -418,6 +439,11 @@ class TabDinos extends DeltaServerTab {
     }
 
     RefreshView() {
+        //If dinos aren't yet loaded, ignore
+        if (!this.dinosLoaded) {
+            return;
+        }
+
         //Redraw the view entirely; Clear
         var holder = this.dataContainer;
         holder.innerHTML = "";

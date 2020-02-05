@@ -57,12 +57,21 @@ class DeltaServer extends DeltaTabView {
         app.rpc.UnsubscribeServer(this.info.id, tag);
     }
 
+    SetLoaderStatus(shown) {
+        if (shown) {
+            this.menu.loaderBadge.classList.add("server_loader_active");
+        } else {
+            this.menu.loaderBadge.classList.remove("server_loader_active");
+        }
+    }
+
     ForceAbort(error) {
         /* Aborts a server and triggers the error badge */
 
         //Set state
         this.error = error;
         this.menu.alertBadge.classList.add("sidebar_server_error_badge_active");
+        this.SetLoaderStatus(false);
 
         //If we are the active server, boot the user out
         if (this.app.lastServer == this) {
@@ -110,9 +119,6 @@ class DeltaServer extends DeltaTabView {
         //Add RPC events
         this.SubscribeRPCEvent("server", 7, (m) => this.OnCharacterLiveUpdate(m));
 
-        //Start downloading
-        this.downloadTask = this.DownloadData();
-
         return null;
     }
 
@@ -158,7 +164,9 @@ class DeltaServer extends DeltaTabView {
         //Load session
         if (this.session == null) {
             try {
+                this.SetLoaderStatus(true);
                 this.session = await DeltaTools.WebRequest(this.info.endpoint_createsession, {}, null);
+                this.SetLoaderStatus(false);
                 this.myLocation = this.session.my_location;
             } catch (e) {
                 this.ForceAbort("Couldn't download server information.");
@@ -208,6 +216,9 @@ class DeltaServer extends DeltaTabView {
 
     OnSwitchedTo() {
         /* Called when this server is switched to */
+
+        //Start downloading
+        this.downloadTask = this.DownloadData();
 
         super.OnSwitchedTo();
 

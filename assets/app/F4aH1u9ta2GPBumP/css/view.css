@@ -2424,3 +2424,87 @@ a {
 .admin_tab_loader_active {
     display:block;
 }
+
+.server_loader {
+    float: right;
+    margin: 1px;
+    display:none;
+}
+
+.server_loader_active {
+    display:unset;
+}
+
+.dinos_loader_holder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height:100%;
+    margin:15px 0;
+}
+
+.dinos_loader_subtext {
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    text-align: center;
+    color: #ffffffbc;
+    font-weight:700;
+}
+
+.advanced_banner_container {
+    border-radius: 5px;
+    background-image: url(/assets/app/icons/warning_white.svg);
+    background-repeat: no-repeat;
+    background-position-y: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    padding-left: 54px;
+    background-position-x: 15px;
+    background-size: 24px;
+    box-shadow: 0px 3px 15px 0px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.advanced_banner_style_red {
+    background-color: #ff5757;
+    color: white;
+}
+
+.advanced_banner_mod_bottom {
+    z-index: 999999;
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+}
+
+.advanced_banner_body {
+    padding: 15px 0;
+    padding-right: 15px;
+    flex-grow: 1;
+}
+
+.advanced_banner_btn {
+    margin-right: 15px;
+    padding: 5px 12px;
+    border: 1px solid #ffffff75;
+    border-radius: 5px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.advanced_banner_btn_close {
+    background: url(/assets/app/icons/close_white.svg);
+    width: 20px;
+    height: 20px;
+    background-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+    margin-left: -5px;
+}

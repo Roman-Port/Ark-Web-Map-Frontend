@@ -124,6 +124,11 @@ class MapAddonStructures extends TabMapAddon {
         for (var i = 0; i < d.s.length; i += 1) {
             var s = d.s[i];
 
+            //Check if this is a valid image
+            if (STRUCTURE_TILES_CACHE[d.i[s.i]] == null) {
+                continue;
+            }
+
             //Check if this is within range
             if (s.x > game_max_x + (s.s * 1.5) || s.x < game_min_x - (s.s * 1.5)) {
                 continue;
@@ -172,17 +177,22 @@ class MapAddonStructures extends TabMapAddon {
         /* Loads the structure tile cache */
         /* This promise should be assigned to STRUCTURE_TILES_CACHE_TASK */
 
-        //Request an index of all structures
-        var index = await DeltaTools.WebRequest("https://echo-content.deltamap.net/structure_metadata.json", {}, null);
+        try {
+            //Request an index of all structures
+            var index = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
 
-        //Load all
-        var promises = [];
-        for (var i = 0; i < index.metadata.length; i += 1) {
-            promises.push(this.LoadStructureStoreImage(index, index.metadata[i].img));
+            //Load all
+            var promises = [];
+            for (var i = 0; i < index.metadata.length; i += 1) {
+                promises.push(this.LoadStructureStoreImage(index, index.metadata[i].img));
+            }
+
+            //Wait for all to finish
+            await Promise.all(promises);
+        } catch (e) {
+            console.log("[STRUCTURE IMAGE STORE] Failed to load structure image listings.");
+            return false;
         }
-
-        //Wait for all to finish
-        await Promise.all(promises);
 
         return true;
     }
@@ -194,7 +204,7 @@ class MapAddonStructures extends TabMapAddon {
                 STRUCTURE_TILES_CACHE[name] = img;
                 resolve(img);
             };
-            img.onerror = reject;
+            img.onerror = resolve;
             img.src = index.image_url.replace("{image}", name);
         });
     }

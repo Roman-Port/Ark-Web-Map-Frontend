@@ -95,6 +95,12 @@ class DeltaRPC {
         if (this.fails > 5) {
             time = 20000;
         }
+        if (this.fails > 8) {
+            time = 60000;
+        }
+        if (this.fails > 12) {
+            time = 120000;
+        }
 
         //Set reconnect timer
         this.Log("CLOSE", "Attempting to reconnect in " + time + "ms.");

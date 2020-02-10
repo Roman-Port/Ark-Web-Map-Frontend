@@ -28,6 +28,11 @@ class DeltaTools {
                     }
                 } else if (this.readyState === 4) {
                     if (token.IsValid()) {
+                        //Check if we're logged out
+                        if (this.status == 401) {
+                            var url = "/login/?next=" + encodeURIComponent(document.location.href);
+                            window.location = url;
+                        }
                         reject({
                             status: this.status
                         });

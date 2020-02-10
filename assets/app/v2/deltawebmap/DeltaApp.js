@@ -27,6 +27,9 @@ class DeltaApp {
     async Init() {
         /* Called when the app is first loaded */
 
+        //Set up the user
+        this.user = await this.InitUser();
+
         //Create DOM
         this.LayoutDom(document.body);
 
@@ -35,9 +38,6 @@ class DeltaApp {
         this.msgViewActiveServerErr = this.CreateMessageView("", "D'oh!", "D'oh!<br><br>Looks like the current ARK server has become unavailable. Check back soon!");
         this.msgViewServerNotFound = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>You don't have access to this ARK server, the server was removed, or it never existed to begin with.");
         this.msgViewServerRequestedNotOk = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>The server you attempted to access is unavailable. Try again later.");
-
-        //Set up the user
-        this.user = await this.InitUser();
 
         //Create RPC
         this.rpc = new DeltaRPC();
@@ -107,6 +107,10 @@ class DeltaApp {
 
         //Swtich to the default server
         this.SwitchServer(this.GetDefaultServer());
+    }
+
+    LayoutLoginScreen(mount) {
+
     }
 
     LayoutDom(mount) {

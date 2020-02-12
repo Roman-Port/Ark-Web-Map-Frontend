@@ -189,6 +189,18 @@ class TabMap extends DeltaServerTab {
         this.server.UnsubscribeRPCEvent("tab.map");
     }
 
+    GetCornersInGameCoords() {
+        return [
+            this.ScreenPosToGamePos(0, 0),
+            this.ScreenPosToGamePos(this.mapContainer.clientWidth, this.mapContainer.clientHeight)
+        ];
+    }
+
+    ScreenPosToGamePos(x, y) {
+        var p = this.map.containerPointToLatLng([x, y]);
+        return TabMap.ConvertFromMapPosToGamePos(this.server.session, p.lng, p.lat);
+    }
+
     SwitchGameLayer(layer) {
         //Create main tile layer
         var mapSettings = {
@@ -373,6 +385,41 @@ class TabMap extends DeltaServerTab {
 
         //Now, return latlng
         return L.latLng(y, x);
+    }
+
+    static ConvertFromMapPosToGamePos(session, x, y) {
+        //When calling this, X IS LNG
+        //Convert to map pos
+        x = x / 256;
+        y = -y / 256;
+
+        //Move
+        x -= 0.5;
+        y -= 0.5;
+
+        //Divide by scale
+        x *= session.mapData.captureSize;
+        y *= session.mapData.captureSize;
+
+        //Add offsets
+        x -= session.mapData.mapImageOffset.x;
+        y -= session.mapData.mapImageOffset.y;
+
+        return [x, y];
+    }
+
+    static ConvertFromMapTilePosToGamePos(session, x, y, zoom) {
+        var upt = Math.pow(2, zoom);
+
+        //Multiply by tile size
+        x *= (session.mapData.captureSize / upt);
+        y *= (session.mapData.captureSize / upt);
+
+        //Add offsets
+        x -= session.mapData.mapImageOffset.x;
+        y -= session.mapData.mapImageOffset.y;
+
+        return [x, y];
     }
 
     /* Dino sidebar */

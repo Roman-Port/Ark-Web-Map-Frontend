@@ -16,7 +16,7 @@ class MapAddonStructures extends TabMapAddon {
         /* Called when we load the map */
 
         //Get the tile data
-        this.tiles = await this.map.server.GetStructuresData();
+        //this.tiles = await this.map.server.GetStructuresData();
 
         //Create the map layer
         var mapSettings = {
@@ -40,9 +40,41 @@ class MapAddonStructures extends TabMapAddon {
         this.map.map.removeLayer(this.layer);
     }
 
-    ProcessTile(et, e, coords, tsize) {
+    GetBoundedStructureQueryURL(d) {
+        //Data format: [[x, y], [x, y]]; or use this.map.GetCornersInGameCoords()
+        return "upperx=" + Math.max(d[0][0], d[1][0]) + "&lowerx=" + Math.min(d[0][0], d[1][0]) + "&uppery=" + Math.max(d[0][1], d[1][1]) + "&lowery=" + Math.min(d[0][1], d[1][1]);
+    }
+
+    async GetTileDataset(coords) {
+        //return this.tiles;
+        if (coords.z <= 5) {
+            return null;
+        }
+
+        //Calculate the range of data
+        var calcOffset = this.map.server.session.mapData.captureSize / 2;
+        var units_per_tile = this.map.server.session.mapData.captureSize / Math.pow(2, coords.z);
+        var game_min_x = (coords.x * units_per_tile) - calcOffset;
+        var game_min_y = (coords.y * units_per_tile) - calcOffset;
+        var game_max_x = ((coords.x + 1) * units_per_tile) - calcOffset;
+        var game_max_y = ((coords.y + 1) * units_per_tile) - calcOffset;
+        var tolerance = (game_max_x - game_min_x) / 2;
+
+        //Get request URL
+        var url = "https://echo-content.dev.deltamap.net/5e324536e6179d3af0f8936a/tribes/*/structures?" + this.GetBoundedStructureQueryURL([
+            [game_min_x - tolerance, game_min_y - tolerance],
+            [game_max_x + tolerance, game_max_y + tolerance]
+        ]);
+
+        return await DeltaTools.WebRequest(url, {}, null);
+    }
+
+    ProcessTile(et, e, coords, tsize, dataset) {
         //Get context
-        var d = this.tiles;
+        var d = dataset;
+        if (d == null) {
+            return et;
+        }
         var context = e.getContext('2d');
 
         //Calculate the range of data
@@ -225,9 +257,11 @@ var MapAddonStructuresLayer = L.GridLayer.extend({
         et.width = tsize.x;
         et.height = tsize.y;
 
-        STRUCTURE_TILES_CACHE_TASK.then(function (e) {
-            var tile = addon.ProcessTile(et, es, coords, tsize);
-            done(null, tile);
+        STRUCTURE_TILES_CACHE_TASK.then((e) => {
+            this.options.addon.GetTileDataset(coords).then((dataset) => {
+                var tile = this.options.addon.ProcessTile(et, es, coords, tsize, dataset);
+                done(null, tile);
+            });
         });
 
         return et;

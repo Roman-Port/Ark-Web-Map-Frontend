@@ -568,6 +568,27 @@
     display:block;
 }
 
+.v3_nav_server_add {
+    text-align: center;
+    border: 1px solid #45484d;
+    margin: 6px 8px;
+    padding: 7px 6px;
+    border-radius: 5px;
+    background-color: #3a3d42;
+    height: 20px;
+    font-size: 15px;
+    line-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+.v3_nav_server_add:hover {
+    background-color: #45484dFF;
+    cursor:pointer;
+}
+
 .v3_nav_bottom {
     position: absolute;
     bottom: 0;
@@ -575,7 +596,6 @@
     border-top: 1px solid #44474b;
     width: 100%;
     background-color: #252629;
-    padding-top: 8px;
 }
 
 .v3_nav_server_alert_container {

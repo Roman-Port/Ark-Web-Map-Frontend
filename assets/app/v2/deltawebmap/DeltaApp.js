@@ -12,11 +12,6 @@ class DeltaApp {
         this.viewUserSettings = new DeltaUserSettingsTabView(this);
         this.SIDEBAR_OPTIONS = [
             {
-                "name": "Add Server",
-                "view": new DeltaUserSettingsTabView(this),
-                "icon": "/assets/app/icons/left_nav_v3/add_server.svg"
-            },
-            {
                 "name": "User Settings",
                 "view": this.viewUserSettings,
                 "icon": "/assets/app/icons/left_nav_v3/user_settings.svg"
@@ -51,6 +46,11 @@ class DeltaApp {
             var cluster = this.user.data.clusters[i];
             clusterMenus[cluster.id] = this.CreateServerListClusterLabel(this.serverListHolder, cluster.name);
         }
+
+        //Add "add server" button
+        DeltaTools.CreateDom("div", "v3_nav_server_add", this.serverListHolder, "Add Server").addEventListener("click", function () {
+            window.open("/servers/", "_blank");
+        });
 
         //Boot up servers
         for (var i = 0; i < this.user.data.servers.length; i += 1) {

@@ -31,10 +31,7 @@ class DeltaServer extends DeltaTabView {
 
         //Cached info
         this.icons = null;
-        this.overview = null;
-        this.structures = null;
-
-        
+        this.overview = null;       
     }
 
     GetDisplayName() {
@@ -86,23 +83,6 @@ class DeltaServer extends DeltaTabView {
         for (var i = 0; i < this.tabs.length; i += 1) {
             this.tabs[i].token = new DeltaCancellationToken(this.token);
         }
-    }
-
-    async OnChangedTribe() {
-        //Cancel token
-        this.CancelTokens();
-
-        //Cached info
-        this.icons = null;
-        this.overview = null;
-        this.structures = null;
-
-        //Run on all
-        var t = [];
-        for (var i = 0; i < this.tabs.length; i += 1) {
-            t.push(this.tabs[i].RedownloadData());
-        }
-        await Promise.all(t);
     }
 
     async Init(mountpoint) {
@@ -175,7 +155,6 @@ class DeltaServer extends DeltaTabView {
 
             //Set our tribe ID
             this.tribe = this.session.target_tribe.tribe_id;
-            this.tribe = "*";                               //TEMPORARY!!!!!!!!!!!!!!!
             this.nativeTribe = this.session.target_tribe.tribe_id;
         }
 
@@ -191,17 +170,6 @@ class DeltaServer extends DeltaTabView {
             }
         }
         return this.icons;
-    }
-
-    async GetStructuresData() {
-        if (this.structures == null) {
-            try {
-                this.structures = await this.WebRequestToEndpoint("tribes_structures", {});
-            } catch (e) {
-                this.ForceAbort("Couldn't download server information.");
-            }
-        }
-        return this.structures;
     }
 
     async GetOverviewData() {
@@ -286,6 +254,34 @@ class DeltaServer extends DeltaTabView {
 
         //Update
         this.app.RefreshBrowserMetadata();
+    }
+
+    async ResetTabs() {
+        /* Clears out all information in tabs and resets them entirely. */
+        /* Usually used when switching data tracks */
+
+        //Clear cached info
+        this.icons = null;
+        this.overview = null;
+
+        //Cancel token and create new 
+        this.token.Cancel();
+        this.token = new DeltaCancellationToken(null);
+
+        //Loop through and deinit tabs
+        for (var i = 0; i < this.tabs.length; i += 1) {
+            var menu = this.tabs[i].menu; //Get a ref to the menu
+            await this.tabs[i].OnDeinit(); //Deinit
+            this.tabs[i] = new this.tabs[i].constructor(this); //Create new 
+            this.tabs[i].menu = menu; //Set menu
+            var m = DeltaTools.CreateDom("div", "main_tab", this.mountpoint); //Create mountpoint
+            await this.tabs[i].OnInit(m); //Init
+        }
+
+        //Open first tab
+        var t = this.activeTab;
+        this.activeTab = -1;
+        this.OnSwitchTab(t);
     }
 
     SubscribeEvent(sourceTag, eventTag, callback) {

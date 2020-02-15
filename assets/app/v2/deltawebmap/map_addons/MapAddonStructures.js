@@ -138,7 +138,7 @@ class MapAddonStructures extends TabMapAddon {
             var x = data[2];
             var y = data[3];
             var rotation = data[1];
-            var id = data[4];
+            var id = data[4] == 0 ? null : data[4];
             var mSize = metadata.size;
 
             //Check if this is within range

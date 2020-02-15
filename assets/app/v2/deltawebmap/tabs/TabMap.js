@@ -38,6 +38,7 @@ class TabMap extends DeltaServerTab {
             new OverviewSearchSourceItems(this.server)
         ];
         this.activePopout = null;
+        this.map = null;
 
         //Create addons
         this.addons = [
@@ -135,37 +136,6 @@ class TabMap extends DeltaServerTab {
         //Add game map
         this.SwitchGameLayer(this.server.session.maps[0]);
 
-        //Add icons
-        //this.EnableTribeDinos();
-
-        //Load overview
-        this.server.GetOverviewData().then((e) => {
-            this.overview = e;
-            this.RefreshSidebar();
-        });
-    }
-
-    async RedownloadData() {
-        /* Used when tribes are changing */
-
-        //Add addons
-        for (var i = 0; i < this.addons.length; i += 1) {
-            await this.addons[i].OnUnload(this.map);
-            await this.addons[i].OnLoad(this.map);
-        }
-
-        //Remove all current items
-        var k = Object.keys(this.markers);
-        for (var i = 0; i < k.length; i += 1) {
-            var kk = Object.keys(this.markers[k[i]]);
-            for (var j = 0; j < kk.length; j += 1) {
-                this.map.removeLayer(this.markers[k[i]][kk[j]]);
-            }
-        }
-
-        //Add icons
-        await this.EnableTribeDinos();
-
         //Load overview
         this.server.GetOverviewData().then((e) => {
             this.overview = e;
@@ -182,7 +152,9 @@ class TabMap extends DeltaServerTab {
     }
 
     async OnDeinit() {
-        this.map.remove();
+        if (this.map != null) {
+            this.map.remove();
+        }
         this.searchBar.removeEventListener("input", TabMap.OnSidebarQueryChangedStatic);
         this.queryCancel++;
 

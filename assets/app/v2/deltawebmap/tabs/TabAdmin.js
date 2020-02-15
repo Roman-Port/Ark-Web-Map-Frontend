@@ -21,7 +21,7 @@ class TabAdmin extends DeltaServerTab {
         var btn = super.CreateMenuItem(container);
         this.switch = DeltaTools.CreateDom("div", "admin_tab_toggle", btn);
         this.loader = DeltaTools.CreateDom("div", "admin_tab_loader loading_spinner", btn);
-        this.switch.addEventListener("click", () => this.OnSwitchToggled());
+        this.switch.addEventListener("click", (e) => this.OnSwitchToggled(e));
         return btn;
     }
 
@@ -56,12 +56,13 @@ class TabAdmin extends DeltaServerTab {
         this.server.UnsubscribeEvent("tab.admin");
     }
 
-    OnSwitchToggled() {
+    OnSwitchToggled(e) {
         if (this.active) {
             this.OnSwitchedOff();
         } else {
             this.OnSwitchedOn();
         }
+        e.stopPropagation();
     }
 
     async OnSwitchedOn() {
@@ -97,6 +98,6 @@ class TabAdmin extends DeltaServerTab {
     }
 
     async RefreshViews() {
-        await this.server.OnChangedTribe();
+        await this.server.ResetTabs();
     }
 }

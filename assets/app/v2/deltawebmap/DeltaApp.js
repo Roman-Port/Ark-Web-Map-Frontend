@@ -37,73 +37,76 @@ class DeltaApp {
         //Create RPC
         this.rpc = new DeltaRPC();
 
-        //Create default cluster
-        var clusterMenus = {};
-        var defaultClusterMenu = this.CreateServerListClusterLabel(this.serverListHolder, "UNCATEGORIZED");
+        //Set up servers
+        if (this.user.data.servers.length > 0) {
+            //Create default cluster
+            var clusterMenus = {};
+            var defaultClusterMenu = this.CreateServerListClusterLabel(this.serverListHolder, "UNCATEGORIZED");
 
-        //Add clusters
-        for (var i = 0; i < this.user.data.clusters.length; i += 1) {
-            var cluster = this.user.data.clusters[i];
-            clusterMenus[cluster.id] = this.CreateServerListClusterLabel(this.serverListHolder, cluster.name);
+            //Add clusters
+            for (var i = 0; i < this.user.data.clusters.length; i += 1) {
+                var cluster = this.user.data.clusters[i];
+                clusterMenus[cluster.id] = this.CreateServerListClusterLabel(this.serverListHolder, cluster.name);
+            }
+
+            //Boot up servers
+            for (var i = 0; i < this.user.data.servers.length; i += 1) {
+                //Get server info
+                var info = this.user.data.servers[i];
+
+                //Create the server on the sidebar
+                var menu = DeltaTools.CreateDom("div", "v3_nav_server");
+                var top = DeltaTools.CreateDom("div", "v3_nav_server_top", menu);
+                DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top).src = info.image_url;
+                var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
+                menu.alertBadge = alertBadge;
+                var loaderBadge = DeltaTools.CreateDom("div", "loading_spinner server_loader", top, "");
+                menu.loaderBadge = loaderBadge;
+                DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
+                var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
+
+                //Create server
+                var server = new DeltaServer(this, info, menu);
+                var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
+                var canSwitch = await server.Init(m); //TODO: Handle this returning false
+
+                //Finish creating menu
+                for (var j = 0; j < server.tabs.length; j += 1) {
+                    var btn = server.tabs[j].CreateMenuItem(bottom);
+                    btn.x_index = j;
+                    btn.x_server = server;
+                    server.tabs[j].menu = btn;
+                    btn.addEventListener("click", function () {
+                        this.x_server.OnSwitchTab(this.x_index);
+                    });
+                }
+
+                //Add event
+                top.x_id = info.id;
+                top.x_app = this;
+                top.addEventListener("click", function () {
+                    this.x_app.SwitchServer(this.x_app.servers[this.x_id]);
+                });
+
+                //Mount the server menu to the sidebar
+                if (info.cluster_id == null) {
+                    //Add to default cluster
+                    defaultClusterMenu.appendChild(menu);
+                } else {
+                    //Mount to this cluster ID
+                    clusterMenus[info.cluster_id].appendChild(menu);
+                }
+
+                //Add to list of servers
+                server.menu = menu;
+                this.servers[info.id] = server;
+            }
         }
 
         //Add "add server" button
         DeltaTools.CreateDom("div", "v3_nav_server_add", this.serverListHolder, "Add Server").addEventListener("click", function () {
             window.open("/servers/", "_blank");
         });
-
-        //Boot up servers
-        for (var i = 0; i < this.user.data.servers.length; i += 1) {
-            //Get server info
-            var info = this.user.data.servers[i];
-
-            //Create the server on the sidebar
-            var menu = DeltaTools.CreateDom("div", "v3_nav_server");
-            var top = DeltaTools.CreateDom("div", "v3_nav_server_top", menu);
-            DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top).src = info.image_url;
-            var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
-            menu.alertBadge = alertBadge;
-            var loaderBadge = DeltaTools.CreateDom("div", "loading_spinner server_loader", top, "");
-            menu.loaderBadge = loaderBadge;
-            DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
-            var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
-
-            //Create server
-            var server = new DeltaServer(this, info, menu);
-            var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
-            var canSwitch = await server.Init(m); //TODO: Handle this returning false
-
-            //Finish creating menu
-            for (var j = 0; j < server.tabs.length; j += 1) {
-                var btn = server.tabs[j].CreateMenuItem(bottom);
-                btn.x_index = j;
-                btn.x_server = server;
-                server.tabs[j].menu = btn;
-                btn.addEventListener("click", function () {
-                    this.x_server.OnSwitchTab(this.x_index);
-                });
-            }
-
-            //Add event
-            top.x_id = info.id;
-            top.x_app = this;
-            top.addEventListener("click", function () {
-                this.x_app.SwitchServer(this.x_app.servers[this.x_id]);
-            });
-
-            //Mount the server menu to the sidebar
-            if (info.cluster_id == null) {
-                //Add to default cluster
-                defaultClusterMenu.appendChild(menu);
-            } else {
-                //Mount to this cluster ID
-                clusterMenus[info.cluster_id].appendChild(menu);
-            }
-
-            //Add to list of servers
-            server.menu = menu;
-            this.servers[info.id] = server;
-        }
 
         //Swtich to the default server
         this.SwitchServer(this.GetDefaultServer());

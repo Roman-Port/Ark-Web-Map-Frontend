@@ -41,7 +41,8 @@ class TabMap extends DeltaServerTab {
 
         //Create addons
         this.addons = [
-            new MapAddonStructures(this)
+            new MapAddonStructures(this),
+            new MapAddonIcons(this)
         ];
     }
 
@@ -135,7 +136,7 @@ class TabMap extends DeltaServerTab {
         this.SwitchGameLayer(this.server.session.maps[0]);
 
         //Add icons
-        this.EnableTribeDinos();
+        //this.EnableTribeDinos();
 
         //Load overview
         this.server.GetOverviewData().then((e) => {
@@ -190,10 +191,14 @@ class TabMap extends DeltaServerTab {
     }
 
     GetCornersInGameCoords() {
-        return [
+        var d = [
             this.ScreenPosToGamePos(0, 0),
             this.ScreenPosToGamePos(this.mapContainer.clientWidth, this.mapContainer.clientHeight)
         ];
+        return [
+            [Math.max(d[0][0], d[1][0]), Math.max(d[0][1], d[1][1])],
+            [Math.min(d[0][0], d[1][0]), Math.min(d[0][1], d[1][1])]
+        ]
     }
 
     ScreenPosToGamePos(x, y) {

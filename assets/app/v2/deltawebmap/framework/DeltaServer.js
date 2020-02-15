@@ -175,6 +175,7 @@ class DeltaServer extends DeltaTabView {
 
             //Set our tribe ID
             this.tribe = this.session.target_tribe.tribe_id;
+            this.tribe = "*";                               //TEMPORARY!!!!!!!!!!!!!!!
             this.nativeTribe = this.session.target_tribe.tribe_id;
         }
 

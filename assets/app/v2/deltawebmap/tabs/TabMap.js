@@ -68,6 +68,8 @@ class TabMap extends DeltaServerTab {
     }
 
     async OnInit(mountpoint) {
+        super.OnInit(mountpoint);
+
         //Create DOM
         this.LayoutDom(mountpoint);
 
@@ -85,13 +87,12 @@ class TabMap extends DeltaServerTab {
         var sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
         this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper", sidebarContainer);
 
-        var sidebarSearchContainer = DeltaTools.CreateDom("div", "dino_stats_search_box", this.mountpoint);
+        var sidebarSearchContainer = DeltaTools.CreateDom("div", "dino_stats_search_box", this.top);
         this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text", sidebarSearchContainer);
         this.searchBar.type = "text";
         this.searchBar.placeholder = "Search Tribe";
         this.searchBar.addEventListener("input", () => this.OnSidebarQueryChanged());
-        var sidebarSort = DeltaTools.CreateDom("select", "dino_stats_search_base dino_stats_search_sort", sidebarSearchContainer);
-        //TODO: Add options to this
+        var sidebarSort = DeltaTools.CreateDom("div", "dino_stats_search_base dino_stats_search_sort", sidebarSearchContainer);
     }
 
     async OnFirstOpen() {
@@ -200,6 +201,10 @@ class TabMap extends DeltaServerTab {
             ]
         };
         L.tileLayer(layer.url, mapSettings).addTo(this.map);
+    }
+
+    ToggleSidebar() {
+        this.mountpoint.classList.toggle("map_tab_hiddensidebar");
     }
 
     async EnableTribeDinos() {

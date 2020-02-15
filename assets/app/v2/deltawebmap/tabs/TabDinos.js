@@ -331,6 +331,7 @@ class TabDinos extends DeltaServerTab {
 
     async OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
+        super.OnInit(mountpoint);
         this.LayoutDom(mountpoint);
 
         this.server.SubscribeRPCEvent("tab.dinos", 1, (m) => this.OnDinoFullRefreshed(m));

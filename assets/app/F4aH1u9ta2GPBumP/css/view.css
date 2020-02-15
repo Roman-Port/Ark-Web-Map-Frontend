@@ -2514,3 +2514,19 @@ a {
     margin-right: 10px;
     margin-left: -5px;
 }
+
+.map_tab_hiddensidebar .map_part {
+    right:0;
+}
+
+.map_tab_hiddensidebar .dino_sidebar {
+    right: -360px;
+}
+
+.server_top_strip {
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    height: 60px;
+}

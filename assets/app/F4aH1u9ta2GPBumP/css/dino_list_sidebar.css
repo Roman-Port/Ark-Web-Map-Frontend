@@ -469,9 +469,9 @@
 /* Search bar */
 .dino_stats_search_box {
     position: absolute;
-    top: -50px;
-    width: 330px;
-    right: 16px;
+    top: 11px;
+    width: 322px;
+    right: 23px;
     height: 38px;
     z-index: 10003;
 }
@@ -479,16 +479,14 @@
 .dino_stats_search_text {
     padding: 5px 10px;
     left: 0;
-    width: calc(100% - 120px - 30px);
+    width: calc(100% - 70px);
     margin: 0;
-    font-size:12px;
+    font-size: 12px;
 }
 
 .dino_stats_search_sort {
     right: 0;
-    width: 120px;
-    padding: 5px;
-    font-size:14px;
+    width: 36px;
 }
 
 .dino_stats_search_base {

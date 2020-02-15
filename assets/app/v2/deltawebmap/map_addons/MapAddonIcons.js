@@ -63,7 +63,7 @@ class MapAddonIcons extends TabMapAddon {
 
         //Check if it exists
         if (marker.x_delta_dialog == null && data.dialog != null) {
-            marker.x_delta_dialog = this.CreateHoverElement(data.img, data.dialog.title, data.dialog.subtitle);
+            marker.x_delta_dialog = this.CreateHoverElement(data.img, data.dialog.title, data.dialog.subtitle, data.type);
             marker.classList.add("mini_modal_marker");
             marker.getElementsByClassName("map_icon_base")[0].appendChild(marker.x_delta_dialog);
         }
@@ -147,10 +147,10 @@ class MapAddonIcons extends TabMapAddon {
         //Apply styling
         statics.MAP_ICON_RENDER_PROFILE[data.type](data, marker, content);
 
-        //Create the hover content, if any
-        /*if (data.dialog != null) {
-            content.appendChild(this.CreateHoverElement(data.img, data.dialog.title, data.dialog.subtitle));
-        }*/
+        //Set border from state
+        if (data.outline_color !== undefined) {
+            marker.style.borderColor = data.outline_color;
+        }
 
         //Create icon
         var icon_template = L.divIcon({
@@ -177,11 +177,6 @@ class MapAddonIcons extends TabMapAddon {
         data.extras._icon = data;
         data.extras._map = this;
 
-        //Set border from state
-        /*if (data.outline_color !== undefined) {
-            icon_div.style.borderColor = data.outline_color;
-        }*/
-
         //Add to register
         this.pins[data.type + "@" + data.id] = {
             "icon": icon_data,
@@ -191,13 +186,16 @@ class MapAddonIcons extends TabMapAddon {
         return icon_data;
     }
 
-    CreateHoverElement(iconImg, title, subtitle) {
+    CreateHoverElement(iconImg, title, subtitle, type) {
         //Create element
         var e = DeltaTools.CreateDom("div", "mini_modal mini_modal_anim");
 
         //Add icon
         var icon = DeltaTools.CreateDom("img", "mini_modal_icon map_icon_base map_icon_dino", e);
         icon.style.backgroundImage = "url(" + iconImg + ")";
+
+        //Render icon
+        statics.MAP_ICON_RENDER_PROFILE[type](null, icon);
 
         //Create content
         var ce = DeltaTools.CreateDom("div", "mini_modal_content", e);

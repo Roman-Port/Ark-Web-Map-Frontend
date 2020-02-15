@@ -2025,7 +2025,13 @@ a {
 
 .map_structure_tile_image {
     visibility: visible;
-    z-index:10000;
+    z-index: 10000;
+    opacity: 1 !important; /* Overrides Leaflet's fadein */
+}
+
+.map_structure_tile_image_canvas {
+    width:256px;
+    height:256px;
 }
 
 .map_structure_loader {

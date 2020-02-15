@@ -5,22 +5,23 @@ class MapAddonStructures extends TabMapAddon {
     constructor(map) {
         super(map);
         this.loadQueue = []; //This is a queue of tiles we need to produce when we're done loading structure images
+        this.scale = 1; //Adjusts the resolution of the structures. Could be used as a premium feature in the future
     }
 
     BindEvents(container) {
         /* Used when we bind events to the map container */
-        
+
     }
 
     async OnLoad(container) {
         /* Called when we load the map */
 
         //Get the tile data
-        //this.tiles = await this.map.server.GetStructuresData();
+        this.source = new BinaryStructureSource(this.map.server);
 
         //Create the map layer
         var mapSettings = {
-            updateWhenZooming: false,
+            updateWhenZooming: true,
             maxZoom: 12,
             id: 'structures',
             opacity: 1,
@@ -29,9 +30,10 @@ class MapAddonStructures extends TabMapAddon {
                 [-256, 0],
                 [0, 256]
             ],
-            addon: this
+            addon: this,
+            updateInterval: 1
         };
-        
+
         this.layer = new MapAddonStructuresLayer(mapSettings);
         this.layer.addTo(this.map.map);
     }
@@ -40,42 +42,9 @@ class MapAddonStructures extends TabMapAddon {
         this.map.map.removeLayer(this.layer);
     }
 
-    GetBoundedStructureQueryURL(d) {
-        //Data format: [[x, y], [x, y]]; or use this.map.GetCornersInGameCoords()
-        return "upperx=" + Math.max(d[0][0], d[1][0]) + "&lowerx=" + Math.min(d[0][0], d[1][0]) + "&uppery=" + Math.max(d[0][1], d[1][1]) + "&lowery=" + Math.min(d[0][1], d[1][1]);
-    }
-
-    async GetTileDataset(coords) {
-        //return this.tiles;
-        if (coords.z <= 5) {
-            return null;
-        }
-
-        //Calculate the range of data
-        var calcOffset = this.map.server.session.mapData.captureSize / 2;
-        var units_per_tile = this.map.server.session.mapData.captureSize / Math.pow(2, coords.z);
-        var game_min_x = (coords.x * units_per_tile) - calcOffset;
-        var game_min_y = (coords.y * units_per_tile) - calcOffset;
-        var game_max_x = ((coords.x + 1) * units_per_tile) - calcOffset;
-        var game_max_y = ((coords.y + 1) * units_per_tile) - calcOffset;
-        var tolerance = (game_max_x - game_min_x) / 2;
-
-        //Get request URL
-        var url = "https://echo-content.dev.deltamap.net/5e324536e6179d3af0f8936a/tribes/*/structures?" + this.GetBoundedStructureQueryURL([
-            [game_min_x - tolerance, game_min_y - tolerance],
-            [game_max_x + tolerance, game_max_y + tolerance]
-        ]);
-
-        return await DeltaTools.WebRequest(url, {}, null);
-    }
-
-    ProcessTile(et, e, coords, tsize, dataset) {
-        //Get context
-        var d = dataset;
-        if (d == null) {
-            return et;
-        }
-        var context = e.getContext('2d');
+    async ProcessTile(et, e, coords, tsize, context) {
+        //Wait for downloading of store to finish
+        await STRUCTURE_TILES_CACHE_TASK;
 
         //Calculate the range of data
         var calcOffset = this.map.server.session.mapData.captureSize / 2;
@@ -86,7 +55,7 @@ class MapAddonStructures extends TabMapAddon {
         var game_max_y = ((coords.y + 1) * units_per_tile) - calcOffset;
 
         //Add all of the elements to this
-        var found = this.WriteToCanvas(context, d, game_min_x, game_min_y, game_max_x, game_max_y, tsize, units_per_tile, 0, 0);
+        var found = await this.WriteToCanvas(context, game_min_x, game_min_y, game_max_x, game_max_y, tsize, units_per_tile, 0, 0);
 
         //Add the highlightable parts
         et.x_hl = found;
@@ -118,7 +87,7 @@ class MapAddonStructures extends TabMapAddon {
         return et;
     }
 
-    AddClickRegions (found, parent) {
+    AddClickRegions(found, parent) {
         for (var i = 0; i < found.length; i += 1) {
             //Draw only items with an ID, as they have an inventory
             if (found[i].id == null) {
@@ -151,46 +120,57 @@ class MapAddonStructures extends TabMapAddon {
         }
     };
 
-    WriteToCanvas (context, d, game_min_x, game_min_y, game_max_x, game_max_y, tsize, units_per_tile, globalOffsetX, globalOffsetY) {
+    async WriteToCanvas(context, game_min_x, game_min_y, game_max_x, game_max_y, tsize, units_per_tile, globalOffsetX, globalOffsetY) {
         var found = [];
-        for (var i = 0; i < d.s.length; i += 1) {
-            var s = d.s[i];
+        var length = await this.source.GetStructureCount();
+        for (var i = 0; i < length; i += 1) {
+            //Get data
+            var data = this.source.GetStructureData(i);
 
             //Check if this is a valid image
-            if (STRUCTURE_TILES_CACHE[d.i[s.i]] == null) {
+            var metadataIndex = data[0];
+            if (STRUCTURE_TILES_METADATA.metadata[metadataIndex] == null) {
                 continue;
             }
+            var metadata = STRUCTURE_TILES_METADATA.metadata[metadataIndex];
+
+            //Get data
+            var x = data[2];
+            var y = data[3];
+            var rotation = data[1];
+            var id = data[4];
+            var mSize = metadata.size;
 
             //Check if this is within range
-            if (s.x > game_max_x + (s.s * 1.5) || s.x < game_min_x - (s.s * 1.5)) {
+            if (x > game_max_x + (mSize * 1.5) || x < game_min_x - (mSize * 1.5)) {
                 continue;
             }
-            if (s.y > game_max_y + (s.s * 1.5) || s.y < game_min_y - (s.s * 1.5)) {
+            if (y > game_max_y + (mSize * 1.5) || y < game_min_y - (mSize * 1.5)) {
                 continue;
             }
 
             //Do size calculations
-            var size = (s.s / units_per_tile) * tsize.x;
+            var size = (mSize / units_per_tile) * tsize.x;
 
             //Skip if it is too small
-            if (size < 5) {
+            if (size < 5 * this.scale) {
                 continue;
             }
 
             //Determine location
-            var loc_tile_x = ((s.x - (s.s / 2) - game_min_x) / units_per_tile) * tsize.x;
-            var loc_tile_y = ((s.y - (s.s / 2) - game_min_y) / units_per_tile) * tsize.y;
+            var loc_tile_x = ((x - (mSize / 2) - game_min_x) / units_per_tile) * tsize.x;
+            var loc_tile_y = ((y - (mSize / 2) - game_min_y) / units_per_tile) * tsize.y;
 
             //Draw this
-            this.DrawRotatedImage(context, STRUCTURE_TILES_CACHE[d.i[s.i]], loc_tile_x + globalOffsetX, loc_tile_y + globalOffsetY, s.r, size, size);
+            this.DrawRotatedImage(context, STRUCTURE_TILES_CACHE[metadata.img], loc_tile_x + globalOffsetX, loc_tile_y + globalOffsetY, rotation, size, size);
 
             //Add to list of found tiles
             found.push({
                 "x": loc_tile_x + globalOffsetX,
                 "y": loc_tile_y + globalOffsetY,
-                "r": s.r,
+                "r": rotation,
                 "s": size,
-                "id": s.id
+                "id": id
             });
         }
         return found;
@@ -212,6 +192,7 @@ class MapAddonStructures extends TabMapAddon {
         try {
             //Request an index of all structures
             var index = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
+            STRUCTURE_TILES_METADATA = index;
 
             //Load all
             var promises = [];
@@ -243,26 +224,26 @@ class MapAddonStructures extends TabMapAddon {
 }
 
 var STRUCTURE_TILES_CACHE = {};
+var STRUCTURE_TILES_METADATA = null;
 var STRUCTURE_TILES_CACHE_TASK = MapAddonStructures.LoadStructureStore();
 
 var MapAddonStructuresLayer = L.GridLayer.extend({
-    createTile: function (coords, done) {
+    createTile: function (coords) {
         var addon = this.options.addon;
         var tsize = this.getTileSize();
+        tsize.x *= addon.scale;
+        tsize.y *= addon.scale;
 
         var et = DeltaTools.CreateDom("div", "leaflet-tile map_structure_tile_image");
-        var es = DeltaTools.CreateDom("canvas", "", et);
+        var es = DeltaTools.CreateDom("canvas", "map_structure_tile_image_canvas", et);
         es.width = tsize.x;
         es.height = tsize.y;
         et.width = tsize.x;
         et.height = tsize.y;
 
-        STRUCTURE_TILES_CACHE_TASK.then((e) => {
-            this.options.addon.GetTileDataset(coords).then((dataset) => {
-                var tile = this.options.addon.ProcessTile(et, es, coords, tsize, dataset);
-                done(null, tile);
-            });
-        });
+        var context = es.getContext('2d');
+
+        addon.ProcessTile(et, es, coords, tsize, context);
 
         return et;
     }

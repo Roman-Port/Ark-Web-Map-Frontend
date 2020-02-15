@@ -517,9 +517,9 @@
 }
 
 .v3_nav_server_bottom {
-    display:none;
+    display: none;
     padding: 8px 0px;
-    background-color: #45484d5c;
+    background-color: rgba(69, 72, 77, 0.36);
 }
 
 .v3_nav_server_bottom_item {
@@ -549,19 +549,19 @@
 }
 
 .v3_nav_server_bottom_item:hover {
-    background-color: #45484d94;
+    background-color: rgba(69, 72, 77, 0.58);
 }
 
 .v3_nav_server_bottom_item_selected {
-    background-color: #45484dFF !important;
+    background-color: #45484d !important;
 }
 
 .v3_nav_server:hover .v3_nav_server_top {
-    background-color: #45484d94;
+    background-color: rgba(69, 72, 77, 0.58);
 }
 
 .v3_nav_server_active .v3_nav_server_top {
-    background-color: #45484dFF !important;
+    background-color: rgb(69, 72, 77) !important;
 }
 
 .v3_nav_server_active .v3_nav_server_bottom {

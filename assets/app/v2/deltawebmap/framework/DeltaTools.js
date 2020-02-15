@@ -6,25 +6,18 @@ class DeltaTools {
 
     }
 
-    static async WebRequest(url, args, token) {
+    static async _BaseWebRequest(url, type, method, body, token) {
         if (token === undefined || token == null) {
             console.warn("WARNING: WebRequest launched without a DeltaCancellationToken!");
             token = new DeltaCancellationToken(null);
         }
-        
+
         return new Promise(function (resolve, reject) {
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function () {
                 if (this.readyState === 4 && this.status === 200) {
-                    //Get reply
-                    var reply = this.responseText;
-                    if (args.isJson === undefined || args.isJson === true) {
-                        reply = JSON.parse(this.responseText);
-                    }
-
-                    //Callback
                     if (token.IsValid()) {
-                        resolve(reply);
+                        resolve(this.response);
                     }
                 } else if (this.readyState === 4) {
                     if (token.IsValid()) {
@@ -39,22 +32,33 @@ class DeltaTools {
                     }
                 }
             }
-            if (args.type === undefined) {
-                args.type = "GET";
-            }
-            xmlhttp.open(args.type, url, true);
-            if (args.nocreds === undefined || !args.nocreds) {
-                //Include auth
-                xmlhttp.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
-            }
-            if (args.headers !== undefined) {
-                var keys = Object.keys(args.headers);
-                for (var i = 0; i < keys.length; i += 1) {
-                    xmlhttp.setRequestHeader(keys[i], args.headers[keys[i]]);
-                }
-            }
-            xmlhttp.send(args.body);
+            xmlhttp.open(method, url, true);
+            xmlhttp.responseType = type;
+            xmlhttp.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
+            xmlhttp.send(body);
         });
+    }
+
+    static async WebRequest(url, args, token) {
+        /* Legacy; Launches with a JSON response */
+        
+        //Get type
+        var type = "GET";
+        if (args.type !== undefined) {
+            type = args.type;
+        }
+
+        //Launch
+        var r = await DeltaTools._BaseWebRequest(url, "text", type, null, token);
+        return JSON.parse(r);
+    }
+
+    static async WebRequestBinary(url, token) {
+        /* Responds with a DataView to use */
+
+        //Launch
+        var r = await DeltaTools._BaseWebRequest(url, "arraybuffer", "GET", null, token);
+        return new DataView(r);
     }
 
     static CreateDom(type, classname, parent, text) {

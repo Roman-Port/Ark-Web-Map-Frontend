@@ -172,12 +172,12 @@ statics.STATUS_ENTRIES = [
     },
     {
         "icon": "/assets/ui/status/unknown3.png",
-        "name": "Temperature Fortitude",
+        "name": "Fortitude",
         "formatString": function (value) { return value; }
     },
     {
         "icon": "/assets/ui/status/unknown3.png",
-        "name": "Crafting Speed Multiplier",
+        "name": "Crafting Speed",
         "formatString": function (value) { return value; }
     }
 ];
@@ -188,5 +188,25 @@ statics.ERROR_BANNER_PACKS = {
         "id": 0,
         "priority": 10,
         "actions":[]
+    }
+}
+
+statics.MAP_ICON_RENDER_PROFILE = {
+    "dinos": function (data, icon, all) {
+        
+    },
+    "players": function (data, icon, all) {
+        icon.style.backgroundSize = "cover";
+    }
+}
+
+statics.MAP_ICON_INTERACT_EVENTS = {
+    "dinos": {
+        "click": function (data, marker) {
+            console.log(data);
+        }
+    },
+    "players": {
+
     }
 }

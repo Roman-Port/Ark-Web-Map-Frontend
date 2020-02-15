@@ -95,9 +95,8 @@ class TabMap extends DeltaServerTab {
     }
 
     async OnFirstOpen() {
-
-        //Get prefs so we know where to spawn the map
-        var user_prefs = this.server.info.user_prefs;
+        //Get map spawn location
+        var pos = TabMap.ConvertFromGamePosToMapPos(this.server.session, this.server.prefs.x, this.server.prefs.y);
 
         //Create map
         this.map = L.map(this.mapContainer, {
@@ -107,8 +106,8 @@ class TabMap extends DeltaServerTab {
                 [-356, -100],
                 [100, 356]
             ],
-            zoomSnap:0.5
-        }).setView([user_prefs.y, user_prefs.x], user_prefs.z);
+            zoomSnap: 0.5
+        }).setView(pos, this.server.prefs.z);
         this.map._dmap = this;
 
         //Bind events to addons
@@ -118,15 +117,9 @@ class TabMap extends DeltaServerTab {
 
         //Bind events
         this.map.on("move", TabMap.CloseAllPopoutsMap);
+        this.map.on("moveend", () => this.MapMovePushSavedPos());
         this.map.on("zoombegin", TabMap.CloseAllPopoutsMap);
         this.map.on("click", TabMap.CloseAllPopoutsMap);
-
-        //Set background color
-        if (this.server.session.mapBackgroundColor !== null) {
-            //this.this.setBackground(ark.session.mapBackgroundColor);
-        } else {
-            //this.this.restoreDefaultBackgroundColor();
-        }
 
         //Add addons
         for (var i = 0; i < this.addons.length; i += 1) {
@@ -141,6 +134,20 @@ class TabMap extends DeltaServerTab {
             this.overview = e;
             this.RefreshSidebar();
         });
+    }
+
+    MapMovePushSavedPos() {
+        if (this._movePushSettingsDelay != null) {
+            clearTimeout(this._movePushSettingsDelay);
+        }
+        var center = this.map.getCenter();
+        var pos = TabMap.ConvertFromMapPosToGamePos(this.server.session, center.lng, center.lat);
+        this.server.prefs.x = pos[0];
+        this.server.prefs.y = pos[1];
+        this.server.prefs.z = Math.ceil(this.map.getZoom());
+        this._movePushSettingsDelay = window.setTimeout(() => {
+            this.server.PushUserPrefs();
+        }, 5000);
     }
 
     async OnOpen() {

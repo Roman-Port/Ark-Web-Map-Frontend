@@ -1,3 +1,7 @@
+.mini_modal_marker:hover {
+    z-index: 999999 !important;
+}
+
 .mini_modal {
     color: white;
     font-family: 'Roboto', sans-serif;

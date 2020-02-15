@@ -34,6 +34,39 @@ class MapAddonIcons extends TabMapAddon {
             //this.markers.addLayer(L.marker(pos));
         }
         this.map.map.addLayer(this.markers);
+
+        //Set up
+        this.markers.on("click", (evt) => this.OnMapMarkerInteractionEvent(evt));
+        this.markers.on("mouseover", (evt) => this.OnMapMarkerInteractionEvent(evt));
+        this.markers.on("scroll", (evt) => this.OnMapMarkerInteractionEvent(evt));
+        this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
+    }
+
+    OnMapMarkerInteractionEvent(evt) {
+        //Get the data of this icon
+        var data = evt.layer.options.x_delta_data;
+        var type = evt.type;
+        var marker = evt.layer._icon;
+
+        //Check if this has any events that need to be handled
+        var outEvt = statics.MAP_ICON_INTERACT_EVENTS[data.type][type];
+        if (outEvt != null) {
+            outEvt(data, marker);
+            evt.originalEvent.stopPropagation();
+        }
+    }
+
+    OnMapMarkerHover(evt) {
+        /* This is called when we hover over something. We'll check if we need to spawn the dialog */
+        var data = evt.layer.options.x_delta_data;
+        var marker = evt.layer._icon;
+
+        //Check if it exists
+        if (marker.x_delta_dialog == null && data.dialog != null) {
+            marker.x_delta_dialog = this.CreateHoverElement(data.img, data.dialog.title, data.dialog.subtitle);
+            marker.classList.add("mini_modal_marker");
+            marker.getElementsByClassName("map_icon_base")[0].appendChild(marker.x_delta_dialog);
+        }
     }
 
     async OnUnload(container) {
@@ -96,7 +129,7 @@ class MapAddonIcons extends TabMapAddon {
         var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server.session, data.location.x, data.location.y);
 
         //Create the inner content
-        var content = DeltaTools.CreateDom("div", "");
+        var content = DeltaTools.CreateDom("div", "mini_modal_marker");
 
         //Create marker
         var marker = DeltaTools.CreateDom("div", "map_icon_base map_icon_dino", content);
@@ -111,6 +144,9 @@ class MapAddonIcons extends TabMapAddon {
             DeltaTools.CreateDom("div", "map_icon_tag", content).style.display = "none";
         }
 
+        //Apply styling
+        statics.MAP_ICON_RENDER_PROFILE[data.type](data, marker, content);
+
         //Create the hover content, if any
         /*if (data.dialog != null) {
             content.appendChild(this.CreateHoverElement(data.img, data.dialog.title, data.dialog.subtitle));
@@ -123,11 +159,15 @@ class MapAddonIcons extends TabMapAddon {
             html: content.innerHTML
         });
 
-        //Add to map
-        var icon_data = this.markers.addLayer(L.marker(pos, {
+        //Make marker
+        var marker = L.marker(pos, {
             icon: icon_template,
-            zIndexOffset: 1
-        }));
+            zIndexOffset: 1,
+            x_delta_data: data
+        });
+
+        //Add to map
+        var icon_data = this.markers.addLayer(marker);
 
         //Create icon
         if (data.extras !== undefined) {

@@ -1982,8 +1982,8 @@ a {
 
 .mini_modal {
     position: absolute;
-    top: -12px;
-    left: -16px;
+    top: -10px;
+    left: -14px;
 }
 
 .map_icon_dino:hover .mini_modal {

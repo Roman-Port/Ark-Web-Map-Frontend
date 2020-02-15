@@ -53,6 +53,14 @@ class DeltaTools {
         return JSON.parse(r);
     }
 
+    static async WebPOSTJson(url, data, token) {
+        /* Legacy; Launches with a JSON response */
+
+        //Launch
+        var r = await DeltaTools._BaseWebRequest(url, "text", "POST", JSON.stringify(data), token);
+        return JSON.parse(r);
+    }
+
     static async WebRequestBinary(url, token) {
         /* Responds with a DataView to use */
 

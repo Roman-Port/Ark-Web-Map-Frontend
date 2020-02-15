@@ -16,6 +16,7 @@ class DeltaServer extends DeltaTabView {
         this.activeTab = -1;
         this.menu = null;
         this.session = null;
+        this.prefs = info.user_prefs;
         this.first = true; //Set to false after this is opened for the first time
         this.myLocation = null; //May or may not be null
         this.downloadTask = null; //Task that is run to create a session on this server
@@ -340,4 +341,9 @@ class DeltaServer extends DeltaTabView {
         }
     }
 
+    async PushUserPrefs() {
+        /* Pushes user prefs for this server */
+        this.prefs = await DeltaTools.WebPOSTJson(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/put_user_prefs", this.prefs, this.token);
+        return this.prefs;
+    }
 }

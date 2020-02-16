@@ -29,7 +29,7 @@ class MapAddonIcons extends TabMapAddon {
         });
         for (var i = 0; i < this.data.length; i += 1) {
             var data = this.data[i];
-            var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server.session, data.location.x, data.location.y);
+            var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, data.location.x, data.location.y);
             this.AddPin(this.data[i]);
             //this.markers.addLayer(L.marker(pos));
         }
@@ -90,7 +90,7 @@ class MapAddonIcons extends TabMapAddon {
         }
 
         //Do some calculations
-        var mapSize = this.map.server.session.mapData.captureSize;
+        var mapSize = this.map.server.GetMapInfo().captureSize;
         var halfMapSize = mapSize / 2;
 
         //Add array items
@@ -126,7 +126,7 @@ class MapAddonIcons extends TabMapAddon {
     /* Adds a pin using the pin data format */
 
         //Get position on the map
-        var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server.session, data.location.x, data.location.y);
+        var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, data.location.x, data.location.y);
 
         //Create the inner content
         var content = DeltaTools.CreateDom("div", "mini_modal_marker");

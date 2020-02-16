@@ -386,7 +386,7 @@ class TabDinos extends DeltaServerTab {
     async LoadDinos() {
         /* Load dinos until we reach a blank page */
         this.dinosLoaded = false;
-        var url = this.server.GetEndpointUrl("tribes_dino_stats");
+        var url = this.server.GetTribesEndpointUrl("/dino_stats?limit=100");
         var loaded = 0;
         while (url != null) {
             //Fetch

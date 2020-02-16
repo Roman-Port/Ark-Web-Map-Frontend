@@ -47,8 +47,8 @@ class MapAddonStructures extends TabMapAddon {
         await STRUCTURE_TILES_CACHE_TASK;
 
         //Calculate the range of data
-        var calcOffset = this.map.server.session.mapData.captureSize / 2;
-        var units_per_tile = this.map.server.session.mapData.captureSize / Math.pow(2, coords.z);
+        var calcOffset = this.map.server.GetMapInfo().captureSize / 2;
+        var units_per_tile = this.map.server.GetMapInfo().captureSize / Math.pow(2, coords.z);
         var game_min_x = (coords.x * units_per_tile) - calcOffset;
         var game_min_y = (coords.y * units_per_tile) - calcOffset;
         var game_max_x = ((coords.x + 1) * units_per_tile) - calcOffset;

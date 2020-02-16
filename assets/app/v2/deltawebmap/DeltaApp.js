@@ -10,6 +10,7 @@ class DeltaApp {
         this.user = null;
         this.lastServer = null;
         this.viewUserSettings = new DeltaUserSettingsTabView(this);
+        this.maps = {};
         this.SIDEBAR_OPTIONS = [
             {
                 "name": "User Settings",
@@ -24,6 +25,9 @@ class DeltaApp {
 
         //Set up the user
         this.user = await this.InitUser();
+
+        //Get map list
+        this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
 
         //Create DOM
         this.LayoutDom(document.body);

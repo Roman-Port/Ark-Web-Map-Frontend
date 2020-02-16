@@ -14,25 +14,6 @@ class TabMap extends DeltaServerTab {
         this.markers = {};
         this.query = "";
         this.queryCancel = 0;
-        this.ICON_ENTRIES = {
-            "dinos": function (data, icon) {
-                //icon.addEventListener('click', map.onDinoClicked);
-            },
-            "players": function (data, icon) {
-                icon.style.backgroundSize = "cover";
-            }
-        };
-        this.EVENT_ENTRIES = {
-            "dinos": function (data, icon, id) {
-                data._map.CloseAllPopouts();
-                var p = PopoutModalView.ShowDinoDataFromIcon(data._map.server, data._icon, function (e) {
-                    e.classList.add("map_popout_mount");
-                    icon.style.zIndex = "99999";
-                    icon.appendChild(e);
-                });
-                data._map.activePopout = p;
-            }
-        }
         this.SIDEBAR_SOURCES = [
             new OverviewSearchSourceDino(this.server),
             new OverviewSearchSourceItems(this.server)
@@ -86,6 +67,7 @@ class TabMap extends DeltaServerTab {
 
         var sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
         this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper", sidebarContainer);
+        this.CreateSidebarLoaderDom(this.sidebarContent);
 
         var sidebarSearchContainer = DeltaTools.CreateDom("div", "dino_stats_search_box", this.top);
         this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text", sidebarSearchContainer);
@@ -97,7 +79,7 @@ class TabMap extends DeltaServerTab {
 
     async OnFirstOpen() {
         //Get map spawn location
-        var pos = TabMap.ConvertFromGamePosToMapPos(this.server.session, this.server.prefs.x, this.server.prefs.y);
+        var pos = TabMap.ConvertFromGamePosToMapPos(this.server, this.server.prefs.saved_map_pos.x, this.server.prefs.saved_map_pos.y);
 
         //Create map
         this.map = L.map(this.mapContainer, {
@@ -108,7 +90,7 @@ class TabMap extends DeltaServerTab {
                 [100, 356]
             ],
             zoomSnap: 0.5
-        }).setView(pos, this.server.prefs.z);
+        }).setView(pos, this.server.prefs.saved_map_pos.z);
         this.map._dmap = this;
 
         //Bind events to addons
@@ -128,7 +110,7 @@ class TabMap extends DeltaServerTab {
         }
 
         //Add game map
-        this.SwitchGameLayer(this.server.session.maps[0]);
+        this.SwitchGameLayer(this.server.GetMapInfo().maps[0]);
 
         //Load overview
         this.server.GetOverviewData().then((e) => {
@@ -142,10 +124,10 @@ class TabMap extends DeltaServerTab {
             clearTimeout(this._movePushSettingsDelay);
         }
         var center = this.map.getCenter();
-        var pos = TabMap.ConvertFromMapPosToGamePos(this.server.session, center.lng, center.lat);
-        this.server.prefs.x = pos[0];
-        this.server.prefs.y = pos[1];
-        this.server.prefs.z = Math.ceil(this.map.getZoom());
+        var pos = TabMap.ConvertFromMapPosToGamePos(this.server, center.lng, center.lat);
+        this.server.prefs.saved_map_pos.x = pos[0];
+        this.server.prefs.saved_map_pos.y = pos[1];
+        this.server.prefs.saved_map_pos.z = Math.ceil(this.map.getZoom());
         this._movePushSettingsDelay = window.setTimeout(() => {
             this.server.PushUserPrefs();
         }, 5000);
@@ -183,7 +165,7 @@ class TabMap extends DeltaServerTab {
 
     ScreenPosToGamePos(x, y) {
         var p = this.map.containerPointToLatLng([x, y]);
-        return TabMap.ConvertFromMapPosToGamePos(this.server.session, p.lng, p.lat);
+        return TabMap.ConvertFromMapPosToGamePos(this.server, p.lng, p.lat);
     }
 
     SwitchGameLayer(layer) {
@@ -355,14 +337,17 @@ class TabMap extends DeltaServerTab {
         ];
     }
 
-    static ConvertFromGamePosToMapPos (session, x, y) {
+    static ConvertFromGamePosToMapPos(server, x, y) {
+        //Get map info
+        var mapData = server.GetMapInfo();
+
         //Add offsets
-        x += session.mapData.mapImageOffset.x;
-        y += session.mapData.mapImageOffset.y;
+        x += mapData.mapImageOffset.x;
+        y += mapData.mapImageOffset.y;
 
         //Divide by scale
-        x /= session.mapData.captureSize;
-        y /= session.mapData.captureSize;
+        x /= mapData.captureSize;
+        y /= mapData.captureSize;
 
         //Move
         x += 0.5;
@@ -376,8 +361,12 @@ class TabMap extends DeltaServerTab {
         return L.latLng(y, x);
     }
 
-    static ConvertFromMapPosToGamePos(session, x, y) {
+    static ConvertFromMapPosToGamePos(server, x, y) {
         //When calling this, X IS LNG
+
+        //Get map info
+        var mapData = server.GetMapInfo();
+
         //Convert to map pos
         x = x / 256;
         y = -y / 256;
@@ -387,26 +376,29 @@ class TabMap extends DeltaServerTab {
         y -= 0.5;
 
         //Divide by scale
-        x *= session.mapData.captureSize;
-        y *= session.mapData.captureSize;
+        x *= mapData.captureSize;
+        y *= mapData.captureSize;
 
         //Add offsets
-        x -= session.mapData.mapImageOffset.x;
-        y -= session.mapData.mapImageOffset.y;
+        x -= mapData.mapImageOffset.x;
+        y -= mapData.mapImageOffset.y;
 
         return [x, y];
     }
 
-    static ConvertFromMapTilePosToGamePos(session, x, y, zoom) {
+    static ConvertFromMapTilePosToGamePos(server, x, y, zoom) {
+        //Get map info
+        var mapData = server.GetMapInfo();
+
         var upt = Math.pow(2, zoom);
 
         //Multiply by tile size
-        x *= (session.mapData.captureSize / upt);
-        y *= (session.mapData.captureSize / upt);
+        x *= (mapData.captureSize / upt);
+        y *= (mapData.captureSize / upt);
 
         //Add offsets
-        x -= session.mapData.mapImageOffset.x;
-        y -= session.mapData.mapImageOffset.y;
+        x -= mapData.mapImageOffset.x;
+        y -= mapData.mapImageOffset.y;
 
         return [x, y];
     }
@@ -415,6 +407,12 @@ class TabMap extends DeltaServerTab {
     OnSidebarQueryChanged() {
         this.query = this.searchBar.value;
         this.RefreshSidebar();
+    }
+
+    CreateSidebarLoaderDom(container) {
+        var e = DeltaTools.CreateDom("div", "sidebar_loading_symbol_container", container);
+        DeltaTools.CreateDom("div", "loading_spinner", e);
+        return e;
     }
 
     async RefreshSidebar() {
@@ -440,7 +438,7 @@ class TabMap extends DeltaServerTab {
         }
 
         //Create loading dialog
-        var loading = DeltaTools.CreateDom("div", "dino_sidebar_noresults_sub dino_sidebar_stillloading", container, "Still Loading...");
+        var loading = this.CreateSidebarLoaderDom(container);
 
         //Wait for all of these to finish
         await Promise.all(promises);
@@ -602,8 +600,8 @@ class OverviewSearchSourceDino extends OverviewSearchAutoSource {
         var holder = [];
 
         //Find
-        for (var i = 0; i < overviewData.dinos.length; i += 1) {
-            var d = overviewData.dinos[i];
+        for (var i = 0; i < overviewData.results.length; i += 1) {
+            var d = overviewData.results[i];
             if (d.displayName.toLowerCase().includes(query) || d.classDisplayName.toLowerCase().includes(query)) {
                 holder.push({
                     "sort": [
@@ -662,7 +660,7 @@ class OverviewSearchSourceItems extends OverviewSearchAutoSource {
         var holder = [];
 
         //Request
-        var d = await this.server.WebRequestToEndpoint("tribes_itemsearch", {}, {
+        var d = await this.server.WebRequestToEndpoint("/items", {}, {
             "{query}": query
         });
 

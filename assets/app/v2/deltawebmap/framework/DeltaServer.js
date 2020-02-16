@@ -15,7 +15,6 @@ class DeltaServer extends DeltaTabView {
         this.nativeTribe = 0;
         this.activeTab = -1;
         this.menu = null;
-        this.session = null;
         this.prefs = info.user_prefs;
         this.first = true; //Set to false after this is opened for the first time
         this.myLocation = null; //May or may not be null
@@ -61,6 +60,11 @@ class DeltaServer extends DeltaTabView {
         } else {
             this.menu.loaderBadge.classList.remove("server_loader_active");
         }
+    }
+
+    GetMapInfo() {
+        var m = this.app.maps.maps[this.info.map_id];
+        return m;
     }
 
     ForceAbort(error) {
@@ -123,12 +127,12 @@ class DeltaServer extends DeltaTabView {
         this.UnsubscribeRPCEvent("server");
     }
 
-    GetEndpointUrl(endpointName) {
-        return this.session["endpoint_" + endpointName].replace("{tribe_id}", this.tribe.toString());
+    GetTribesEndpointUrl(extra) {
+        return LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/" + this.id + "/tribes/" + this.tribe + extra;
     }
 
-    async WebRequestToEndpoint(endpointName, args, replacements) {
-        var url = this.GetEndpointUrl(endpointName);
+    async WebRequestToEndpoint(extra, args, replacements) {
+        var url = this.GetTribesEndpointUrl(extra);
         if (replacements !== undefined) {
             var keys = Object.keys(replacements);
             for (var i = 0; i < keys.length; i += 1) {
@@ -142,22 +146,10 @@ class DeltaServer extends DeltaTabView {
         /* Downloads all of the server info */
         /* Returns true if this loaded OK, or else returns false */
 
-        //Load session
-        if (this.session == null) {
-            try {
-                this.SetLoaderStatus(true);
-                this.session = await DeltaTools.WebRequest(this.info.endpoint_createsession, {}, null);
-                this.SetLoaderStatus(false);
-                this.myLocation = this.session.my_location;
-            } catch (e) {
-                this.ForceAbort("Couldn't download server information.");
-                return false;
-            }
-
-            //Set our tribe ID
-            this.tribe = this.session.target_tribe.tribe_id;
-            this.nativeTribe = this.session.target_tribe.tribe_id;
-        }
+        //Set our tribe ID and player info
+        this.myLocation = this.info.my_location;
+        this.tribe = this.info.target_tribe.tribe_id;
+        this.nativeTribe = this.info.target_tribe.tribe_id;
 
         return true;
     }
@@ -165,7 +157,7 @@ class DeltaServer extends DeltaTabView {
     async GetIconsData() {
         if (this.icons == null) {
             try {
-                this.icons = await this.WebRequestToEndpoint("tribes_icons", {});
+                this.icons = await this.WebRequestToEndpoint("/icons", {});
             } catch (e) {
                 this.ForceAbort("Couldn't download server information.");
             }
@@ -176,7 +168,7 @@ class DeltaServer extends DeltaTabView {
     async GetOverviewData() {
         if (this.overview == null) {
             try {
-                this.overview = await this.WebRequestToEndpoint("tribes_overview", {});
+                this.overview = await this.WebRequestToEndpoint("/overview", {});
             } catch (e) {
                 this.ForceAbort("Couldn't download server information.");
             }
@@ -313,15 +305,14 @@ class DeltaServer extends DeltaTabView {
         /* BUG: This will fail if the user changes tribes without reloading the page, but since this is such a rare occurance, we're not going to worry about it. */
 
         //Check if our data exists
-        if (this.session == null) { return; }
-        if (this.session.my_profile == null) { return; }
+        if (this.info.my_profile == null) { return; }
 
         //Run
         for (var i = 0; i < m.updates.length; i += 1) {
             var u = m.updates[i];
 
             //Check if this is us
-            if (u.type != 0 || u.id != this.session.my_profile.ark_id) { continue; }
+            if (u.type != 0 || u.id != this.info.my_profile.ark_id) { continue; }
 
             //Check if this is a location update
             if (u.x == null || u.y == null || u.z == null) { continue; }

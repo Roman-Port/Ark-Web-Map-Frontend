@@ -59,12 +59,14 @@
     <script src="/assets/app/v2/deltawebmap/framework/DeltaTools.js"></script>
     <script src="/assets/app/v2/deltawebmap/framework/DeltaServerTab.js"></script>
     <script src="/assets/app/v2/deltawebmap/framework/DeltaEventDispatcher.js"></script>
+    <script src="/assets/app/v2/deltawebmap/framework/DeltaWebsock.js"></script>
     <script src="/assets/app/v2/deltawebmap/framework/DeltaRPC.js"></script>
     <script src="/assets/app/v2/deltawebmap/tabs/TabMap.js"></script>
     <script src="/assets/app/v2/deltawebmap/tabs/TabDinos.js"></script>
     <script src="/assets/app/v2/deltawebmap/tabs/TabAdmin.js"></script>
     <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonStructures.js"></script>
     <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonIcons.js"></script>
+    <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonCanvas.js"></script>
     <script src="/assets/app/v2/deltawebmap/views/PopoutModalView.js"></script>
     <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitle.js"></script>
     <script src="/assets/app/v2/deltawebmap/views/popouts/PopoutPartTitleColorPicker.js"></script>
@@ -78,7 +80,9 @@
     <script src="/assets/app/v2/deltawebmap/entities/structure_sources/BinaryStructureSource.js"></script>
 
     <script>
-        var app = new DeltaApp();
+        var app = new DeltaApp({
+            mountpoint: document.body
+        });
         app.Init();
     </script>
 </body>

@@ -476,27 +476,33 @@
     z-index: 10003;
 }
 
+.dino_stats_search_base {
+    border: 1px solid #50545b;
+    position: absolute;
+    top: 0;
+    height: 36px;
+    background-color: #33363c;
+    border-radius: 5px;
+    color: white;
+    transition:top 120ms ease-in-out;
+}
+
 .dino_stats_search_text {
     padding: 5px 10px;
     left: 0;
     width: calc(100% - 70px);
     margin: 0;
     font-size: 12px;
+    height: 26px;
 }
 
 .dino_stats_search_sort {
     right: 0;
     width: 36px;
-}
-
-.dino_stats_search_base {
-    border: 1px solid #50545b;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background-color: #33363c;
-    border-radius: 5px;
-    color: white;
+    cursor:pointer;
+    background-size:24px;
+    background-repeat:no-repeat;
+    background-position:center;
 }
 
 .dino_stats_search_base:focus {

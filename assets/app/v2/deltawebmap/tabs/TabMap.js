@@ -24,7 +24,8 @@ class TabMap extends DeltaServerTab {
         //Create addons
         this.addons = [
             new MapAddonStructures(this),
-            new MapAddonIcons(this)
+            new MapAddonIcons(this),
+            new MapAddonCanvas(this)
         ];
     }
 
@@ -62,19 +63,21 @@ class TabMap extends DeltaServerTab {
         this.mountpoint = mountpoint;
 
         //Create DOM layout
-        this.mapContainer = DeltaTools.CreateDom("div", "map_part", this.mountpoint);
+        this.mapContainer = DeltaTools.CreateDom("div", "map_part smooth_anim", this.mountpoint);
         var mapCanvas = DeltaTools.CreateDom("div", "map_part_canvas", this.mapContainer);
 
         var sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
-        this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper", sidebarContainer);
+        this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper smooth_anim", sidebarContainer);
         this.CreateSidebarLoaderDom(this.sidebarContent);
 
         var sidebarSearchContainer = DeltaTools.CreateDom("div", "dino_stats_search_box", this.top);
-        this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text", sidebarSearchContainer);
+        this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text dino_stats_search_unimportant", sidebarSearchContainer);
         this.searchBar.type = "text";
         this.searchBar.placeholder = "Search Tribe";
         this.searchBar.addEventListener("input", () => this.OnSidebarQueryChanged());
-        var sidebarSort = DeltaTools.CreateDom("div", "dino_stats_search_base dino_stats_search_sort", sidebarSearchContainer);
+
+        var sidebarHide = DeltaTools.CreateDom("div", "dino_stats_search_base dino_stats_search_sort", sidebarSearchContainer);
+        sidebarHide.addEventListener("click", () => this.mountpoint.classList.toggle("map_tab_hiddensidebar"));
     }
 
     async OnFirstOpen() {
@@ -103,6 +106,7 @@ class TabMap extends DeltaServerTab {
         this.map.on("moveend", () => this.MapMovePushSavedPos());
         this.map.on("zoombegin", TabMap.CloseAllPopoutsMap);
         this.map.on("click", TabMap.CloseAllPopoutsMap);
+        this.map.on("contextmenu", function () { }); //Only used to prevent context menu
 
         //Add addons
         for (var i = 0; i < this.addons.length; i += 1) {

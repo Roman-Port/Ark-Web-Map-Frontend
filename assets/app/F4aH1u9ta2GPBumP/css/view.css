@@ -2523,6 +2523,10 @@ a {
     right: -360px;
 }
 
+.map_tab_hiddensidebar .dino_stats_search_unimportant {
+    top:-50px;
+}
+
 .server_top_strip {
     position: absolute;
     top: -60px;

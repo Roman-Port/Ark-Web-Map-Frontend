@@ -4,8 +4,13 @@ class DeltaApp {
 
     /* This class is the main class that sets up the rest of the app */
 
-    constructor() {
+    constructor(settings) {
         this.servers = {};
+        this.settings = settings;
+        /* SETTINGS:
+         * mountpoint [dom] - Where the app will be mounted
+         * 
+         */
         this.rpc = null;
         this.user = null;
         this.lastServer = null;
@@ -30,7 +35,7 @@ class DeltaApp {
         this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
 
         //Create DOM
-        this.LayoutDom(document.body);
+        this.LayoutDom(this.settings.mountpoint);
 
         //Create message views
         this.msgViewNoServers = this.CreateMessageView("", "No Servers", "Sorry, you don't seem to have any servers. Join an ARK server with Delta Web Map to get started.");

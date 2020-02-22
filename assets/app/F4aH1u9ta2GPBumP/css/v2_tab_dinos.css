@@ -19,6 +19,8 @@
     width: fit-content;
     padding: 0 10px;
     min-width: -webkit-fill-available; /* Just so that the background shading will reach the edge of the screen */
+    position: absolute;
+    left: 0;
 }
 
 .v2tab_dinos_row_standard:hover {

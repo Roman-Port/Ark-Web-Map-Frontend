@@ -210,3 +210,22 @@ statics.MAP_ICON_INTERACT_EVENTS = {
 
     }
 }
+
+statics.MAP_ICON_ADAPTERS = {
+    "dinos": async function (data, map) {
+        var s = await map.server.app.species.GetSpeciesById(data.classname);
+        return {
+            "location": data.location,
+            "img": s.icon.image_thumb_url,
+            "type": "dinos",
+            "id": data.dino_id,
+            "outline_color": "#000000",
+            "tag_color": null,
+            "dialog": {
+                "title": data.tamed_name,
+                "subtitle": s.screen_name + " - Lvl " + data.level
+            },
+            "extras": {}
+        };
+    }
+}

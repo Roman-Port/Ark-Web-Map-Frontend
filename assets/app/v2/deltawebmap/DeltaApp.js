@@ -11,6 +11,7 @@ class DeltaApp {
          * mountpoint [dom] - Where the app will be mounted
          * 
          */
+        this.species = null;
         this.rpc = null;
         this.user = null;
         this.lastServer = null;
@@ -33,6 +34,9 @@ class DeltaApp {
 
         //Get map list
         this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
+
+        //Init species db
+        this.species = new DeltaSpeciesDatabase();
 
         //Create DOM
         this.LayoutDom(this.settings.mountpoint);

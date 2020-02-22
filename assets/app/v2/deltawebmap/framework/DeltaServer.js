@@ -21,6 +21,7 @@ class DeltaServer extends DeltaTabView {
         this.downloadTask = null; //Task that is run to create a session on this server
         this.error = null;
         this.token = new DeltaCancellationToken(null);
+        this.db = new DeltaServerDatabase(this);
 
         //Create tabs
         this.tabs = [
@@ -150,6 +151,7 @@ class DeltaServer extends DeltaTabView {
         this.myLocation = this.info.my_location;
         this.tribe = this.info.target_tribe.tribe_id;
         this.nativeTribe = this.info.target_tribe.tribe_id;
+        this.db.Sync();
 
         return true;
     }

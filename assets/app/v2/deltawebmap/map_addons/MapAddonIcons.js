@@ -18,8 +18,6 @@ class MapAddonIcons extends TabMapAddon {
     async OnLoad(container) {
         /* Called when we load the map */
 
-        this.data = (await this.map.server.GetIconsData()).icons;
-
         //Add markers
         this.markers = L.markerClusterGroup({
             showCoverageOnHover: false,
@@ -27,12 +25,6 @@ class MapAddonIcons extends TabMapAddon {
             disableClusteringAtZoom: 6,
             maxClusterRadius: 50
         });
-        for (var i = 0; i < this.data.length; i += 1) {
-            var data = this.data[i];
-            var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, data.location.x, data.location.y);
-            this.AddPin(this.data[i]);
-            //this.markers.addLayer(L.marker(pos));
-        }
         this.map.map.addLayer(this.markers);
 
         //Set up
@@ -40,6 +32,12 @@ class MapAddonIcons extends TabMapAddon {
         this.markers.on("mouseover", (evt) => this.OnMapMarkerInteractionEvent(evt));
         this.markers.on("scroll", (evt) => this.OnMapMarkerInteractionEvent(evt));
         this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
+
+        //Subscribe to events
+        this.map.server.db.dinos.SubscribeAndRead("TAB_MAP", async (data, end) => {
+            var d = await statics.MAP_ICON_ADAPTERS["dinos"](data, this.map);
+            this.AddPin(d);
+        }, () => { });
     }
 
     OnMapMarkerInteractionEvent(evt) {

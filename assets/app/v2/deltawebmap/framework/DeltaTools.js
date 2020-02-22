@@ -72,10 +72,10 @@ class DeltaTools {
     static CreateDom(type, classname, parent, text) {
         var e = document.createElement(type);
         e.className = classname;
-        if (parent !== undefined) {
+        if (parent != null) {
             parent.appendChild(e);
         }
-        if (text !== undefined) {
+        if (text != null) {
             e.innerText = text;
         }
         /*if (true) {

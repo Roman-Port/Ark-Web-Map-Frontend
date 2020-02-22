@@ -25,7 +25,7 @@ class TabMap extends DeltaServerTab {
         this.addons = [
             new MapAddonStructures(this),
             new MapAddonIcons(this),
-            new MapAddonCanvas(this)
+            /*new MapAddonCanvas(this)*/
         ];
     }
 

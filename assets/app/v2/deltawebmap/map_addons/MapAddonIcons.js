@@ -34,10 +34,30 @@ class MapAddonIcons extends TabMapAddon {
         this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
 
         //Subscribe to events
-        this.map.server.db.dinos.SubscribeAndRead("TAB_MAP", async (data, end) => {
+        /*this.map.server.db.dinos.SubscribeAndRead("TAB_MAP", async (data, end) => {
             var d = await statics.MAP_ICON_ADAPTERS["dinos"](data, this.map);
             this.AddPin(d);
-        }, () => { });
+        }, () => { });*/
+
+        //Set up sessions
+        this.map.server.CreateManagedAddRemoveSession('dinos', {
+            "tribe_key": "tribe_id"
+        }, (a, b) => {
+            return a.dino_id == b.dino_id;
+        }, () => {
+            return true; //Accept all items
+        }, (adds) => {
+                //Adds
+                for (var i = 0; i < adds.length; i += 1) {
+                    var d = statics.MAP_ICON_ADAPTERS["dinos"](adds[i], this.map);
+                    this.AddPin(d);
+                }
+        }, (removes) => {
+                //Removes
+                for (var i = 0; i < removes.length; i += 1) {
+                    this.markers.removeLayer(this.pins["dinos@" + removes[i].dino_id].marker);
+                }
+        });
     }
 
     OnMapMarkerInteractionEvent(evt) {
@@ -178,7 +198,8 @@ class MapAddonIcons extends TabMapAddon {
         //Add to register
         this.pins[data.type + "@" + data.id] = {
             "icon": icon_data,
-            "data": data
+            "data": data,
+            "marker": marker
         };
 
         return icon_data;

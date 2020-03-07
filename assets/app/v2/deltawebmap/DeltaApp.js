@@ -17,6 +17,8 @@ class DeltaApp {
         this.lastServer = null;
         this.viewUserSettings = new DeltaUserSettingsTabView(this);
         this.maps = {};
+        this.db = null;
+        this.dbInitTask = null; //This should be awaited before be activate any tabs
         this.SIDEBAR_OPTIONS = [
             {
                 "name": "User Settings",
@@ -35,11 +37,13 @@ class DeltaApp {
         //Get map list
         this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
 
-        //Init species db
-        this.species = new DeltaSpeciesDatabase();
-
         //Create DOM
         this.LayoutDom(this.settings.mountpoint);
+
+        //Init species db
+        this.db = new DeltaSystemDatabase();
+        this.dbInitTask = this.db.Init();
+        await this.dbInitTask;
 
         //Create message views
         this.msgViewNoServers = this.CreateMessageView("", "No Servers", "Sorry, you don't seem to have any servers. Join an ARK server with Delta Web Map to get started.");
@@ -125,6 +129,10 @@ class DeltaApp {
         this.SwitchServer(this.GetDefaultServer());
     }
 
+    GetSpeciesByClassName(classname) {
+        return this.db.species.GetSpeciesByClassName(classname);
+    }
+
     LayoutLoginScreen(mount) {
 
     }
@@ -142,7 +150,7 @@ class DeltaApp {
         this.mainHolder = mount;
 
         var top = DeltaTools.CreateDom("div", "top_nav", mount); //Top strip. Pretty much has no use except to show a darker color at this point, though
-        DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap");
+        DeltaTools.CreateDom("span", "delta_nav_badge_beta", DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap"), "BETA");
 
         var leftSidebar = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open v3_nav_area", mount);
         this.serverListHolder = DeltaTools.CreateDom("div", "v3_nav_server_area", leftSidebar);

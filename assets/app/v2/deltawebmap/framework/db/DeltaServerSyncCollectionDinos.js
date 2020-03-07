@@ -10,4 +10,8 @@ class DeltaServerSyncCollectionDinos extends DeltaServerSyncCollection {
         return this.db.server.GetTribesEndpointUrl("/dinos");
     }
 
+    GetPrimaryKey() {
+        return "dino_id";
+    }
+
 }

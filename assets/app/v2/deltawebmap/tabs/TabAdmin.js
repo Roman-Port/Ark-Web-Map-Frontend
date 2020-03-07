@@ -7,6 +7,7 @@ class TabAdmin extends DeltaServerTab {
         this.switch = null;
         this.active = false;
         this.loader = null;
+        this.busy = false;
     }
 
     GetDisplayName() {
@@ -67,38 +68,62 @@ class TabAdmin extends DeltaServerTab {
     }
 
     async OnSwitchedOn() {
+        //Check if we're busy
+        if (this.CheckIfBusy()) {
+            return;
+        }
+
         //Set UI
         this.active = true;
         this.switch.classList.add("admin_tab_toggle_active");
-        this.loader.classList.add("admin_tab_loader_active");
 
-        //Change the current tab
-        this.server.tribe = '*';
-
-        //Refresh all
-        await this.RefreshViews();
-
-        //Set UI
-        this.loader.classList.remove("admin_tab_loader_active");
+        //Change
+        await this.RunWaitingFunction(this.ChangeTribe('*'));
     }
 
     async OnSwitchedOff() {
+        //Check if we're busy
+        if (this.CheckIfBusy()) {
+            return;
+        }
+
         //Set UI
         this.active = false;
         this.switch.classList.remove("admin_tab_toggle_active");
-        this.loader.classList.add("admin_tab_loader_active");
-
-        //Change the current tribe
-        this.server.tribe = this.server.nativeTribe;
-
-        //Refresh all
-        await this.RefreshViews();
-
-        //Set UI
-        this.loader.classList.remove("admin_tab_loader_active");
+        
+        //Change
+        await this.RunWaitingFunction(this.ChangeTribe(this.server.nativeTribe));
     }
 
-    async RefreshViews() {
-        await this.server.ResetTabs();
+    async ChangeTribe(nextTribeId) {
+        await this.server.ChangeTribe(nextTribeId);
+    }
+
+    CheckIfBusy() {
+        if (!this.server.ready) {
+            return true;
+        }
+        return this.busy;
+    }
+
+    async RunWaitingFunction(promise) {
+        //Runs a function that should block other changes. This will also show the loading symbol
+        if (this.busy) {
+            //We're already doing something!
+            return false;
+        }
+
+        //Set the loader
+        this.busy = true;
+        this.loader.classList.add("admin_tab_loader_active");
+
+        //Run
+        var r = await promise;
+
+        //Unset the loader
+        this.busy = false;
+        this.loader.classList.remove("admin_tab_loader_active");
+
+        return r;
     }
 }

@@ -41,13 +41,14 @@ class DeltaRecyclerView {
 
     _CreateTemplateDOMs() {
         //Get number of DOMs needed
-        var needed = Math.ceil(this._GetContainerHeight() / this.rowHeight) + 5;
+        var needed = Math.ceil((this._GetContainerHeight() + 100) / this.rowHeight) + 5;
 
         //Generate and position these many
         for (var i = 0; i < needed; i += 1) {
             var d = this.fCreateRow();
             d.style.top = this._GetRowOffsetPixels(i) + "px";
             d.style.display = "none";
+            d._rindex = i;
             this.mount.appendChild(d);
             this.nodes.push(d);
         }
@@ -67,8 +68,14 @@ class DeltaRecyclerView {
         this.data = d;
 
         //Show and render all elements up this point
-        for (var i = 0; i < this.nodes.length && i < this.data.length; i += 1) {
-            this._RenderRow(this.nodes[i], i);
+        for (var i = 0; i < this.nodes.length; i += 1) {
+            var index = this.nodes[i]._rindex;
+            if (index < this.data.length) {
+                this._RenderRow(this.nodes[i], index);
+            } else {
+                this.nodes[i].style.display = "none";
+            }
+            
         }
     }
 

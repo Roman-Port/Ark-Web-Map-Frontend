@@ -31,17 +31,17 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "Name",
                 "render": function (e, data, sortIndex, species) {
-                    e.innerText = data.dino.tamed_name;
+                    e.innerText = data./*dino.*/tamed_name;
                 },
                 "create": function (e) {
                     
                 },
                 "sort_modes": [
                     function (a, b) {
-                        return a.dino.tamed_name.localeCompare(b.dino.tamed_name);
+                        return a./*dino.*/tamed_name.localeCompare(b./*dino.*/tamed_name);
                     },
                     function (a, b) {
-                        return b.dino.tamed_name.localeCompare(a.dino.tamed_name);
+                        return b./*dino.*/tamed_name.localeCompare(a./*dino.*/tamed_name);
                     }
                 ],
                 "size_min": 90,
@@ -60,10 +60,10 @@ class TabDinos extends DeltaServerTab {
                 },
                 "sort_modes": [
                     function (a, b) {
-                        return a.dino.classname.localeCompare(b.dino.classname);
+                        return a./*dino.*/classname.localeCompare(b./*dino.*/classname);
                     },
                     function (a, b) {
-                        return b.dino.classname.localeCompare(a.dino.classname);
+                        return b./*dino.*/classname.localeCompare(a./*dino.*/classname);
                     }
                 ],
                 "size_min": 90,
@@ -76,7 +76,7 @@ class TabDinos extends DeltaServerTab {
                 "name": "Sex",
                 "render": function (e, data, sortIndex, species) {
                     var s = e.x_sex;
-                    if (data.dino.is_female) {
+                    if (data./*dino.*/is_female) {
                         s.classList.add("v2tab_dinos_row_item_sex_female");
                         s.innerHTML = "&#9792;";
                     } else {
@@ -90,19 +90,19 @@ class TabDinos extends DeltaServerTab {
                 },
                 "sort_modes": [
                     function (a, b) {
-                        if (a.dino.is_female && !b.dino.is_female) {
+                        if (a./*dino.*/is_female && !b./*dino.*/is_female) {
                             return 1;
                         }
-                        if (b.dino.is_female && !a.dino.is_female) {
+                        if (b./*dino.*/is_female && !a./*dino.*/is_female) {
                             return -1;
                         }
                         return 0;
                     },
                     function (a, b) {
-                        if (a.dino.is_female && !b.dino.is_female) {
+                        if (a./*dino.*/is_female && !b./*dino.*/is_female) {
                             return -1;
                         }
-                        if (b.dino.is_female && !a.dino.is_female) {
+                        if (b./*dino.*/is_female && !a./*dino.*/is_female) {
                             return 1;
                         }
                         return 0;
@@ -118,9 +118,9 @@ class TabDinos extends DeltaServerTab {
                 "name": "Tag",
                 "render": function (e, data, sortIndex, species) {
                     var s = e.x_tag;
-                    if (data.prefs.color_tag) {
+                    /*if (data.prefs.color_tag) {
                         s.style.backgroundColor = data.prefs.color_tag;
-                    }
+                    }*/
                 },
                 "create": function (e) {
                     e.x_tag = DeltaTools.CreateDom("div", "v2tab_dinos_row_item_sex v2tab_dinos_row_item_sex_unknown", e);
@@ -135,26 +135,26 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "Lvl.",
                 "render": function (e, data, sortIndex, species) {
-                    e.innerText = data.dino.level;
+                    e.innerText = data./*dino.*/level;
                 },
                 "create": function (e) {
                     
                 },
                 "sort_modes": [
                     function (a, b) {
-                        if (a.dino.level > b.dino.level) {
+                        if (a./*dino.*/level > b./*dino.*/level) {
                             return 1;
                         }
-                        if (b.dino.level > a.dino.level) {
+                        if (b./*dino.*/level > a./*dino.*/level) {
                             return -1;
                         }
                         return 0;
                     },
                     function (a, b) {
-                        if (a.dino.level > b.dino.level) {
+                        if (a./*dino.*/level > b./*dino.*/level) {
                             return -1;
                         }
-                        if (b.dino.level > a.dino.level) {
+                        if (b./*dino.*/level > a./*dino.*/level) {
                             return 1;
                         }
                         return 0;
@@ -169,26 +169,26 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "B. Lvl.",
                 "render": function (e, data, sortIndex, species) {
-                    e.innerText = data.dino.base_level;
+                    e.innerText = data./*dino.*/base_level;
                 },
                 "create": function (e) {
 
                 },
                 "sort_modes": [
                     function (a, b) {
-                        if (a.dino.base_level > b.dino.base_level) {
+                        if (a./*dino.*/base_level > b./*dino.*/base_level) {
                             return 1;
                         }
-                        if (b.dino.base_level > a.dino.base_level) {
+                        if (b./*dino.*/base_level > a./*dino.*/base_level) {
                             return -1;
                         }
                         return 0;
                     },
                     function (a, b) {
-                        if (a.dino.base_level > b.dino.base_level) {
+                        if (a./*dino.*/base_level > b./*dino.*/base_level) {
                             return -1;
                         }
-                        if (b.dino.base_level > a.dino.base_level) {
+                        if (b./*dino.*/base_level > a./*dino.*/base_level) {
                             return 1;
                         }
                         return 0;
@@ -203,11 +203,11 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "Distance",
                 "render": (e, data, sortIndex, species) => {
-                    if (data.dino.is_cryo) {
+                    if (data./*dino.*/is_cryo) {
                         e.innerText = "--";
                         return;
                     }
-                    var p = this.server.GetDistanceFromMe(data.dino.location.x, data.dino.location.y);
+                    var p = this.server.GetDistanceFromMe(data./*dino.*/location.x, data./*dino.*/location.y);
                     if (p == null) {
                         e.innerText = "--";
                     } else {
@@ -220,12 +220,12 @@ class TabDinos extends DeltaServerTab {
                 "sort_modes": [
                     (a, b) => {
                         var aa = null
-                        if (!a.dino.is_cryo) {
-                            aa = this.server.GetDistanceFromMe(a.dino.location.x, a.dino.location.y);
+                        if (!a./*dino.*/is_cryo) {
+                            aa = this.server.GetDistanceFromMe(a./*dino.*/location.x, a./*dino.*/location.y);
                         }
                         var bb = null;
-                        if (!b.dino.is_cryo) {
-                            bb = this.server.GetDistanceFromMe(b.dino.location.x, b.dino.location.y);
+                        if (!b./*dino.*/is_cryo) {
+                            bb = this.server.GetDistanceFromMe(b./*dino.*/location.x, b./*dino.*/location.y);
                         }
                         if (aa == null && bb == null) { return 0; }
                         if (aa != null && bb == null) { return -1; }
@@ -234,12 +234,12 @@ class TabDinos extends DeltaServerTab {
                     },
                     (a, b) => {
                         var aa = null
-                        if (!a.dino.is_cryo) {
-                            aa = this.server.GetDistanceFromMe(a.dino.location.x, a.dino.location.y);
+                        if (!a./*dino.*/is_cryo) {
+                            aa = this.server.GetDistanceFromMe(a./*dino.*/location.x, a./*dino.*/location.y);
                         }
                         var bb = null;
-                        if (!b.dino.is_cryo) {
-                            bb = this.server.GetDistanceFromMe(b.dino.location.x, b.dino.location.y);
+                        if (!b./*dino.*/is_cryo) {
+                            bb = this.server.GetDistanceFromMe(b./*dino.*/location.x, b./*dino.*/location.y);
                         }
                         if (aa == null && bb == null) { return 0; }
                         if (aa != null && bb == null) { return -1; }
@@ -258,8 +258,8 @@ class TabDinos extends DeltaServerTab {
                 "render": function (e, data, sortIndex, species, width) {
                     for (var i = 0; i < 6; i += 1) {
                         var c = e.children[i];
-                        if (data.dino.colors.length > i) {
-                            c.style.backgroundColor = "#" + data.dino.colors[i];
+                        if (data./*dino.*/colors.length > i) {
+                            c.style.backgroundColor = "#" + data./*dino.*/colors[i];
                             c.style.display = "";
                         } else {
                             c.style.display = "none";
@@ -290,10 +290,10 @@ class TabDinos extends DeltaServerTab {
                 },
                 "sort_modes": [
                     function (a, b) {
-                        return a.dino.status.localeCompare(b.status);
+                        return a./*dino.*/status.localeCompare(b.status);
                     },
                     function (a, b) {
-                        return b.dino.status.localeCompare(a.status);
+                        return b./*dino.*/status.localeCompare(a.status);
                     }
                 ],
                 "size_min": 110,
@@ -310,8 +310,8 @@ class TabDinos extends DeltaServerTab {
                 },
                 "render": function (e, data, sortIndex, species, width, arrayIndex) {
                     var index = TabDinos.ConvertColumnStatIndexToArkIndex(arrayIndex);//statics.ARK_DINO_STAT.Health;
-                    e.x_stat_a.innerText = data.dino.base_levelups_applied[index];
-                    e.x_stat_b.innerText = data.dino.tamed_levelups_applied[index];
+                    e.x_stat_a.innerText = data./*dino.*/base_levelups_applied[index];
+                    e.x_stat_b.innerText = data./*dino.*/tamed_levelups_applied[index];
                 },
                 "create": function (e) {
                     e.x_stat_a = DeltaTools.CreateDom("div", "v2tab_dinos_row_item_stat_box", e);
@@ -364,7 +364,6 @@ class TabDinos extends DeltaServerTab {
         //Clear
         this.dinos = [];
         this.dinoViews = {};
-        this.species = {};
         this.dinosLoaded = false;
         this.dinoLoadTask = null;
 
@@ -414,12 +413,10 @@ class TabDinos extends DeltaServerTab {
             this.ForEachRowType((info, index, globalIndex) => {
                 //Get row node
                 var e = node._rindexes[globalIndex];
-                info.render(e, data, this.sortMode, this.species[data.dino.classname], this.size_default, index);
+                var species = this.server.app.GetSpeciesByClassName(data.classname);
+                info.render(e, data, this.sortMode, species, this.size_default, index);
             });
         });
-        
-
-        //this.ShowDefaultLoader();
     }
 
     ShowDefaultLoader() {
@@ -431,8 +428,19 @@ class TabDinos extends DeltaServerTab {
 
     async OnFirstOpen() {
         /* Called when this tab is opened for the first time */
+
         window.requestAnimationFrame(() => {
+            //Set up recycler
             this.recycler._CreateTemplateDOMs();
+
+            //Set dataset
+            this.server.CreateManagedDbSession('dinos', {
+                "tribe_key":"tribe_id"
+            }, () => {
+                return true;
+            }, {}, (dataset) => {
+                this.recycler.SetData(dataset);
+            });
         });
     }
 
@@ -440,9 +448,9 @@ class TabDinos extends DeltaServerTab {
         /* Called when this tab is switched to */
 
         //Check if we need to load dinos
-        if (this.dinoLoadTask == null) {
+        /*if (this.dinoLoadTask == null) {
             this.dinoLoadTask = this.LoadDinos();
-        }
+        }*/
     }
 
     async OnClose() {
@@ -570,7 +578,8 @@ class TabDinos extends DeltaServerTab {
             } else {
                 //Does not exist
                 this.CreateRow(holder, (e, info, width, arrayIndex, index) => {
-                    info.render(e, d, 0, this.species[d.dino.classname], width, arrayIndex);
+                    var species = this.server.app.GetSpeciesByClassName(d.classname);
+                    info.render(e, d, 0, species, width, arrayIndex);
                 }, "v2tab_dinos_row_standard", "v2tab_dinos_row_item_standard", d.dino_id);
             }
         }

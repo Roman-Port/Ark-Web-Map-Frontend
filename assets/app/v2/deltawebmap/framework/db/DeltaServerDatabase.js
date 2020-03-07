@@ -1,30 +1,26 @@
 "use strict";
 
-class DeltaServerDatabase {
+class DeltaServerDatabase extends DeltaDatabase {
 
     constructor(server) {
-        //Set info
+        super(server.app);
         this.server = server;
-        this.name = "PROD_GUILD_" + server.id;
-
-        //Set up DB
-        this.db = new Dexie(this.name);
-        this.db.version(1).stores({
-            dinos: 'dino_id, tamed_name, classname, level, is_baby'
-        });
-
-        //Add collections
-        this.collections = [];
-        this.collections.push(new DeltaServerSyncCollectionDinos(this, "dinos"));
-        for (var i = 0; i < this.collections.length; i += 1) {
-            this[this.collections[i].name] = this.collections[i];
-        }
+        this._Init();
     }
 
-    async Sync() {
-        //Sync all
-        for (var i = 0; i < this.collections.length; i += 1) {
-            await this.collections[i].Sync();
+    GetDbName() {
+        return "PROD_GUILD_" + this.server.id;
+    }
+
+    GetDbStores() {
+        return {
+            dinos: 'dino_id, tamed_name, classname, level, is_baby'
+        };
+    }
+
+    GetDbStoreTypes() {
+        return {
+            dinos: DeltaServerSyncCollectionDinos
         }
     }
 

@@ -2317,13 +2317,24 @@ a {
 
 .delta_nav_badge {
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 400;
     font-family: 'Rubik', sans-serif;
-    color: #45484d;
+    color: #b7b7b7;
     text-align: center;
     height: 60px;
     line-height: 60px;
     width: 200px;
+}
+
+.delta_nav_badge_beta {
+    background-color: #3882dc;
+    color: white;
+    font-size: 13px;
+    font-weight: 200;
+    font-family: 'Roboto', sans-serif;
+    padding: 3px 5px;
+    border-radius: 5px;
+    margin-left: 6px;
 }
 
 .centered_container {

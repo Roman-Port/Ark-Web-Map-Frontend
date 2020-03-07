@@ -82,18 +82,19 @@
 
 .dino_sidebar_item {
     width: 320px;
-    margin-bottom: 6px;
+    margin-top: 6px;
     background-color: #252629;
     color: white;
     border-radius: 5px;
-    border: 1px solid #44474b;
+    border: 1px solid #1f2023;
     position: relative;
-    cursor:pointer;
-    font-size:0;
+    cursor: pointer;
+    font-size: 0;
+    position:absolute;
 }
 
 .dino_sidebar_item img {
-    margin: 10px;
+    margin: 8px 10px;
     height: 30px;
     width: 30px;
     border-radius: 5px;
@@ -113,9 +114,9 @@
 
 .dino_sidebar_item_title {
     position: absolute;
-    top: 10px;
+    top: 9px;
     left: 50px;
-    font-size: 16px;
+    font-size: 15px;
     color: white;
     line-height: 16px;
     font-family: 'Roboto', sans-serif;
@@ -134,7 +135,7 @@
 
 .dino_sidebar_item_sub {
     position: absolute;
-    top: 30px;
+    top: 27px;
     left: 50px;
     font-size: 12px;
     color: #bfbfbf;
@@ -153,8 +154,18 @@
     left: unset;
     font-size: 13px;
     line-height: 15px;
-    top: 15px;
+    top: 13px;
     text-transform: uppercase;
+}
+
+.dino_sidebar_item_status {
+    position:absolute;
+    top: 26px;
+    left: 30px;
+    border: 2px solid #252629;
+    width:10px;
+    height:10px;
+    border-radius:50%;
 }
 
 .dino_sidebar_togglebtn {

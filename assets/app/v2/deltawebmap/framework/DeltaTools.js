@@ -105,4 +105,20 @@ class DeltaTools {
         }
     }
 
+    static ForEachKey(data, callback) {
+        var k = Object.keys(data);
+        for (var i = 0; i < k.length; i += 1) {
+            callback(data[k[i]], k[i]);
+        }
+    }
+
+    static CheckIfItemExistsInArrayComparator(dataset, data, compare) {
+        for (var i = 0; i < dataset.length; i += 1) {
+            if (compare(dataset[i], data)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

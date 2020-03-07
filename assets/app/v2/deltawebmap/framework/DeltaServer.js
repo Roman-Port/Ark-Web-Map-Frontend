@@ -22,6 +22,8 @@ class DeltaServer extends DeltaTabView {
         this.error = null;
         this.token = new DeltaCancellationToken(null);
         this.db = new DeltaServerDatabase(this);
+        this.db_sessions = []; //Managed DB sessions. In format [collection_key, session_token, options];
+        this.ready = false; //Set to true when all data has been synced
 
         //Create tabs
         this.tabs = [
@@ -30,9 +32,10 @@ class DeltaServer extends DeltaTabView {
             new TabAdmin(this)
         ];
 
-        //Cached info
-        this.icons = null;
-        this.overview = null;       
+        //Set some content
+        this.myLocation = this.info.my_location;
+        this.tribe = this.info.target_tribe.tribe_id;
+        this.nativeTribe = this.info.target_tribe.tribe_id;
     }
 
     GetDisplayName() {
@@ -147,11 +150,11 @@ class DeltaServer extends DeltaTabView {
         /* Downloads all of the server info */
         /* Returns true if this loaded OK, or else returns false */
 
-        //Set our tribe ID and player info
-        this.myLocation = this.info.my_location;
-        this.tribe = this.info.target_tribe.tribe_id;
-        this.nativeTribe = this.info.target_tribe.tribe_id;
-        this.db.Sync();
+        //Download data
+        await this.db.Init();
+
+        this.SetLoaderStatus(false);
+        this.ready = true;
 
         return true;
     }
@@ -182,6 +185,7 @@ class DeltaServer extends DeltaTabView {
         /* Called when this server is switched to */
 
         //Start downloading
+        this.SetLoaderStatus(true);
         this.downloadTask = this.DownloadData();
 
         super.OnSwitchedTo();
@@ -206,9 +210,6 @@ class DeltaServer extends DeltaTabView {
         if (this.activeTab == index) {
             return;
         }
-
-        //Verify that we have downloaded initial session data
-        await this.downloadTask;
 
         //Close the old tab
         if (this.activeTab != -1 && this.activeTab != index) {
@@ -338,5 +339,100 @@ class DeltaServer extends DeltaTabView {
         /* Pushes user prefs for this server */
         this.prefs = await DeltaTools.WebPOSTJson(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/put_user_prefs", this.prefs, this.token);
         return this.prefs;
+    }
+
+    async ChangeTribe(nextTribeId) {
+        //Set the var for this
+        this.tribe = nextTribeId;
+
+        //Update managed DBs
+        for (var i = 0; i < this.db_sessions.length; i += 1) {
+            var d = this.db_sessions[i];
+            this.db[d[0]].RefreshSessionDataset(d[1]);
+        }
+
+        //Sync DB - this will also update managed DBs with changes
+        await this.db.Sync();
+    }
+
+    CreateManagedDbSession(collection, options, onCheckItem, context, onDatasetUpdated) {
+        //Creates a managed DB session that will automatically close, update, etc from this server. No further action is required from users.
+        //Collection is a string key for the DB collection to be used
+        //Options has the following:
+        /* {
+         *      "tribe_key":STRING, identifies the tribe ID INTEGER that will be used to check if the tribe matches
+         * }
+         */
+
+        //Set some internal params on the context
+        if (context == null) {
+            throw "Context cannot be null!";
+        }
+        context._options_tribekey = options.tribe_key;
+
+        //Create a new session
+        var token = this.db[collection].CreateSession((item, ctx) => {
+            //Check if we need to check the tribe
+            if (ctx._options_tribekey != null && this.tribe != '*') {
+                //We have a tribe key, so we should check to see if the tribe matches
+                var tribe = item[ctx._options_tribekey];
+                var targetTribe = parseInt(this.tribe);
+                if (tribe != targetTribe) {
+                    return false;
+                }
+            }
+
+            //Continue to user code
+            return onCheckItem(item, ctx);
+        }, context, (dataset, ctx) => onDatasetUpdated(dataset, ctx));
+
+        //Add to collection
+        this.db_sessions.push([collection, token, options]);
+
+        return token;
+    }
+
+    CreateManagedAddRemoveSession(collection, options, compareItems, onCheckItem, onAdd, onRemove) {
+        //Creates a managed session that simply sends two events: onAdd(items) and onRemove(items)
+        //compareItems(a, b) returns true/false if the items match
+        //This is a more primitive version of CreateManagedDbSession. The two other options match those of CreateManagedDbSession
+
+        //Create the context object
+        var ctx = {
+            "current_items": []
+        };
+
+        //Set up session
+        return this.CreateManagedDbSession(collection, options, (item, ctx) => {
+            return true;
+            return onCheckItem(item, ctx);
+        }, ctx, (dataset, context) => {
+            //Check for changes in the dataset
+            var adds = [];
+            var removes = [];
+
+            //Check for adds
+            for (var i = 0; i < dataset.length; i += 1) {
+                var data = dataset[i];
+                if (!DeltaTools.CheckIfItemExistsInArrayComparator(context.current_items, data, compareItems)) {
+                    //This did not exist before, it has been added
+                    adds.push(data);
+                }
+            }
+
+            //Check for removes
+            for (var i = 0; i < context.current_items.length; i += 1) {
+                var data = context.current_items[i];
+                if (!DeltaTools.CheckIfItemExistsInArrayComparator(dataset, data, compareItems)) {
+                    //This no longer exists now, remove it
+                    removes.push(data);
+                }
+            }
+
+            //Apply changes
+            context.current_items = dataset.slice(); //This makes a copy of the array, but keeps all objects the same
+            if (adds.length > 0) { onAdd(adds); }
+            if (removes.length > 0) { onRemove(removes); }
+        });
     }
 }

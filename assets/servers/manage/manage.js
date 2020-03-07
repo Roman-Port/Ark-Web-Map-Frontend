@@ -15,14 +15,14 @@ function Init() {
     params = delta.parseURLParams();
 
     //Request all resources
-    delta.serverRequest("https://config.deltamap.net/prod/permission_indexes.json", { "nocreds": true, "failOverride": OnInitFailure}, function(pc) {
+    delta.serverRequest(LAUNCH_CONFIG.CONFIG_API_ENDPOINT + "/" + LAUNCH_CONFIG.CONFIG_ENV + "/permission_indexes.json", { "nocreds": true, "failOverride": OnInitFailure }, function (pc) {
         permissionsconfig = pc;
         CreatePermissions();
-        delta.serverRequest("https://deltamap.net/api/config/maps.json", { "nocreds": true, "failOverride": OnInitFailure }, function (maps) {
+        delta.serverRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", { "nocreds": true, "failOverride": OnInitFailure }, function (maps) {
             maplist = maps;
-            delta.serverRequest("https://deltamap.net/api/users/@me/clusters", { "failOverride": OnInitFailure }, function (c) {
+            delta.serverRequest(LAUNCH_CONFIG.API_ENDPOINT + "/users/@me/clusters", { "failOverride": OnInitFailure }, function (c) {
                 clusters = c;
-                delta.serverRequest("https://deltamap.net/api/users/@me/servers", { "failOverride": OnInitFailure }, function (sc) {
+                delta.serverRequest(LAUNCH_CONFIG.API_ENDPOINT + "/users/@me/servers", { "failOverride": OnInitFailure }, function (sc) {
                     serversme = sc;
                     SetPageFlag("state_hide", false);
                     SetPageFlag("state_loading", false);
@@ -63,7 +63,7 @@ function InitServer(id) {
     SetPageFlag("state_loading", true);
 
     //Download
-    delta.serverRequest("https://deltamap.net/api/servers/" + id + "/manage", {}, function (c) {
+    delta.serverRequest(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + id + "/manage", {}, function (c) {
         serverdata = c;
 
         //Set content
@@ -144,7 +144,7 @@ function SetPermissionValues() {
 function PushUpdate() {
     //Pushes update data, then refreshes
     SetPageFlag("state_loading", true);
-    delta.serverRequest("https://deltamap.net/api/servers/" + serverid + "/manage", {
+    delta.serverRequest(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + serverid + "/manage", {
         "type": "POST",
         "body": JSON.stringify(serverdata),
         "failOverride": function () {

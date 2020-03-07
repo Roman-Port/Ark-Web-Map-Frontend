@@ -212,8 +212,8 @@ statics.MAP_ICON_INTERACT_EVENTS = {
 }
 
 statics.MAP_ICON_ADAPTERS = {
-    "dinos": async function (data, map) {
-        var s = await map.server.app.species.GetSpeciesById(data.classname);
+    "dinos": function (data, map) {
+        var s = map.server.app.GetSpeciesByClassName(data.classname);
         return {
             "location": data.location,
             "img": s.icon.image_thumb_url,

@@ -138,6 +138,8 @@
                         <div class="serveridalog_box_tab">
                             <h2>Request your Map</h2>
                             <p>Unfortunately, your map isn't supported. But don't fear! You can vote for it below to get added in a future update.</p>
+                            <br><br>
+                            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSf_nOp6x7sVIIdbK3-9mvr5DxVtDnyX_z19xHsz9KrlcazRYQ/viewform?embedded=true" width="560" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
                         </div>
 
                         <div class="serveridalog_box_tab">
@@ -211,6 +213,7 @@
 		</tr>
 	</table>
 
+	<script src="/enviornment.js" charset="UTF-8"></script>
 	<script src="/assets/servers/manage/static.js" charset="UTF-8"></script>
     <script src="/assets/servers/manage/manage.js" charset="UTF-8"></script>
 </body>

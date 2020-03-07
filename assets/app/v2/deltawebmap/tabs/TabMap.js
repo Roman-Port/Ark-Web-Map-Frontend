@@ -14,10 +14,6 @@ class TabMap extends DeltaServerTab {
         this.markers = {};
         this.query = "";
         this.queryCancel = 0;
-        this.SIDEBAR_SOURCES = [
-            new OverviewSearchSourceDino(this.server),
-            new OverviewSearchSourceItems(this.server)
-        ];
         this.activePopout = null;
         this.map = null;
 
@@ -25,6 +21,7 @@ class TabMap extends DeltaServerTab {
         this.addons = [
             new MapAddonStructures(this),
             new MapAddonIcons(this),
+            new MapAddonOverview(this),
             /*new MapAddonCanvas(this)*/
         ];
     }
@@ -68,7 +65,6 @@ class TabMap extends DeltaServerTab {
 
         var sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
         this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper smooth_anim", sidebarContainer);
-        this.CreateSidebarLoaderDom(this.sidebarContent);
 
         var sidebarSearchContainer = DeltaTools.CreateDom("div", "dino_stats_search_box", this.top);
         this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text dino_stats_search_unimportant", sidebarSearchContainer);
@@ -115,12 +111,6 @@ class TabMap extends DeltaServerTab {
 
         //Add game map
         this.SwitchGameLayer(this.server.GetMapInfo().maps[0]);
-
-        //Load overview
-        this.server.GetOverviewData().then((e) => {
-            this.overview = e;
-            this.RefreshSidebar();
-        });
     }
 
     MapMovePushSavedPos() {
@@ -193,18 +183,7 @@ class TabMap extends DeltaServerTab {
         this.mountpoint.classList.toggle("map_tab_hiddensidebar");
     }
 
-    async EnableTribeDinos() {
-        //Get items
-        var d = await this.server.GetIconsData();
-
-        //Add all map icons
-        for (var i = 0; i < d.icons.length; i += 1) {
-            var data = d.icons[i];
-            this.AddDataIconToMap(data, this.map);
-        }
-    }
-
-    AddDataIconToMap (data) {
+    AddDataIconToMap(data) {
         //Get position on the map
         var pos = TabMap.ConvertFromGamePosToMapPos(this.server.session, data.location.x, data.location.y);
 
@@ -407,72 +386,6 @@ class TabMap extends DeltaServerTab {
         return [x, y];
     }
 
-    /* Dino sidebar */
-    OnSidebarQueryChanged() {
-        this.query = this.searchBar.value;
-        this.RefreshSidebar();
-    }
-
-    CreateSidebarLoaderDom(container) {
-        var e = DeltaTools.CreateDom("div", "sidebar_loading_symbol_container", container);
-        DeltaTools.CreateDom("div", "loading_spinner", e);
-        return e;
-    }
-
-    async RefreshSidebar() {
-        /* Called when it's time to refresh the dino sidebar */
-
-        //Check if we have data
-        if (this.overview == null) {
-            return;
-        }
-
-        //Obtain a token
-        this.queryCancel++;
-        var token = this.queryCancel;
-
-        //Get container
-        var container = this.sidebarContent;
-        container.innerHTML = "";
-
-        //Get results for all
-        var promises = [];
-        for (var i = 0; i < this.SIDEBAR_SOURCES.length; i += 1) {
-            promises.push(this.SidebarLoadResult(token, DeltaTools.CreateDom("div", "", container), i));
-        }
-
-        //Create loading dialog
-        var loading = this.CreateSidebarLoaderDom(container);
-
-        //Wait for all of these to finish
-        await Promise.all(promises);
-
-        //Check if our token is still valid
-        if (token != this.queryCancel) {
-            return;
-        }
-
-        //Collapse loader
-        loading.remove();
-
-        console.log("done loading");
-    }
-
-    async SidebarLoadResult(token, container, index) {
-        //Load results
-        var data = await this.SIDEBAR_SOURCES[index].LoadResults(this.query, this.overview);
-
-        //Check if our token is still valid
-        if (token != this.queryCancel) {
-            return;
-        }
-
-        //Now, produce results
-        container.appendChild(this.SIDEBAR_SOURCES[index].DisplayResults(data));
-
-        return true;
-    }
-
     /*
      * RPC EVENTS
      */
@@ -546,209 +459,6 @@ class TabMapAddon {
 
     async OnUnload(container) {
         /* Called when we unload the map */
-    }
-
-}
-
-class OverviewSearchSource {
-
-    /* Result type for overview searches */
-
-    constructor(server) {
-        this.server = server;
-    }
-
-    async LoadResults(query, overviewData) {
-        /* Returns adapted results for overview search */
-        throw new Error("OverviewSearchSource cannot be constructed; Please implement it!");
-    }
-
-    DisplayResults(data) {
-        /* Returns DOM results from LoadResults() */
-        throw new Error("OverviewSearchSource cannot be constructed; Please implement it!");
-    }
-
-}
-
-class OverviewSearchAutoSource extends OverviewSearchSource {
-
-    /* Used to produce the standard box */
-
-    constructor(server) {
-        super(server);
-    }
-
-    GetStandardBox(img, title, subtitle, isImgInverted) {
-        var e = DeltaTools.CreateDom("div", "dino_sidebar_item");
-        var imgD = DeltaTools.CreateDom("img", "", e);
-        imgD.src = img;
-        if (isImgInverted) {
-            imgD.classList.add("dino_sidebar_item_invertedimg");
-        }
-        DeltaTools.CreateDom("div", "dino_sidebar_item_title", e, title);
-        DeltaTools.CreateDom("div", "dino_sidebar_item_sub", e, subtitle);
-        return e;
-    }
-
-}
-
-class OverviewSearchSourceDino extends OverviewSearchAutoSource {
-
-    constructor(server) {
-        super(server);
-    }
-
-    async LoadResults(query, overviewData) {
-
-        //Create holder
-        var holder = [];
-
-        //Find
-        for (var i = 0; i < overviewData.results.length; i += 1) {
-            var d = overviewData.results[i];
-            if (d.displayName.toLowerCase().includes(query) || d.classDisplayName.toLowerCase().includes(query)) {
-                holder.push({
-                    "sort": [
-                        d.displayName,
-                        d.classDisplayName,
-                        d.level
-                    ],
-                    "data": d
-                });
-            }
-        }
-
-        return holder;
-    }
-
-    DisplayResults(data) {
-
-        //Create holder
-        var holder = DeltaTools.CreateDom("div", "");
-
-        //Find
-        for (var i = 0; i < data.length; i += 1) {
-            var d = data[i].data;
-
-            //Create box
-            var b = this.GetStandardBox(d.img, d.displayName, d.classDisplayName + " - Lvl " + d.level, true);
-
-            //Add dino status
-            var status = DeltaTools.CreateDom("div", "dino_sidebar_item_sub dino_sidebar_item_sub_state", b);
-            var entry = statics.STATUS_STATES[d.status];
-            if (entry != null) {
-                status.innerText = entry.text;
-                status.style.color = entry.modal_color;
-            } else {
-                status.innerText = "UNKNOWN";
-            }
-
-            //Add
-            holder.appendChild(b);
-        }
-
-        return holder;
-    }
-
-}
-
-class OverviewSearchSourceItems extends OverviewSearchAutoSource {
-
-    constructor(server) {
-        super(server);
-    }
-
-    async LoadResults(query, overviewData) {
-
-        //Create holder
-        var holder = [];
-
-        //Request
-        var d = await this.server.WebRequestToEndpoint("/items", {}, {
-            "{query}": query
-        });
-
-        //Add
-        for (var i = 0; i < d.items.length; i += 1) {
-            var item = d.items[i];
-
-            //Read inventories
-            var inventoryRefs = [];
-            var inventories = [];
-
-            //Loop through connected inventories
-            for (var j = 0; j < item.owner_inventories.length; j += 1) {
-                var inventory_ref = item.owner_inventories[j];
-                var inventory = d.inventories[inventory_ref.type.toString()][inventory_ref.id.toString()];
-                inventoryRefs.push(inventory_ref);
-                inventories.push(inventory);
-            }
-
-            //Add item
-            holder.push({
-                "sort": [
-                    
-                ],
-                "data": item,
-                "inventories": inventories,
-                "refs": inventoryRefs
-            });
-        }
-
-        return holder;
-    }
-
-    DisplayResults(data) {
-
-        //Create holder
-        var holder = DeltaTools.CreateDom("div", "");
-
-        //Find
-        for (var i = 0; i < data.length; i += 1) {
-            var item = data[i].data;
-
-            //Create structure.
-            var e = this.GetStandardBox(item.item_icon, item.item_displayname, DeltaTools.CreateNumberWithCommas(item.total_count) + " total", false);
-            var e_dinos = DeltaTools.CreateDom("div", "", e);
-
-            //Loop through connected inventories
-            for (var j = 0; j < data[i].inventories.length; j += 1) {
-                var inventory_ref = data[i].refs[j];
-                var inventory = data[i].inventories[j];
-                var e_dom = null;
-                if (inventory_ref.type == 0) {
-                    //Dino
-                    e_dom = this.CreateMiniItemModal(inventory.img, inventory.displayName + " (x" + DeltaTools.CreateNumberWithCommas(inventory_ref.count) + ")", true);
-                    e_dom.x_id = inventory_ref.id;
-                } else if (inventory_ref.type == 1) {
-                    //Inventory
-                    e_dom = this.CreateMiniItemModal(inventory.img, inventory.displayName + " (x" + DeltaTools.CreateNumberWithCommas(inventory_ref.count) + ")", false);
-                    e_dom.x_id = inventory_ref.id;
-                } else {
-                    //Character
-                    e_dom = this.CreateMiniItemModal(inventory.img, inventory.name + " (x" + DeltaTools.CreateNumberWithCommas(inventory_ref.count) + ")", false);
-                    e_dom.x_id = inventory_ref.id;
-                }
-                e_dom.x_type = inventory_ref.type;
-                e_dinos.appendChild(e_dom);
-            }
-
-            //Add
-            holder.appendChild(e);
-        }
-
-        return holder;
-    }
-
-    CreateMiniItemModal(imgSrc, text, isInverted) {
-        var e = DeltaTools.CreateDom("div", "dino_entry dino_entry_offset dino_entry_mini");
-        var img = DeltaTools.CreateDom("img", "", e);
-        img.src = imgSrc;
-        if (!isInverted) {
-            e.classList.add("dino_entry_no_invert");
-        }
-        DeltaTools.CreateDom("div", "dino_entry_sub", e).innerText = text;
-        return e;
     }
 
 }

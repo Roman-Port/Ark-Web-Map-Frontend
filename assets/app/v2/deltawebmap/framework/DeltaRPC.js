@@ -7,7 +7,7 @@ class DeltaRPC {
         this.fails = 0;
         this.connectTimeout = null;
         this.dispatcher = new DeltaEventDispatcher();
-        //this.OpenConnection();
+        this.OpenConnection();
     }
 
     FireSubscription(msg) {

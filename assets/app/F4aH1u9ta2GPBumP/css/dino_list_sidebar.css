@@ -91,6 +91,7 @@
     cursor: pointer;
     font-size: 0;
     position:absolute;
+    height:46px;
 }
 
 .dino_sidebar_item img {

@@ -14,4 +14,12 @@ class DeltaServerSyncCollectionDinos extends DeltaServerSyncCollection {
         return "dino_id";
     }
 
+    GetEpochKeyName() {
+        return this.fullname + "~" + this.db.server.tribe + "~LAST_EPOCH";
+    }
+
+    GetRPCSyncType() {
+        return 0;
+    }
+
 }

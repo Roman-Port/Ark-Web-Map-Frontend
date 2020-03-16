@@ -35,9 +35,15 @@ class MapAddonOverview {
         });
         this.recycler.SetRenderRowFunction((node, data) => {
             var species = this.map.server.app.GetSpeciesByClassName(data.classname);
-            node._img.style.display = "none";
-            node._img.src = species.icon.image_thumb_url;
-            node._title.innerText = data.tamed_name;
+            if (node._img.src != species.icon.image_thumb_url) {
+                node._img.style.display = "none";
+                node._img.src = species.icon.image_thumb_url;
+            }
+            if (data.tamed_name != "") {
+                node._title.innerText = data.tamed_name;
+            } else {
+                node._title.innerText = species.screen_name;
+            }
             node._sub.innerText = species.screen_name + " - Lvl "+data.level.toString();
         });
 
@@ -52,6 +58,9 @@ class MapAddonOverview {
             }, () => {
                 return true;
             }, {}, (dataset) => {
+                dataset.sort(function (a, b) {
+                    return b.base_level - a.base_level;
+                });
                 this.recycler.SetData(dataset);
             });
         });

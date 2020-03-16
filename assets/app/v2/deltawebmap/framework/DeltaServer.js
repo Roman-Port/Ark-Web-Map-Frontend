@@ -159,41 +159,19 @@ class DeltaServer extends DeltaTabView {
         return true;
     }
 
-    async GetIconsData() {
-        if (this.icons == null) {
-            try {
-                this.icons = await this.WebRequestToEndpoint("/icons", {});
-            } catch (e) {
-                this.ForceAbort("Couldn't download server information.");
-            }
-        }
-        return this.icons;
-    }
-
-    async GetOverviewData() {
-        if (this.overview == null) {
-            try {
-                this.overview = await this.WebRequestToEndpoint("/overview", {});
-            } catch (e) {
-                this.ForceAbort("Couldn't download server information.");
-            }
-        }
-        return this.overview;
-    }
-
     OnSwitchedTo() {
         /* Called when this server is switched to */
-
-        //Start downloading
-        this.SetLoaderStatus(true);
-        this.downloadTask = this.DownloadData();
-
         super.OnSwitchedTo();
 
         //If this hasn't been used yet, init the first tab
         if (this.first) {
+            //Switch
             this.first = false;
             this.OnSwitchTab(0);
+
+            //Start downloading
+            this.SetLoaderStatus(true);
+            this.downloadTask = this.DownloadData();
         }
     }
 
@@ -433,6 +411,7 @@ class DeltaServer extends DeltaTabView {
             context.current_items = dataset.slice(); //This makes a copy of the array, but keeps all objects the same
             if (adds.length > 0) { onAdd(adds); }
             if (removes.length > 0) { onRemove(removes); }
+            console.log("SENDING " + adds.length + " ADDS and " + removes.length + " REMOVES");
         });
     }
 }

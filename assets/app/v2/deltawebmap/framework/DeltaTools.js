@@ -69,7 +69,7 @@ class DeltaTools {
         return new DataView(r);
     }
 
-    static CreateDom(type, classname, parent, text) {
+    static CreateDom(type, classname, parent, text, debug) {
         var e = document.createElement(type);
         e.className = classname;
         if (parent != null) {
@@ -78,9 +78,9 @@ class DeltaTools {
         if (text != null) {
             e.innerText = text;
         }
-        /*if (true) {
+        if (debug) {
             e.style.backgroundColor = "rgb(" + (Math.random() * 254) + ", " + (Math.random() * 254) + ", " + (Math.random() * 254) + ")";
-        }*/
+        }
         return e;
     }
 

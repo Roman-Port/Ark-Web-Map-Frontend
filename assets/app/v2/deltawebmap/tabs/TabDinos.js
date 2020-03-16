@@ -12,6 +12,7 @@ class TabDinos extends DeltaServerTab {
         this.sortModeIndex = 0;
         this.dinoLoadTask = null;
         this.dinosLoaded = false;
+        this.query = "";
         this.SORT_COLUMNS = [
             {
                 "name": "",
@@ -387,6 +388,7 @@ class TabDinos extends DeltaServerTab {
         var search = DeltaTools.CreateDom("input", "dino_stats_search", this.mountpoint);
         search.type = "text";
         search.placeholder = "Search Tribe Dinos";
+        search.addEventListener("input", (search) => this._OnSearchChanged(search.target.value));
 
         this.dataContainer = DeltaTools.CreateDom("div", "dino_stats_container", this.mountpoint);
         this.dataInner = DeltaTools.CreateDom("div", "", this.dataContainer);
@@ -416,6 +418,16 @@ class TabDinos extends DeltaServerTab {
                 var species = this.server.app.GetSpeciesByClassName(data.classname);
                 info.render(e, data, this.sortMode, species, this.size_default, index);
             });
+        });
+        this.recycler.SetSortFunction((a, b) => {
+            return b.level - a.level;
+        });
+        this.recycler.SetGetUniqueKeyFunction((a) => {
+            return a.dino_id;
+        });
+        this.recycler.SetNewSearchQuery((a) => {
+            if (this.query == "") { return true; }
+            return a.tamed_name.toLowerCase().includes(this.query) || this.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
         });
     }
 
@@ -624,6 +636,11 @@ class TabDinos extends DeltaServerTab {
         if (!exists) {
             this.dinos.push(replacement);
         }
+    }
+
+    _OnSearchChanged(query) {
+        this.query = query.toLowerCase();
+        this.recycler.RefreshSearch();
     }
 
 }

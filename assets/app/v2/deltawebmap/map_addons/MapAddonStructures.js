@@ -10,7 +10,7 @@ class MapAddonStructures extends TabMapAddon {
     }
 
     static IsFastModeSupported() {
-        return true;
+        return window.Worker != null && window.OffscreenCanvas != null && window.Blob != null;
     }
 
     static async SendCommandToWorker(serverId, opcode, payload) {
@@ -288,39 +288,6 @@ class MapAddonStructures extends TabMapAddon {
         this.map.server.db.structures.RemoveListener(this.listenerToken);
     }
 
-    AddClickRegions(found, parent) {
-        for (var i = 0; i < found.length; i += 1) {
-            //Draw only items with an ID, as they have an inventory
-            if (found[i].id == null) {
-                continue;
-            }
-
-            //Draw
-            var e = DeltaTools.CreateDom("div", "map_structure_mouseover_target", parent);
-            var d = found[i];
-            e.style.left = d.x + "px";
-            e.style.top = d.y + "px";
-            e.style.transform = "rotate(" + d.r + "deg)";
-            e.style.height = d.s + "px";
-            e.style.width = d.s + "px";
-            e.x_id = d.id;
-
-            //The following are just to detect clicks and get rid of accidental "clicks" triggered by the user scrolling
-            e.addEventListener("mousedown", function () {
-                this.x_fcc = map.map.getCenter();
-            });
-            e.addEventListener("mouseup", function () {
-                if (this.x_fcc == null) {
-                    return;
-                }
-                var d = map.map.distance(this.x_fcc, map.map.getCenter());
-                if (d < 0.1) {
-                    map.dtiles.onClickStructure(this);
-                }
-            });
-        }
-    };
-
     static GetStructureMetadata(metadatas, classname) {
         for (var i = 0; i < metadatas.length; i += 1) {
             if (metadatas[i].names.includes(classname)) {
@@ -383,6 +350,8 @@ class MapAddonStructures extends TabMapAddon {
                 "y": loc_tile_y + globalOffsetY,
                 "r": rotation,
                 "s": size,
+                "hit": this.CreateVectorPoints(metadata, loc_tile_x + globalOffsetX, loc_tile_y + globalOffsetY, rotation, size),
+                "has_inventory": data.has_inventory,
                 "id": id
             });
         }
@@ -396,6 +365,40 @@ class MapAddonStructures extends TabMapAddon {
         context.rotate(angle * TO_RADIANS);
         context.drawImage(image, -(width / 2), -(height / 2), width, height);
         context.restore();
+    }
+
+    CreateVectorPoints(metadata, gx, gy, angle, size) {
+        var points = [];
+        var scale = (1 / metadata.image_size.width) * size;
+        var radians = (Math.PI / 180) * -angle;
+        var cos = Math.cos(radians);
+        var sin = Math.sin(radians);
+        for (var i = 0; i < metadata.outline.length; i += 1) {
+            //Apply transformations to the points here
+            var p = metadata.outline[i];
+            var x = p.x;
+            var y = p.y;
+
+            //Apply rotation
+            var cx = (metadata.image_size.width / 2);
+            var cy = (metadata.image_size.width / 2);
+            var tx = (cos * (x - cx)) + (sin * (y - cy)) + cx;
+            var ty = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+            x = tx;
+            y = ty;
+
+            //Apply scale
+            x *= scale;
+            y *= scale;
+
+            //Apply position
+            x += gx;
+            y += gy;
+
+            //Add
+            points.push([x, y]);
+        }
+        return points;
     }
 
     static async LoadStructureStore() {

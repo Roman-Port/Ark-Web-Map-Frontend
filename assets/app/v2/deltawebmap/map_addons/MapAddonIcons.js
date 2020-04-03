@@ -33,66 +33,7 @@ class MapAddonIcons extends TabMapAddon {
         this.markers.on("scroll", (evt) => this.OnMapMarkerInteractionEvent(evt));
         this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
 
-        //Subscribe to events
-        /*this.map.server.db.dinos.SubscribeAndRead("TAB_MAP", async (data, end) => {
-            var d = await statics.MAP_ICON_ADAPTERS["dinos"](data, this.map);
-            this.AddPin(d);
-        }, () => { });*/
-
-        //Set up sessions
-        /*this.map.server.CreateManagedAddRemoveSession('dinos', {
-            "tribe_key": "tribe_id"
-        }, (a, b) => {
-                if (a.dino_id != b.dino_id) {
-                    return false;
-                } else {
-                    //JANK: Check if their location has changed
-                    if (Math.abs(a.location.x - b.location.x) > 10) { return false; }
-                    if (Math.abs(a.location.y - b.location.y) > 10) { return false; }
-                    return true;
-                }
-        }, () => {
-            return true; //Accept all items
-        }, (adds) => {
-                //Adds
-                for (var i = 0; i < adds.length; i += 1) {
-                    var d = statics.MAP_ICON_ADAPTERS["dinos"](adds[i], this.map);
-                    this.AddPin(d);
-                }
-        }, (removes) => {
-                //Removes
-                for (var i = 0; i < removes.length; i += 1) {
-                    this.markers.removeLayer(this.pins["dinos@" + removes[i].dino_id].marker);
-                }
-        });*/
-
-        /*this.map.server.CreateManagedDbSession("dinos", {
-            "tribe_key": "tribe_id"
-        }, () => {
-                return true;
-        }, {}, (d) => {
-                for (var i = 0; i < d.length; i += 1) {
-                    //Check if we have a pin for this
-                    var key = "dinos@" + d[i].dino_id;
-                    var pin = this.pins[key];
-                    var cd = statics.MAP_ICON_ADAPTERS["dinos"](d[i], this.map);
-                    if (pin == null) {
-                        //Add
-                        this.AddPin(cd);
-                    } else {
-                        //Update pos
-                        if (Math.abs(pin.marker.x_last_data.location.x - cd.location.x) > 10 || Math.abs(pin.marker.x_last_data.location.y - cd.location.y) > 10) {
-                            var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, cd.location.x, cd.location.y);
-                            pin.marker.setLatLng(pos);
-                            console.log("UPDATE ONE");
-                        }
-
-                        //Finish updating
-                        pin.marker.x_last_data = cd;
-                    }
-                }
-        });*/
-
+        //Add DB events
         this.map.server.CreateManagedDbListener('dinos', "tribe_id", (adds, removes) => {
             //Use adds
             for (var i = 0; i < adds.length; i += 1) {

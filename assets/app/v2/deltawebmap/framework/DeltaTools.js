@@ -25,10 +25,11 @@ class DeltaTools {
                         if (this.status == 401) {
                             var url = "/login/?next=" + encodeURIComponent(document.location.href);
                             window.location = url;
+                        } else {
+                            reject({
+                                status: this.status
+                            });
                         }
-                        reject({
-                            status: this.status
-                        });
                     }
                 }
             }
@@ -119,6 +120,14 @@ class DeltaTools {
             }
         }
         return false;
+    }
+
+    static async AsyncDelay(time) {
+        return new Promise(function (resolve, reject) {
+            window.setTimeout(() => {
+                resolve();
+            }, time);
+        });
     }
 
 }

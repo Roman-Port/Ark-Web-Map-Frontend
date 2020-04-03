@@ -15,10 +15,21 @@ class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
         return "classname";
     }
 
-    OnPostUpdate() {
+    async Sync() {
+        await super.Sync();
+
         //Build a map for quick lookup
-        for (var i = 0; i < this.items.length; i++) {
-            this.species[this.items[i].classname] = this.items[i];
+        await this.BuildMap();
+    }
+
+    OnPostUpdate() {
+        
+    }
+
+    async BuildMap() {
+        var items = await this.GetDbCollection().toArray();
+        for (var i = 0; i < items.length; i++) {
+            this.species[items[i].classname] = items[i];
         }
     }
 

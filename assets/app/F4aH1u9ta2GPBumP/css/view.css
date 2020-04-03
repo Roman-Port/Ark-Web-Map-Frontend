@@ -2032,6 +2032,12 @@ a {
 .map_structure_tile_image_canvas {
     width:256px;
     height:256px;
+    z-index:100;
+    position:absolute;
+}
+
+.map_structure_tile_image_canvas_priority {
+    z-index:101;
 }
 
 .map_structure_loader {
@@ -2552,4 +2558,110 @@ a {
     justify-content: center;
     margin-top: 15px;
     margin-bottom: 5px;
+}
+
+.map_structure_loader_circle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 9000;
+    pointer-events: none;
+    padding: 16px;
+}
+
+.intro_slide {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #3882dc;
+    z-index: 99999999999999;
+    opacity:1;
+    transition: background 300ms ease-in-out, opacity 200ms ease-in-out;
+}
+
+.intro_slide_hide {
+    pointer-events:none;
+    opacity:0;
+}
+
+.intro_slide_content {
+    background-color: #252629;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    top: 0;
+    box-shadow: 0px 0 10px 0px rgba(0, 0, 0, 0.62);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intro_slide_body_title {
+    font-family: 'Rubik', sans-serif;
+    color: white;
+    font-size: 25px;
+    font-weight: 500;
+}
+
+.intro_slide_body_loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top:50px;
+}
+
+.intro_slide_warning {
+    z-index: 100;
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    right: 0;
+    transition: bottom 150ms ease-in-out;
+}
+
+.intro_slide_warning_box {
+    display: block;
+    margin: auto;
+    color: white;
+    background-color: #e85a5a;
+    padding: 15px 20px;
+    border-radius: 5px;
+    font-size: 15px;
+    background-image: url('/assets/app/icons/warning_white.svg');
+    background-repeat: no-repeat;
+    background-size: 24px;
+    background-position-y: center;
+    background-position-x: 20px;
+    padding-left: 64px;
+    width: fit-content;
+}
+
+.intro_slide_state_error {
+    background-color: #e85a5a;
+}
+
+.intro_slide_state_error .intro_slide_warning {
+    bottom: 60px;
+}
+
+.intro_slide_info {
+    position: absolute;
+    bottom: 0;
+    z-index: 9999;
+    color: white;
+    font-size: 13px;
+    line-height: 20px;
+    left: 5px;
+    opacity: 0;
+    right: 5px;
+}
+
+.intro_slide_info:hover {
+    opacity:1;
 }

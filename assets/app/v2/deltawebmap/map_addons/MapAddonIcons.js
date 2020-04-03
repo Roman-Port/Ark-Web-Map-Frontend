@@ -66,7 +66,7 @@ class MapAddonIcons extends TabMapAddon {
                 }
         });*/
 
-        this.map.server.CreateManagedDbSession("dinos", {
+        /*this.map.server.CreateManagedDbSession("dinos", {
             "tribe_key": "tribe_id"
         }, () => {
                 return true;
@@ -91,6 +91,35 @@ class MapAddonIcons extends TabMapAddon {
                         pin.marker.x_last_data = cd;
                     }
                 }
+        });*/
+
+        this.map.server.CreateManagedDbListener('dinos', "tribe_id", (adds, removes) => {
+            //Use adds
+            for (var i = 0; i < adds.length; i += 1) {
+                //Check if we have a pin for this
+                var key = "dinos@" + adds[i].dino_id;
+                var pin = this.pins[key];
+                var cd = statics.MAP_ICON_ADAPTERS["dinos"](adds[i], this.map);
+                if (pin == null) {
+                    //Add
+                    this.AddPin(cd);
+                } else {
+                    //Update pos
+                    if (Math.abs(pin.marker.x_last_data.location.x - cd.location.x) > 10 || Math.abs(pin.marker.x_last_data.location.y - cd.location.y) > 10) {
+                        var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, cd.location.x, cd.location.y);
+                        pin.marker.setLatLng(pos);
+                        console.log("UPDATE ONE");
+                    }
+
+                    //Finish updating
+                    pin.marker.x_last_data = cd;
+                }
+            }
+
+            //Use removes
+            for (var i = 0; i < removes.length; i += 1) {
+                RemovePin("dinos", removes[i].dino_id);
+            }
         });
     }
 

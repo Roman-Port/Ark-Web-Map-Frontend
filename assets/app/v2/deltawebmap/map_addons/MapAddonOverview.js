@@ -4,7 +4,7 @@ class MapAddonOverview {
 
     constructor(map) {
         this.map = map;
-        
+        this.query = "";
     }
 
     BindEvents(container) {
@@ -46,6 +46,16 @@ class MapAddonOverview {
             }
             node._sub.innerText = species.screen_name + " - Lvl "+data.level.toString();
         });
+        this.recycler.SetSortFunction((a, b) => {
+            return b.level - a.level;
+        });
+        this.recycler.SetGetUniqueKeyFunction((a) => {
+            return a.dino_id;
+        });
+        this.recycler.SetNewSearchQuery((a) => {
+            if (this.query == "") { return true; }
+            return a.tamed_name.toLowerCase().includes(this.query) || this.map.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
+        });
 
         //Set recycler views
         window.requestAnimationFrame(() => {
@@ -53,21 +63,24 @@ class MapAddonOverview {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.map.server.CreateManagedDbSession('dinos', {
-                "tribe_key": "tribe_id"
-            }, () => {
-                return true;
-            }, {}, (dataset) => {
-                dataset.sort(function (a, b) {
-                    return b.base_level - a.base_level;
-                });
-                this.recycler.SetData(dataset);
+            this.map.server.CreateManagedDbListener('dinos', "tribe_id", (adds, removes) => {
+                if (adds.length > 0) {
+                    this.recycler.BulkAddItems(adds);
+                }
+                if (removes.length > 0) {
+                    this.recycler.BulkRemoveItems(removes);
+                }
             });
         });
     }
 
     async OnUnload(container) {
         /* Called when we unload the map */
+    }
+
+    OnSidebarQueryChanged(query) {
+        this.query = query.toLowerCase();
+        this.recycler.RefreshSearch();
     }
 
 }

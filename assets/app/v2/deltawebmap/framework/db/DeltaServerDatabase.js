@@ -14,13 +14,15 @@ class DeltaServerDatabase extends DeltaDatabase {
 
     GetDbStores() {
         return {
-            dinos: 'dino_id, tamed_name, classname, level, is_baby'
+            dinos: 'dino_id, tamed_name, classname, level, is_baby',
+            structures: 'structure_id, tribe_id, classname'
         };
     }
 
     GetDbStoreTypes() {
         return {
-            dinos: DeltaServerSyncCollectionDinos
+            dinos: DeltaServerSyncCollectionDinos,
+            structures: DeltaServerSyncCollectionStructures
         }
     }
 

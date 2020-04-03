@@ -70,7 +70,7 @@ class TabMap extends DeltaServerTab {
         this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text dino_stats_search_unimportant", sidebarSearchContainer);
         this.searchBar.type = "text";
         this.searchBar.placeholder = "Search Tribe";
-        this.searchBar.addEventListener("input", () => this.OnSidebarQueryChanged());
+        this.searchBar.addEventListener("input", () => this.addons[2].OnSidebarQueryChanged(this.searchBar.value));
 
         var sidebarHide = DeltaTools.CreateDom("div", "dino_stats_search_base dino_stats_search_sort", sidebarSearchContainer);
         sidebarHide.addEventListener("click", () => this.mountpoint.classList.toggle("map_tab_hiddensidebar"));

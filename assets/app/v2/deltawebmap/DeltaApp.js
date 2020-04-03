@@ -1,5 +1,9 @@
 "use strict";
 
+var SYSTEM_VERSION_MAJOR = 0;
+var SYSTEM_VERSION_MINOR = 1;
+var SYSTEM_RELEASE_ENV = "ALPHA";
+
 class DeltaApp {
 
     /* This class is the main class that sets up the rest of the app */
@@ -11,6 +15,7 @@ class DeltaApp {
          * mountpoint [dom] - Where the app will be mounted
          * 
          */
+        this.loaderScreen = null;
         this.species = null;
         this.rpc = null;
         this.user = null;
@@ -31,19 +36,15 @@ class DeltaApp {
     async Init() {
         /* Called when the app is first loaded */
 
-        //Set up the user
-        this.user = await this.InitUser();
-
-        //Get map list
-        this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
-
         //Create DOM
         this.LayoutDom(this.settings.mountpoint);
 
-        //Init species db
-        this.db = new DeltaSystemDatabase();
-        this.dbInitTask = this.db.Init();
-        await this.dbInitTask;
+        //Load network resources
+        await this.InitNetworkResources();
+
+        //Set up full DOM
+        this.TriggerLoaderHide();
+        this.LayoutMainView(this.settings.mountpoint);
 
         //Create message views
         this.msgViewNoServers = this.CreateMessageView("", "No Servers", "Sorry, you don't seem to have any servers. Join an ARK server with Delta Web Map to get started.");
@@ -129,8 +130,45 @@ class DeltaApp {
         this.SwitchServer(this.GetDefaultServer());
     }
 
+    async InitNetworkResources() {
+        var tries = 0;
+        while (true) {
+            try {
+                //Set up the user
+                this.user = await this.InitUser();
+
+                //Get map list
+                this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
+
+                //Init species db
+                this.db = new DeltaSystemDatabase();
+                this.dbInitTask = this.db.Init();
+                await this.dbInitTask;
+
+                break;
+            } catch {
+                //Set error state
+                if (tries > 0) {
+                    this.TriggerLoaderError();
+                }
+                tries++;
+
+                //Try again shortly
+                await DeltaTools.AsyncDelay(3000);
+            }
+        }
+    }
+
     GetSpeciesByClassName(classname) {
         return this.db.species.GetSpeciesByClassName(classname);
+    }
+
+    TriggerLoaderError() {
+        this.loaderScreen.classList.add("intro_slide_state_error");
+    }
+
+    TriggerLoaderHide() {
+        this.loaderScreen.classList.add("intro_slide_hide");
     }
 
     LayoutLoginScreen(mount) {
@@ -138,14 +176,22 @@ class DeltaApp {
     }
 
     LayoutDom(mount) {
-        //Create top banner
-        var banner = DeltaTools.CreateDom("div", "error_box_generic error_box_fixed_top_banner", mount);
-
-        //Create main view
-        this.LayoutMainView(mount);
+        //Create the intro page
+        var intro = DeltaTools.CreateDom("div", "intro_slide", mount);
+        DeltaTools.CreateDom("div", "intro_slide_info", intro, "(C) DeltaWebMap, RomanPort 2020 - " + SYSTEM_RELEASE_ENV + " v" + SYSTEM_VERSION_MAJOR + "." + SYSTEM_VERSION_MINOR);
+        var introContent = DeltaTools.CreateDom("div", "intro_slide_content", intro);
+        var introBody = DeltaTools.CreateDom("div", "", introContent);
+        DeltaTools.CreateDom("div", "intro_slide_body_title", introBody, "DeltaWebMap");
+        DeltaTools.CreateDom("div", "loading_spinner", DeltaTools.CreateDom("div", "intro_slide_body_loader", introBody));
+        var introWarning = DeltaTools.CreateDom("div", "intro_slide_warning", intro);
+        DeltaTools.CreateDom("div", "intro_slide_warning_box", introWarning, "Hang tight! We're having troubles connecting.");
+        this.loaderScreen = intro;
     }
 
     LayoutMainView(parent) {
+        //Create top banner
+        var banner = DeltaTools.CreateDom("div", "error_box_generic error_box_fixed_top_banner", parent);
+
         var mount = DeltaTools.CreateDom("div", "main_view", parent);
         this.mainHolder = mount;
 

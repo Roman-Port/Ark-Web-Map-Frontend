@@ -446,12 +446,13 @@ class TabDinos extends DeltaServerTab {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.server.CreateManagedDbSession('dinos', {
-                "tribe_key":"tribe_id"
-            }, () => {
-                return true;
-            }, {}, (dataset) => {
-                this.recycler.SetData(dataset);
+            this.server.CreateManagedDbListener('dinos', "tribe_id", (adds, removes) => {
+                if (adds.length > 0) {
+                    this.recycler.BulkAddItems(adds);
+                }
+                if (removes.length > 0) {
+                    this.recycler.BulkRemoveItems(removes);
+                }
             });
         });
     }

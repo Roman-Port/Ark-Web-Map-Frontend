@@ -326,92 +326,22 @@ class DeltaServer extends DeltaTabView {
         //Update managed DBs
         for (var i = 0; i < this.db_sessions.length; i += 1) {
             var d = this.db_sessions[i];
-            this.db[d[0]].RefreshSessionDataset(d[1]);
+            this.db[d[0]].RefreshManagedFilterListener(d[1]);
         }
 
         //Sync DB - this will also update managed DBs with changes
         await this.db.Sync();
     }
 
-    CreateManagedDbSession(collection, options, onCheckItem, context, onDatasetUpdated) {
-        //Creates a managed DB session that will automatically close, update, etc from this server. No further action is required from users.
-        //Collection is a string key for the DB collection to be used
-        //Options has the following:
-        /* {
-         *      "tribe_key":STRING, identifies the tribe ID INTEGER that will be used to check if the tribe matches
-         * }
-         */
-
-        //Set some internal params on the context
-        if (context == null) {
-            throw "Context cannot be null!";
-        }
-        context._options_tribekey = options.tribe_key;
-
-        //Create a new session
-        var token = this.db[collection].CreateSession((item, ctx) => {
-            //Check if we need to check the tribe
-            if (ctx._options_tribekey != null && this.tribe != '*') {
-                //We have a tribe key, so we should check to see if the tribe matches
-                var tribe = item[ctx._options_tribekey];
-                var targetTribe = parseInt(this.tribe);
-                if (tribe != targetTribe) {
-                    return false;
-                }
-            }
-
-            //Continue to user code
-            return onCheckItem(item, ctx);
-        }, context, (dataset, ctx) => onDatasetUpdated(dataset, ctx));
+    CreateManagedDbListener(collection, tribeKey, callback) {
+        //Create
+        var token = this.db[collection].AddManagedFilterListener((add, remove) => callback(add, remove), (item) => {
+            return item[tribeKey] == parseInt(this.tribe) || this.tribe == "*";
+        });
 
         //Add to collection
-        this.db_sessions.push([collection, token, options]);
+        this.db_sessions.push([collection, token, null]);
 
         return token;
-    }
-
-    CreateManagedAddRemoveSession(collection, options, compareItems, onCheckItem, onAdd, onRemove) {
-        //Creates a managed session that simply sends two events: onAdd(items) and onRemove(items)
-        //compareItems(a, b) returns true/false if the items match
-        //This is a more primitive version of CreateManagedDbSession. The two other options match those of CreateManagedDbSession
-
-        //Create the context object
-        var ctx = {
-            "current_items": []
-        };
-
-        //Set up session
-        return this.CreateManagedDbSession(collection, options, (item, ctx) => {
-            return true;
-            return onCheckItem(item, ctx);
-        }, ctx, (dataset, context) => {
-            //Check for changes in the dataset
-            var adds = [];
-            var removes = [];
-
-            //Check for adds
-            for (var i = 0; i < dataset.length; i += 1) {
-                var data = dataset[i];
-                if (!DeltaTools.CheckIfItemExistsInArrayComparator(context.current_items, data, compareItems)) {
-                    //This did not exist before, it has been added
-                    adds.push(data);
-                }
-            }
-
-            //Check for removes
-            for (var i = 0; i < context.current_items.length; i += 1) {
-                var data = context.current_items[i];
-                if (!DeltaTools.CheckIfItemExistsInArrayComparator(dataset, data, compareItems)) {
-                    //This no longer exists now, remove it
-                    removes.push(data);
-                }
-            }
-
-            //Apply changes
-            context.current_items = dataset.slice(); //This makes a copy of the array, but keeps all objects the same
-            if (adds.length > 0) { onAdd(adds); }
-            if (removes.length > 0) { onRemove(removes); }
-            console.log("SENDING " + adds.length + " ADDS and " + removes.length + " REMOVES");
-        });
     }
 }

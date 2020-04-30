@@ -31,6 +31,8 @@ class DeltaApp {
                 "icon": "/assets/app/icons/left_nav_v3/user_settings.svg"
             }
         ];
+        this.topBanner = null;
+        this.modal = null;
     }
 
     async Init() {
@@ -38,6 +40,17 @@ class DeltaApp {
 
         //Create DOM
         this.LayoutDom(this.settings.mountpoint);
+
+        //Create top banner
+        this.topBanner = new DeltaBannerMount(DeltaTools.CreateDom("div", "app_banner_container", this.settings.mountpoint), "app_banner_class", (b) => {
+            if (b == null) {
+                this.mainHolder.style.top = "0px";
+            } else {
+                window.requestAnimationFrame(() => {
+                    this.mainHolder.style.top = b.clientHeight.toString() + "px";
+                });
+            }
+        });
 
         //Load network resources
         await this.InitNetworkResources();
@@ -53,7 +66,7 @@ class DeltaApp {
         this.msgViewServerRequestedNotOk = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>The server you attempted to access is unavailable. Try again later.");
 
         //Create RPC
-        this.rpc = new DeltaRPC();
+        this.rpc = new DeltaRPC(this);
 
         //Set up servers
         if (this.user.data.servers.length > 0) {
@@ -122,8 +135,8 @@ class DeltaApp {
         }
 
         //Add "add server" button
-        DeltaTools.CreateDom("div", "v3_nav_server_add", this.serverListHolder, "Add Server").addEventListener("click", function () {
-            window.open("/servers/", "_blank");
+        DeltaTools.CreateDom("div", "v3_nav_server_add", this.serverListHolder, "Add Server").addEventListener("click", () => {
+            new DeltaGuildCreator(this);
         });
 
         //Swtich to the default server
@@ -186,6 +199,9 @@ class DeltaApp {
         var introWarning = DeltaTools.CreateDom("div", "intro_slide_warning", intro);
         DeltaTools.CreateDom("div", "intro_slide_warning_box", introWarning, "Hang tight! We're having troubles connecting.");
         this.loaderScreen = intro;
+
+        //Create modal view
+        this.modal = new DeltaModalContainer(mount, this);
     }
 
     LayoutMainView(parent) {
@@ -347,6 +363,23 @@ class DeltaApp {
         var e = new DeltaHtmlTabView(this, title, url, message);
         e.Init(DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder));
         return e;
+    }
+
+    OpenPromptModal(title, subtitle, positiveText, negativeText, positiveAction, negativeAction, positiveType, negativeType) {
+        var modal = this.modal.AddModal(480, 190);
+
+        var builder = new DeltaModalBuilder();
+        builder.AddContentCustomText("modal_preset_title", title);
+        builder.AddContentCustomText("modal_preset_subtitle", subtitle);
+        builder.AddAction(positiveText, positiveType, () => {
+            modal.Close();
+            positiveAction();
+        });
+        builder.AddAction(negativeText, negativeType, () => {
+            modal.Close();
+            negativeAction();
+        });
+        modal.AddPage(builder.Build());
     }
 
 }

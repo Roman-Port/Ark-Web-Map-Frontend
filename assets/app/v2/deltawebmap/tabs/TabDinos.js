@@ -46,7 +46,7 @@ class TabDinos extends DeltaServerTab {
                     }
                 ],
                 "size_min": 90,
-                "size_default": 200,
+                "size_default": 250,
                 "size_max": 400,
                 "has_handle": true,
                 "array_size": 1
@@ -68,7 +68,7 @@ class TabDinos extends DeltaServerTab {
                     }
                 ],
                 "size_min": 90,
-                "size_default": 150,
+                "size_default": 200,
                 "size_max": 400,
                 "has_handle": true,
                 "array_size": 1
@@ -283,7 +283,10 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "Status",
                 "render": function (e, data, sortIndex, species, width) {
-                    
+                    var d = statics.STATUS_STATES[data.status];
+                    var ee = e.x_status;
+                    ee.innerText = d.text;
+                    ee.style.color = d.modal_color;
                 },
                 "create": function (e) {
                     e.x_status = DeltaTools.CreateDom("div", "status_box_display", e);
@@ -385,6 +388,7 @@ class TabDinos extends DeltaServerTab {
 
     LayoutDom(mountpoint) {
         this.mountpoint = mountpoint;
+
         var search = DeltaTools.CreateDom("input", "dino_stats_search", this.mountpoint);
         search.type = "text";
         search.placeholder = "Search Tribe Dinos";
@@ -393,7 +397,13 @@ class TabDinos extends DeltaServerTab {
         this.dataContainer = DeltaTools.CreateDom("div", "dino_stats_container", this.mountpoint);
         this.dataInner = DeltaTools.CreateDom("div", "", this.dataContainer);
 
-        this.recycler = new DeltaRecyclerView(this.dataInner, this.dataContainer, 0, 30);
+        this.header = this.CreateHeader();
+        mountpoint.appendChild(this.header);
+        this.dataContainer.addEventListener("scroll", () => {
+            this.header.style.left = (-this.dataContainer.scrollLeft).toString() + "px";
+        });
+
+        this.recycler = new DeltaRecyclerView(this.dataInner, this.dataContainer, 50, 30);
         this.recycler.SetCreateRowFunction(() => {
             //Create row
             var row = DeltaTools.CreateDom("div", "v2tab_dinos_row v2tab_dinos_row_standard");
@@ -429,6 +439,68 @@ class TabDinos extends DeltaServerTab {
             if (this.query == "") { return true; }
             return a.tamed_name.toLowerCase().includes(this.query) || this.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
         });
+        
+    }
+
+    CreateHeader() {
+        //Create row
+        var row = DeltaTools.CreateDom("div", "v2tab_header");
+
+        //Add each
+        var indexes = [];
+        this.ForEachRowType((info, index, globalIndex) => {
+            var e = DeltaTools.CreateDom("div", "v2tab_dinos_row_item v2tab_dinos_row_item_standard", row);
+            if (typeof (info.name) == "string") {
+                e.innerText = info.name;
+            } else {
+                info.name(e, index);
+            }
+            e.style.width = info.size_default.toString() + "px";
+            if (info.sort_modes.length > 0) {
+                e._sort = info.sort_modes;
+                e._index = (globalIndex * 100) + index; //only has to be unique
+                e._tab = this;
+                e.addEventListener("click", function () {
+                    this._tab.NewSort(this._sort, this._index, this);
+                });
+                e.style.cursor = "pointer";
+            }
+            if (globalIndex == 5) {
+                //Janky way of setting the sort label on the default item
+                e.classList.add("v2tab_header_sort_down");
+            }
+            indexes.push(e);
+        });
+        return row;
+    }
+
+    NewSort(sortModes, index, element) {
+        //Update index
+        if (this.sortMode == index) {
+            //Add to the sort index
+            this.sortModeIndex += 1;
+            if (this.sortModeIndex >= sortModes.length) {
+                this.sortModeIndex = 0;
+            }
+        } else {
+            //Set sort to this
+            this.sortMode = index;
+            this.sortModeIndex = 0;
+        }
+
+        //Update sort
+        this.recycler.SetSortFunction(sortModes[this.sortModeIndex]);
+
+        //Remove old sort elements
+        DeltaTools.RemoveClassFromClassNames(element.parentNode, "v2tab_header_sort_down", "v2tab_header_sort_down");
+        DeltaTools.RemoveClassFromClassNames(element.parentNode, "v2tab_header_sort_up", "v2tab_header_sort_up");
+
+        //Add classname
+        if (this.sortModeIndex == 0) {
+            element.classList.add("v2tab_header_sort_up");
+        } else if (this.sortModeIndex == 1) {
+            element.classList.add("v2tab_header_sort_down");
+        }
     }
 
     ShowDefaultLoader() {
@@ -446,13 +518,12 @@ class TabDinos extends DeltaServerTab {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.server.CreateManagedDbListener('dinos', "tribe_id", (adds, removes) => {
-                if (adds.length > 0) {
-                    this.recycler.BulkAddItems(adds);
-                }
-                if (removes.length > 0) {
-                    this.recycler.BulkRemoveItems(removes);
-                }
+            this.server.CreateManagedDinoDbListener((adds) => {
+                this.recycler.BulkAddItems(adds);
+            }, (removes) => {
+                this.recycler.BulkRemoveItems(removes);
+            }, () => {
+                this.recycler.Reset();
             });
         });
     }

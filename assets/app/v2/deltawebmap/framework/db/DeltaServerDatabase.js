@@ -16,7 +16,7 @@ class DeltaServerDatabase extends DeltaDatabase {
         return {
             dinos: 'dino_id, tamed_name, classname, level, is_baby',
             structures: 'structure_id, tribe_id, classname',
-            inventories: 'holder_id, holder_type'
+            inventories: 'holder_id, holder_type, tribe_id, classname, item_id'
         };
     }
 

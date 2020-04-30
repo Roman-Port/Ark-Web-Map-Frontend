@@ -214,6 +214,10 @@ statics.MAP_ICON_INTERACT_EVENTS = {
 statics.MAP_ICON_ADAPTERS = {
     "dinos": function (data, map) {
         var s = map.server.app.GetSpeciesByClassName(data.classname);
+        var name = data.tamed_name;
+        if (name == null || name.length == 0) {
+            name = s.screen_name;
+        }
         return {
             "location": data.location,
             "img": s.icon.image_thumb_url,
@@ -222,7 +226,7 @@ statics.MAP_ICON_ADAPTERS = {
             "outline_color": "#000000",
             "tag_color": null,
             "dialog": {
-                "title": data.tamed_name,
+                "title": name,
                 "subtitle": s.screen_name + " - Lvl " + data.level
             },
             "extras": {}

@@ -41,7 +41,7 @@ class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
 
         //This doesn't exist! Create a template so we don't cause errors
         return {
-            "screen_name": "Unknown Dino",
+            "screen_name": classname,
             "colorizationIntensity": 1,
             "babyGestationSpeed": -1,
             "extraBabyGestationSpeedMultiplier": -1,
@@ -60,8 +60,8 @@ class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
             "childFoods": [],
             "classname": "Argent_Character_BP",
             "icon": {
-                "image_url": "https://charlie-assets.deltamap.net/c342eeba-dca8-4944-b578-4c11f77362ce.png",
-                "image_thumb_url": "https://charlie-assets.deltamap.net/d6385ad4-2a0e-4a19-a222-b20c9b68e991.png"
+                "image_url": "https://icon-assets.deltamap.net/unknown_dino.png",
+                "image_thumb_url": "https://icon-assets.deltamap.net/unknown_dino.png"
             },
             "baseLevel": [100, 100, 100, 100, 100, 100, 0, 0, 1, 1, 0, 1],
             "increasePerWildLevel": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

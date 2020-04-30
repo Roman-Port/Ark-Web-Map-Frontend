@@ -303,11 +303,6 @@ class MapAddonStructures extends TabMapAddon {
             //Get data
             var data = this.tiles[i];
 
-            //Check tribe
-            if (this.map.server.tribe != '*' && this.map.server.tribe != data.tribe_id) {
-                continue;
-            }
-
             //Get metadata
             var metadata = MapAddonStructures.GetStructureMetadata(STRUCTURE_TILES_METADATA.metadata, data.classname);
             if (metadata == null) {

@@ -24,6 +24,7 @@ class DeltaServer extends DeltaTabView {
         this.db = new DeltaServerDatabase(this);
         this.db_sessions = []; //Managed DB sessions. In format [collection_key, session_token, options];
         this.ready = false; //Set to true when all data has been synced
+        this.bottomBanner = null;
 
         //Create tabs
         this.tabs = [
@@ -34,8 +35,13 @@ class DeltaServer extends DeltaTabView {
 
         //Set some content
         this.myLocation = this.info.my_location;
-        this.tribe = this.info.target_tribe.tribe_id;
-        this.nativeTribe = this.info.target_tribe.tribe_id;
+        if (this.info.target_tribe != null) {
+            this.tribe = this.info.target_tribe.tribe_id;
+            this.nativeTribe = this.info.target_tribe.tribe_id;
+        } else {
+            this.tribe = '*';
+            this.nativeTribe = '*';
+        }
     }
 
     GetDisplayName() {
@@ -68,7 +74,14 @@ class DeltaServer extends DeltaTabView {
 
     GetMapInfo() {
         var m = this.app.maps.maps[this.info.map_id];
+        if (m == null) {
+            return this.app.maps.maps["DEFAULT"];
+        }
         return m;
+    }
+
+    GetIsMapSupported() {
+        return this.app.maps.maps[this.info.map_id] != null;
     }
 
     ForceAbort(error) {
@@ -98,6 +111,14 @@ class DeltaServer extends DeltaTabView {
         /* Called when we are adding this server to the list of servers. */
         /* Returns null if we can load this server, or else it will return a string that will be displayed as an error. */
         await super.Init(mountpoint);
+
+        //Add banner mounts
+        this.bottomBanner = new DeltaBannerMount(DeltaTools.CreateDom("div", "server_bottom_banner", mountpoint), null);
+
+        //Check if the current map is compatible
+        if (!this.GetIsMapSupported()) {
+            this.bottomBanner.AddBanner("advanced_banner_style_red", "This map isn't supported. You won't be able to view map tiles for now. Sorry about that.", [], () => { });
+        }
 
         //Init our tabs
         for (var i = 0; i < this.tabs.length; i++) {
@@ -132,7 +153,7 @@ class DeltaServer extends DeltaTabView {
     }
 
     GetTribesEndpointUrl(extra) {
-        return LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/" + this.id + "/tribes/" + this.tribe + extra;
+        return LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/" + this.id + "/tribes/*" + /*this.tribe + */extra;
     }
 
     async WebRequestToEndpoint(extra, args, replacements) {
@@ -319,29 +340,74 @@ class DeltaServer extends DeltaTabView {
         return this.prefs;
     }
 
-    async ChangeTribe(nextTribeId) {
-        //Set the var for this
-        this.tribe = nextTribeId;
-
-        //Update managed DBs
-        for (var i = 0; i < this.db_sessions.length; i += 1) {
-            var d = this.db_sessions[i];
-            this.db[d[0]].RefreshManagedFilterListener(d[1]);
-        }
-
-        //Sync DB - this will also update managed DBs with changes
-        await this.db.Sync();
-    }
-
-    CreateManagedDbListener(collection, tribeKey, callback) {
+    CreateManagedDinoDbListener(add, remove, reset) {
         //Create
-        var token = this.db[collection].AddManagedFilterListener((add, remove) => callback(add, remove), (item) => {
-            return item[tribeKey] == parseInt(this.tribe) || this.tribe == "*";
+        var token = this.db["dinos"].AddManagedFilterListener((adds, removes) => {
+            if (adds.length > 0) {
+                add(adds);
+            }
+            if (removes.length > 0) {
+                remove(removes);
+            }
+        }, (item) => {
+            return this.CheckFilterDino(item);
         });
 
         //Add to collection
-        this.db_sessions.push([collection, token, null]);
 
         return token;
+    }
+
+    CreateManagedStructureDbListener(callback) {
+        //Create
+        var token = this.db["structures"].AddManagedFilterListener((add, remove) => callback(add, remove), (item) => {
+            return this.CheckFilterStructure(item);
+        });
+
+        //Add to collection
+
+        return token;
+    }
+
+    CheckFilterDino(dino) {
+        /* Checks if a dino fits the criteria for the active filter */
+        return true;
+    }
+
+    CheckFilterStructure(structure) {
+        /* Checks if a structure fits the criteria for the active filter */
+        return true;
+    }
+
+    async OpenSortDialog() {
+        var builder = new DeltaModalBuilder();
+        var modal = this.app.modal.AddModal(670, 380);
+
+        //Fetch dinos and get their name and ID
+        var species = await app.db.species.GetAllItems();
+        species.sort((a, b) => {
+            return a.screen_name.localeCompare(b.screen_name);
+        });
+        var speciesTitles = ["Any"];
+        var speciesIds = ["*"];
+        for (var i = 0; i < species.length; i += 1) {
+            speciesTitles.push(species[i].screen_name);
+            speciesIds.push(species[i].classname);
+        }
+
+        var commonGridBuilder = new DeltaModalBuilder(false, "sort_menu_grid", "sort_menu_grid_item");
+        commonGridBuilder.AddContentInputSelect("Status", ["Alive", "(Wanted) Dead or Alive", "Dead"], ["alive", "any", "dead"], "alive");
+        commonGridBuilder.AddContentInputSelect("Cryo Status", ["Any", "In World", "In Cryo"], ["any", "world", "cryo"], "any");
+        commonGridBuilder.AddContentInputSelect("Species", speciesTitles, speciesIds, "*");
+        commonGridBuilder.AddContentInputSelect("Sex", ["Any", "Male", "Female"], ["any", "male", "female"], "any");
+        builder.AddContentBuilder(commonGridBuilder);
+
+        builder.AddAction("Apply", "POSITIVE", () => {
+            modal.Close();
+        });
+        builder.AddAction("Clear", "NEUTRAL", () => {
+            modal.Close();
+        });
+        modal.AddPage(builder.Build());
     }
 }

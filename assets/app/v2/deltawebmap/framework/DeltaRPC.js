@@ -2,7 +2,8 @@
 
 class DeltaRPC {
 
-    constructor() {
+    constructor(app) {
+        this.app = app;
         this.subscriptions = [];
         this.fails = 0;
         this.connectTimeout = null;
@@ -63,6 +64,7 @@ class DeltaRPC {
 
     OnRPCOpen() {
         this.Log("CONNECT", "RPC connected.");
+        this.app.topBanner.RemoveType("TAG_RPC_DISCONNECT");
         this.fails = 0;
         if (this.connectTimeout != null) {
             clearTimeout(this.connectTimeout);
@@ -83,6 +85,9 @@ class DeltaRPC {
     OnRPCClose() {
         this.fails += 1;
         this.Log("CLOSE", "RPC closed. Fail #" + this.fails);
+
+        //Show banner
+        this.app.topBanner.AddBanner("advanced_banner_style_red_disconnected", "Disconnected. Attempting to reconnect...", [], null, "TAG_RPC_DISCONNECT");
 
         //Calculate the amount of time to wait to reconnect. If this is one of the first fails, we'll wait a short amount of time. If we haven't been able to connect for a while, wait longer
         var time = 2000;

@@ -34,7 +34,7 @@ class MapAddonIcons extends TabMapAddon {
         this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
 
         //Add DB events
-        this.map.server.CreateManagedDbListener('dinos', "tribe_id", (adds, removes) => {
+        this.map.server.CreateManagedDinoDbListener((adds) => {
             //Use adds
             for (var i = 0; i < adds.length; i += 1) {
                 //Check if we have a pin for this
@@ -56,11 +56,13 @@ class MapAddonIcons extends TabMapAddon {
                     pin.marker.x_last_data = cd;
                 }
             }
-
+        }, (removes) => {
             //Use removes
             for (var i = 0; i < removes.length; i += 1) {
-                RemovePin("dinos", removes[i].dino_id);
+                this.RemovePin("dinos", removes[i].dino_id);
             }
+        }, () => {
+            this.RemoveAllPins();
         });
     }
 
@@ -243,15 +245,13 @@ class MapAddonIcons extends TabMapAddon {
         }
     }
 
-    RemovePinsOfType(type) {
-        var k = Object.keys(this.pins);
-        for (var i = 0; i < k.length; i++) {
-            if (k[i].startsWith(type + "@")) {
-                var data = this.pins[k[i]];
-                if (data != null) {
-                    data.icon.remove();
-                    delete this.pins[k[i]];
-                }
+    RemoveAllPins() {
+        var keys = Object.keys(this.pins);
+        for (var i = 0; i < keys.length; i += 1) {
+            var data = this.pins[keys[i]];
+            if (data != null) {
+                data.icon.remove();
+                delete this.pins[keys[i]];
             }
         }
     }

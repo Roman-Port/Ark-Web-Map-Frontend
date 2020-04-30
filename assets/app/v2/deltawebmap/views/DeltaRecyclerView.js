@@ -30,6 +30,10 @@ class DeltaRecyclerView {
         this._OnDatasetUpdated();
     }
 
+    AddFixedElement(d) {
+        this.mount.appendChild(d);
+    }
+
     SetCreateRowFunction(f) {
         this.fCreateRow = f;
         /* f() RETURNS row DOM */
@@ -52,7 +56,7 @@ class DeltaRecyclerView {
     }
 
     _GetCurrentScroll() {
-        return this.scrollProxy.scrollTop;
+        return this.scrollProxy.scrollTop - this.scrollOffset;
     }
 
     _GetContainerHeight() {
@@ -64,7 +68,7 @@ class DeltaRecyclerView {
     }
 
     _GetRowOffsetPixels(index) {
-        return index * this.rowHeight;
+        return (index * this.rowHeight) + this.scrollOffset;
     }
 
     _GetDataLength() {
@@ -109,12 +113,10 @@ class DeltaRecyclerView {
         this._Remap();
 
         //Make sure the height of the DOM matches
-        this.mount.style.height = (this._GetDataLength() * this.rowHeight).toString() + "px";
+        this.mount.style.height = ((this._GetDataLength() * this.rowHeight) + this.scrollOffset).toString() + "px";
 
         //Update all
         this.RefreshAllItemsInView();
-
-        window.that = this;
     }
 
     _CreateTemplateDOMs() {
@@ -125,9 +127,6 @@ class DeltaRecyclerView {
         //Generate and position these many
         for (var i = 0; i < needed; i += 1) {
             var d = this.fCreateRow();
-            //var d = DeltaTools.CreateDom("div", "", null, i.toString(), true);
-            //d.style.height = "30px";
-            //d.style.width = "100%";
             d.style.position = "absolute";
 
             d.style.display = "none";
@@ -176,7 +175,6 @@ class DeltaRecyclerView {
         var top = this._GetTopElementIndex();
         var bottom = this._GetBottomElementIndex();
         var count = bottom - top;
-        console.log(top.toString() + " / " + bottom.toString());
 
         //Find elements that have not been moved to a location on-screen. Start off by finding what we need to update
         var elements = {};
@@ -187,7 +185,6 @@ class DeltaRecyclerView {
             if (elements[i] == null || elements[i] == undefined) {
                 //Move an element to here
                 var node = this._GetNextElementOutOfBounds(top, bottom);
-                console.log(node._startindex);
                 this._RenderRow(node, i + top);
             }
         }
@@ -251,6 +248,14 @@ class DeltaRecyclerView {
         return true;
     }
 
+    Reset() {
+        //Clears all items
+        this.data = [];
+
+        //Refresh
+        this._OnDatasetUpdated();
+    }
+
     _PushAdds(updates) {
         //First, try to update all of these using a quick modify
         for (var i = 0; i < updates.length; i += 1) {
@@ -289,6 +294,9 @@ class DeltaRecyclerView {
                 this.data.splice(index, 1);
             }
         }
+
+        //Trigger updates
+        this._OnDatasetUpdated();
     }
 
     AddItem(item) {

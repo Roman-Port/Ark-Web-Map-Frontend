@@ -463,10 +463,20 @@
 
 .v3_nav_server_area {
     position: absolute;
-    top:10px;
-    left:0;
-    right:0;
-    bottom:80px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 51px;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.v3_nav_server_area::-webkit-scrollbar {
+    display: none;
+}
+
+.v3_nav_server_area {
+    -ms-overflow-style: none;
 }
 
 .v3_nav_top {

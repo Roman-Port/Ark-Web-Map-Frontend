@@ -15,7 +15,7 @@ class DeltaServerSyncCollection extends DeltaSyncCollection {
             }
 
             //Update
-            this._BatchUpdate([d.content]);
+            this.HandleRPCUpdate(d);
         });
     }
 
@@ -27,4 +27,7 @@ class DeltaServerSyncCollection extends DeltaSyncCollection {
         throw "Not implimented!";
     }
 
+    HandleRPCUpdate(d) {
+        this._BatchUpdate([d.content], []);
+    }
 }

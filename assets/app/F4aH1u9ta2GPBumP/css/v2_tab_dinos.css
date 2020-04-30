@@ -128,3 +128,33 @@
 .v2tab_dinos_row_item_sex_unknown {
     background-color: #555862;
 }
+
+.v2tab_header {
+    display: flex;
+    width: fit-content;
+    min-width: -webkit-fill-available;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0px 10px;
+    background-color: #222325;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.v2tab_header .v2tab_dinos_row_item {
+    background-size: 15px;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.v2tab_header_sort_down {
+    background-image:url(/assets/app/icons/tab_dino_list/sort_down.svg);
+}
+
+.v2tab_header_sort_up {
+    background-image: url(/assets/app/icons/tab_dino_list/sort_up.svg);
+}

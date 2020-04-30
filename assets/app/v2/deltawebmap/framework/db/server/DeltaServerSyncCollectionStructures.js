@@ -21,7 +21,7 @@ class DeltaServerSyncCollectionStructures extends DeltaServerSyncCollection {
     }
 
     GetRPCSyncType() {
-        return 1;
+        return 3;
     }
 
     async RequestWebData(epoch) {

@@ -189,11 +189,6 @@ async function ProcessCommand(payload, server, code) {
         //Get data
         var data = server[i];
 
-        //Check tribe
-        if (tribeFilter != null && tribeFilter != data.tribe_id) {
-            continue;
-        }
-
         //Get metadata
         var metadata = GetStructureMetadata(metadatas.metadata, data.classname);
         if (metadata == null) {

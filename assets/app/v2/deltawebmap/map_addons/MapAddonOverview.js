@@ -63,13 +63,12 @@ class MapAddonOverview {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.map.server.CreateManagedDbListener('dinos', "tribe_id", (adds, removes) => {
-                if (adds.length > 0) {
-                    this.recycler.BulkAddItems(adds);
-                }
-                if (removes.length > 0) {
-                    this.recycler.BulkRemoveItems(removes);
-                }
+            this.map.server.CreateManagedDinoDbListener((adds) => {
+                this.recycler.BulkAddItems(adds);
+            }, (removes) => {
+                this.recycler.BulkRemoveItems(removes);
+            }, () => {
+                this.recycler.Reset();
             });
         });
     }

@@ -75,7 +75,6 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
             offset += 15;
 
             //Read items
-            var items = [];
             for (var i = 0; i < itemCount; i += 1) {
                 //Read raw item header
                 var itemId = DeltaBigIntegerReader.ConvertArrayBufferToString(d, offset + 0, 8);
@@ -97,28 +96,61 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
                 }
 
                 //Add item data
-                items.push({
+                var result = {
+                    "holder_id": holderId,
+                    "holder_type": holderType,
+                    "tribe_id": tribeId,
                     "item_id": itemId,
                     "classname": classname,
                     "durability": durability,
                     "stack_size": stackSize,
                     "flags": flags,
                     "custom_data": custom
-                });
+                };
+
+                //Add to desired array
+                r.adds.push(result);
             }
-
-            //Reconstruct data
-            var result = {
-                "holder_id": holderId,
-                "holder_type": holderType,
-                "tribe_id": tribeId,
-                "items": items
-            };
-
-            //Add to desired array
-            r.adds.push(result);
         }
         return r;
+    }
+
+    HandleRPCUpdate(d) {
+        debugger;
+    }
+
+    async GetAllItemsFromInventories(classnames) {
+        //Essentially acts as an item search. Returns all items, sorted by item classname, from inventories
+
+        //First, find all items matching these classnames
+        var items = await this.GetDbCollection().filter((x) => {
+            return classnames.includes(x.classname);
+        }).toArray();
+
+        //Loop through and add item inventory holders
+        var itemHolders = {};
+        for (var i = 0; i < items.length; i += 1) {
+            if (itemHolders[items[i].classname] == null) {
+                itemHolders[items[i].classname] = {
+                    "classname": items[i].classname,
+                    "inventories": []
+                }
+            }
+        }
+
+        //Loop through and add items to holders
+        for (var i = 0; i < items.length; i += 1) {
+            itemHolders[items[i].classname].inventories.push(items[i]);
+        }
+
+        //Convert this to a list
+        var output = [];
+        var keys = Object.keys(itemHolders);
+        for (var i = 0; i < keys.length; i += 1) {
+            output.push(itemHolders[keys[i]]);
+        }
+
+        return output;
     }
 
 }

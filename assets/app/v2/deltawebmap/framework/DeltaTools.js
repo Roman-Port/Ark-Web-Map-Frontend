@@ -6,10 +6,13 @@ class DeltaTools {
 
     }
 
-    static async _BaseWebRequest(url, type, method, body, token) {
+    static async _BaseWebRequest(url, type, method, body, token, args) {
         if (token === undefined || token == null) {
             console.warn("WARNING: WebRequest launched without a DeltaCancellationToken!");
             token = new DeltaCancellationToken(null);
+        }
+        if (args == null) {
+            args = {};
         }
 
         return new Promise(function (resolve, reject) {
@@ -35,7 +38,9 @@ class DeltaTools {
             }
             xmlhttp.open(method, url, true);
             xmlhttp.responseType = type;
-            xmlhttp.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
+            if (args.noauth == false || args.noauth == null) {
+                xmlhttp.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
+            }
             xmlhttp.send(body);
         });
     }
@@ -50,7 +55,7 @@ class DeltaTools {
         }
 
         //Launch
-        var r = await DeltaTools._BaseWebRequest(url, "text", type, null, token);
+        var r = await DeltaTools._BaseWebRequest(url, "text", type, null, token, args);
         return JSON.parse(r);
     }
 
@@ -72,7 +77,9 @@ class DeltaTools {
 
     static CreateDom(type, classname, parent, text, debug) {
         var e = document.createElement(type);
-        e.className = classname;
+        if (classname != null) {
+            e.className = classname;
+        }
         if (parent != null) {
             parent.appendChild(e);
         }

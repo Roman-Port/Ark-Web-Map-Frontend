@@ -30,6 +30,7 @@ class DeltaServer extends DeltaTabView {
         this.tabs = [
             new TabMap(this),
             new TabDinos(this),
+            new TabItems(this),
             new TabAdmin(this)
         ];
 

@@ -119,12 +119,24 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
         debugger;
     }
 
+    async GetAllItemsFromInventoriesByName(query) {
+        //Searches items by their screen name
+        var results = this.db.app.SearchItemClassnamesByDisplayName(query);
+
+        //Search
+        return await this.GetAllItemsFromInventories(results);
+    }
+
     async GetAllItemsFromInventories(classnames) {
         //Essentially acts as an item search. Returns all items, sorted by item classname, from inventories
 
         //First, find all items matching these classnames
         var items = await this.GetDbCollection().filter((x) => {
-            return classnames.includes(x.classname);
+            var cn = x.classname;
+            if (cn.endsWith("_C")) {
+                cn = cn.substr(0, cn.length - 2);
+            }
+            return classnames.includes(cn);
         }).toArray();
 
         //Loop through and add item inventory holders

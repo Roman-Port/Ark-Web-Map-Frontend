@@ -16,7 +16,7 @@ class DeltaDatabase {
         var stores = this.GetDbStores();
         var storeKeys = Object.keys(stores);
         var storeTypes = this.GetDbStoreTypes();
-        this.db.version(1).stores(stores);
+        this.db.version(this.GetDbVersion()).stores(stores);
 
         //Add collections
         this.collections = [];
@@ -28,6 +28,10 @@ class DeltaDatabase {
             this.collections.push(collec);
             this[k] = collec;
         }
+    }
+
+    GetDbVersion() {
+        return 1;
     }
 
     GetDbName() {

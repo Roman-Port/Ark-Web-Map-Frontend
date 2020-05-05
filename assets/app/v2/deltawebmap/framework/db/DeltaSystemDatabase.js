@@ -14,14 +14,20 @@ class DeltaSystemDatabase extends DeltaDatabase {
 
     GetDbStores() {
         return {
-            species: 'classname'
+            species: 'classname',
+            items: 'classname'
         }
     }
 
     GetDbStoreTypes() {
         return {
-            species: DeltaSystemSyncCollectionSpecies
+            species: DeltaSystemSyncCollectionSpecies,
+            items: DeltaSystemSyncCollectionItems
         }
+    }
+
+    GetDbVersion() {
+        return 1;
     }
 
 }

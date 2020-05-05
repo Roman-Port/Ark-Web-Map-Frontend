@@ -85,8 +85,8 @@ class DeltaSyncCollection {
         throw "This must be overriden.";
     }
 
-    GetById(id) {
-
+    async GetById(id) {
+        return await this.GetDbCollection().get(id);
     }
 
     _ReplaceByPrimaryKey(target, data) {

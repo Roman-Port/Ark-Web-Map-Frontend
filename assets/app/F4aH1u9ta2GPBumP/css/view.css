@@ -2855,3 +2855,120 @@ a {
     border-radius: 5px;
     font-size:13px;
 }
+
+.itemlist_container {
+    overflow-y: scroll;
+    overflow-x: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+}
+
+.itemlist_item {
+    width: fit-content;
+    min-width: -webkit-fill-available;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.itemlist_item_top {
+    display: flex;
+    width: fit-content;
+    padding: 0 10px;
+    min-width: -webkit-fill-available;
+    height: 40px;
+}
+
+.itemlist_item_row {
+    padding: 0px 5px;
+    padding-left: 4px;
+    padding-right: 2px;
+    color: #ffffffcc;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-flex;
+    height: 40px;
+    line-height: 40px;
+    margin-right: 1px;
+    vertical-align: middle;
+}
+
+.itemlist_item_row_amount {
+    font-weight:800;
+    min-width:30px;
+}
+
+.itemlist_item_row_icon {
+    padding: 5px;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    background-color: white;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 30px;
+    padding-left: 8px;
+    padding-left: 8px;
+    margin-left: 4px;
+}
+
+.itemlist_inventory {
+    display: flex;
+    width: fit-content;
+    padding: 0 10px;
+    min-width: -webkit-fill-available;
+    height: 30px;
+    padding-left: 60px;
+    background-image: url(/assets/app/icons/item_list/sortline.svg);
+    background-repeat:no-repeat;
+    background-position:left;
+}
+
+.itemlist_inventory_loader {
+    margin:4px;
+}
+
+.itemlist_inventory:last-child {
+    background-image: url(/assets/app/icons/item_list/sortline_bottom.svg);
+}
+
+.itemlist_inventory_row {
+    padding: 0px 5px;
+    padding-left: 8px;
+    padding-right: 2px;
+    color: #ffffffcc;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-flex;
+    height: 30px;
+    line-height: 30px;
+    margin-right: 1px;
+    vertical-align: middle;
+}
+
+.itemlist_inventory_row_amount {
+    font-weight: 800;
+    min-width: 35px;
+}
+
+.itemlist_inventory_row_icon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 26px;
+    width:26px;
+    padding:0;
+}
+
+.itemlist_inventory_row_icon_invert {
+    filter:invert(1);
+}

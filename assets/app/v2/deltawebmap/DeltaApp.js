@@ -20,6 +20,7 @@ class DeltaApp {
         this.rpc = null;
         this.user = null;
         this.lastServer = null;
+        this.structureMetadata = null;
         this.viewUserSettings = new DeltaUserSettingsTabView(this);
         this.maps = {};
         this.db = null;
@@ -147,6 +148,9 @@ class DeltaApp {
         var tries = 0;
         while (true) {
             try {
+                //Get structure metadata
+                this.structureMetadata = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
+
                 //Set up the user
                 this.user = await this.InitUser();
 
@@ -174,6 +178,26 @@ class DeltaApp {
 
     GetSpeciesByClassName(classname) {
         return this.db.species.GetSpeciesByClassName(classname);
+    }
+
+    GetItemEntryByClassName(classname) {
+        if (classname.endsWith("_C")) {
+            classname = classname.substr(0, classname.length - 2);
+        }
+        return this.db.items.GetItemEntryByClassName(classname);
+    }
+
+    GetStructureEntryByClassName(name) {
+        for (var i = 0; i < this.structureMetadata.metadata.length; i += 1) {
+            if (this.structureMetadata.metadata[i].names.includes(name)) {
+                return this.structureMetadata.metadata[i];
+            }
+        }
+        return null;
+    }
+
+    SearchItemClassnamesByDisplayName(query) {
+        return this.db.items.SearchItemClassNamesByDisplayName(query.toLowerCase());
     }
 
     TriggerLoaderError() {

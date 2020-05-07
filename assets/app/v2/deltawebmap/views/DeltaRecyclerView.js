@@ -20,6 +20,8 @@ class DeltaRecyclerView {
         this.dataMap = []; //Maps indexes to the data. Used for searching
         this.lastScroll = 0;
 
+        this.events = [];
+
         this.addCollateTimeout = null;
         this.addCollateQueue = [];
         this.removeCollateTimeout = null;
@@ -28,6 +30,13 @@ class DeltaRecyclerView {
         this.scrollProxy.addEventListener("scroll", () => this._OnScroll());
 
         this._OnDatasetUpdated();
+    }
+
+    AddEventListener(type, callback) {
+        this.events.push({
+            "type": type,
+            "callback": callback
+        });
     }
 
     AddFixedElement(d) {
@@ -119,6 +128,17 @@ class DeltaRecyclerView {
         this.RefreshAllItemsInView();
     }
 
+    _CallEvent(type, evt) {
+        var target = evt.currentTarget;
+        var data = this.data[target._rindex];
+        for (var i = 0; i < this.events.length; i += 1) {
+            var e = this.events[i];
+            if (e.type == type) {
+                e.callback(data, evt, target);
+            }
+        }
+    }
+
     _CreateTemplateDOMs() {
         //Get number of DOMs needed
         var needed = Math.ceil((this._GetContainerHeight()) / this.rowHeight) + 5;
@@ -132,6 +152,11 @@ class DeltaRecyclerView {
             d.style.display = "none";
             d._rindex = i;
             d._startindex = i;
+
+            d.addEventListener("click", (evt) => {
+                this._CallEvent("click", evt);
+            });
+
             this.mount.appendChild(d);
             this.nodes.push(d);
             this._RenderRow(d, i);

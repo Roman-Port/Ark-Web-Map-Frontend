@@ -439,7 +439,14 @@ class TabDinos extends DeltaServerTab {
             if (this.query == "") { return true; }
             return a.tamed_name.toLowerCase().includes(this.query) || this.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
         });
-        
+
+        this.recycler.AddEventListener("click", (data, originalEvent, originalDom) => {
+            //Show the dino modal
+            var pos = originalDom.getBoundingClientRect();
+            var x = pos.left + 10;
+            var y = pos.top + 35;
+            DeltaPopoutModal.ShowDinoModal(this.server.app, data, { "x": x, "y": y }, this.server);
+        });
     }
 
     CreateHeader() {

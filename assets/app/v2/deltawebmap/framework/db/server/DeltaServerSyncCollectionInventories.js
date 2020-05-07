@@ -11,7 +11,7 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
     }
 
     GetPrimaryKey() {
-        return "structure_id";
+        return "item_id";
     }
 
     GetEpochKeyName() {
@@ -163,6 +163,13 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
         }
 
         return output;
+    }
+
+    async GetItemsFromInventory(holderType, holderId) {
+        var items = await this.GetDbCollection().filter((x) => {
+            return x.holder_id == holderId && x.holder_type == holderType;
+        }).toArray();
+        return items;
     }
 
 }

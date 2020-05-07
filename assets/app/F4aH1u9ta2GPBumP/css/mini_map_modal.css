@@ -5,21 +5,18 @@
 .mini_modal {
     color: white;
     font-family: 'Roboto', sans-serif;
-    background-color: #33363c;
+    background-color: #252629;
     min-width:220px;
-    max-width:640px;
-    min-height:60px;
-    position:fixed;
-    z-index:99;
+    max-width: 640px;
+    min-height: 60px;
+    position: fixed;
+    z-index: 99;
     pointer-events: none;
     border-radius: 5px;
-
     -webkit-box-shadow: 2px 2px 9px 0px rgba(0,0,0,0.43);
     -moz-box-shadow: 2px 2px 9px 0px rgba(0,0,0,0.43);
     box-shadow: 2px 2px 9px 0px rgba(0,0,0,0.43);
-
-    border-left:4px solid #5585e6;
-
+    border-left: 4px solid #5585e6;
     opacity: 0;
 }
 

@@ -2972,3 +2972,227 @@ a {
 .itemlist_inventory_row_icon_invert {
     filter:invert(1);
 }
+
+.popoutm2_container {
+    position: fixed;
+    z-index: 9999;
+    width: 330px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #252629;
+    border-radius: 5px;
+    border: 1px solid #33363c;
+    -webkit-box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.17);
+    -moz-box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.17);
+    box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.17);
+    border-left: 4px solid #5585e6;
+}
+
+.popoutm2_top {
+    padding-left: 65px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    padding-right: 20px;
+    white-space: nowrap;
+}
+
+.popoutm2_top_img {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    white-space: nowrap;
+    border-radius: 50%;
+    background-color: white;
+    border: 2px solid white;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 30px;
+}
+
+.popoutm2_top_textt {
+    font-size: 16px;
+    color: white;
+    line-height: 19px;
+    height: 19px;
+    display: block;
+}
+
+.popoutm2_top_textb {
+    font-size: 15px;
+    color: #b5b5b5;
+    line-height: 18px;
+    height: 18px;
+    display: block;
+}
+
+.popoutm2_collapse {
+    font-family: 'Roboto', sans-serif;
+    background-color: #33363c;
+}
+
+.popoutm2_collapse_top {
+    padding: 5px 5px;
+    font-weight: 800;
+    color: #d2d2d2;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 13px;
+    background-image: url(/assets/app/icons/modal_popout/expandable_less.svg);
+    background-position-y: center;
+    background-position-x: 5px;
+    background-repeat: no-repeat;
+    padding-left: 34px;
+    background-size: 24px;
+    user-select: none;
+}
+
+.popoutm2_collapse:first-of-type {
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+}
+
+.popoutm2_statbars {
+    padding: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0px 3px;
+    padding-bottom: 3px;
+}
+
+.popoutm2_statbars_bar {
+    height: 30px;
+    margin: 2px;
+    margin-top: 0;
+    background-color: #252629;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    flex-grow: 2;
+    flex-basis: 40%;
+}
+
+.popoutm2_statbars_bar_progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 50%;
+    background-color: #3882dc;
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.popoutm2_statbars_bar_left {
+    position:absolute;
+    top:0;
+    bottom:0;
+    line-height:30px;
+    color:white;
+    left:5px;
+    text-align:left;
+    font-size:13px;
+    z-index:5;
+}
+
+.popoutm2_statbars_bar_right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    line-height: 30px;
+    color: rgba(255, 255, 255, 0.86);
+    right: 5px;
+    text-align: right;
+    font-size: 13px;
+    z-index: 4;
+}
+
+.popoutm2_main {
+
+}
+
+.popoutm2_state_closed .popoutm2_main {
+    display:none;
+}
+
+.popoutm2_state_closed .popoutm2_collapse_top {
+    background-image: url(/assets/app/icons/modal_popout/expandable_show.svg);
+}
+
+.popoutm2_inventory {
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    justify-content: center;
+    overflow:hidden;
+    /* margin-left: 12px; */
+    max-height:156px;
+    padding:10px;
+}
+
+.popoutm2_inventory_ready {
+    overflow-y: scroll;
+    padding:0;
+}
+
+.popoutm2_inventory_empty {
+    font-size: 15px;
+    color: #ececec;
+    justify-content: left;
+    padding: 3px 10px;
+}
+
+.popoutm2_inventory_item {
+    margin: 2px;
+    background-color: #252629;
+    border-radius:5px;
+    width:74px;
+    height:74px;
+    position:relative;
+    background-position:center;
+    background-size:45px;
+    background-repeat:no-repeat;
+}
+
+.popoutm2_inventory_item_weight {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    font-size: 13px;
+    color:white;
+}
+
+.popoutm2_inventory_item_count {
+    position:absolute;
+    top:3px;
+    right:3px;
+    font-size:13px;
+    color:white;
+}
+
+.popoutm2_inventory_item_name {
+    position: absolute;
+    bottom: 3px;
+    left: 1px;
+    right: 1px;
+    font-size: 10px;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.popoutm2_dinostatus {
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    justify-content: left;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+}
+
+.popoutm2_dinostatus_status {
+    margin:0;
+    text-align:center;
+}

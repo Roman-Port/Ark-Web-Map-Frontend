@@ -56,6 +56,13 @@ class MapAddonOverview {
             if (this.query == "") { return true; }
             return a.tamed_name.toLowerCase().includes(this.query) || this.map.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
         });
+        this.recycler.AddEventListener("click", (data, originalEvent, originalDom) => {
+            //Show the dino modal
+            var pos = originalDom.getBoundingClientRect();
+            var x = pos.left - 360;
+            var y = pos.top - 5;
+            DeltaPopoutModal.ShowDinoModal(this.map.server.app, data, { "x": x, "y": y }, this.map.server);
+        });
 
         //Set recycler views
         window.requestAnimationFrame(() => {

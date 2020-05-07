@@ -137,4 +137,12 @@ class DeltaTools {
         });
     }
 
+    static async AwaitAnimationFrame() {
+        return new Promise(function (resolve, reject) {
+            window.requestAnimationFrame(() => {
+                resolve();
+            });
+        });
+    }
+
 }

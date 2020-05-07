@@ -117,42 +117,42 @@ statics.STATUS_ENTRIES = [
     {
         "icon": "/assets/ui/status/health.png",
         "name": "Health",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/stamina.png",
         "name": "Stamina",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/unknown1.png",
         "name": "Torpidity",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/oxygen.png",
         "name": "Oxygen",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/food.png",
         "name": "Food",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/water.png",
         "name": "Water",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/unknown2.png",
         "name": "Temperature",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/inventoryWeight.png",
         "name": "Weight",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/meleeDamageMult.png",
@@ -173,12 +173,12 @@ statics.STATUS_ENTRIES = [
     {
         "icon": "/assets/ui/status/unknown3.png",
         "name": "Fortitude",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     },
     {
         "icon": "/assets/ui/status/unknown3.png",
         "name": "Crafting Speed",
-        "formatString": function (value) { return value; }
+        "formatString": function (value) { return (Math.round(value * 10) / 10).toString(); }
     }
 ];
 
@@ -203,7 +203,10 @@ statics.MAP_ICON_RENDER_PROFILE = {
 statics.MAP_ICON_INTERACT_EVENTS = {
     "dinos": {
         "click": function (data, marker) {
-            console.log(data);
+            var pos = marker.getBoundingClientRect();
+            var x = pos.left-14;
+            var y = pos.top-11;
+            DeltaPopoutModal.ShowDinoModal(data.extras._map.map.server.app, data._original, { "x": x, "y": y }, data.extras._map.map.server);
         }
     },
     "players": {
@@ -229,7 +232,10 @@ statics.MAP_ICON_ADAPTERS = {
                 "title": name,
                 "subtitle": s.screen_name + " - Lvl " + data.level
             },
-            "extras": {}
+            "extras": {
+                
+            },
+            "_original": data
         };
     }
 }

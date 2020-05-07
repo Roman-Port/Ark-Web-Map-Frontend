@@ -52,35 +52,27 @@ class DeltaSystemSyncCollectionItems extends DeltaSyncCollection {
 
         //This doesn't exist! Create a template so we don't cause errors
         return {
-            "screen_name": classname,
-            "colorizationIntensity": 1,
-            "babyGestationSpeed": -1,
-            "extraBabyGestationSpeedMultiplier": -1,
-            "babyAgeSpeed": 0.000003,
-            "extraBabyAgeSpeedMultiplier": 0,
-            "useBabyGestation": false,
-            "extraBabyAgeMultiplier": 1.7,
-            "statusComponent": {
-                "baseFoodConsumptionRate": -0.001852,
-                "babyDinoConsumingFoodRateMultiplier": 25.5,
-                "extraBabyDinoConsumingFoodRateMultiplier": 20,
-                "foodConsumptionMultiplier": 1,
-                "tamedBaseHealthMultiplier": 1
-            },
-            "adultFoods": [],
-            "childFoods": [],
-            "classname": "Argent_Character_BP",
+            "classname": classname,
             "icon": {
                 "image_url": "https://icon-assets.deltamap.net/unknown_dino.png",
                 "image_thumb_url": "https://icon-assets.deltamap.net/unknown_dino.png"
             },
-            "baseLevel": [100, 100, 100, 100, 100, 100, 0, 0, 1, 1, 0, 1],
-            "increasePerWildLevel": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            "increasePerTamedLevel": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            "additiveTamingBonus": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            "multiplicativeTamingBonus": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            "statImprintMult": null
-        }
+            "hideFromInventoryDisplay": false,
+            "useItemDurability": false,
+            "isTekItem": false,
+            "allowUseWhileRiding": false,
+            "name": classname,
+            "description": "Unknown item. It may be modded and is unsupported at this time.",
+            "spoilingTime": 0.0,
+            "baseItemWeight": 0.0,
+            "useCooldownTime": 0.0,
+            "baseCraftingXP": 1.0,
+            "baseRepairingXP": 0.0,
+            "maxItemQuantity": 0,
+            "addStatusValues": {
+
+            }
+        };
     }
 
 }

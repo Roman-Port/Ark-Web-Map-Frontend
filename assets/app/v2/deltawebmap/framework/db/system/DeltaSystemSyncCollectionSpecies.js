@@ -8,7 +8,7 @@ class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
     }
 
     GetSyncUrlBase() {
-        return LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/species.json";
+        return LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/species.json?format=binary";
     }
 
     GetPrimaryKey() {
@@ -33,10 +33,12 @@ class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
         }
     }
 
-    GetSpeciesByClassName(classname) {
+    GetSpeciesByClassName(classname, defaultToNull) {
         var s = this.species[classname];
         if (s != null) {
             return s;
+        } else if (defaultToNull == true && defaultToNull != null) {
+            return null;
         }
 
         //This doesn't exist! Create a template so we don't cause errors
@@ -70,6 +72,18 @@ class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
             "multiplicativeTamingBonus": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             "statImprintMult": null
         }
+    }
+
+    async RequestWebData(epoch) {
+        //Fetch and decode
+        var d = await DeltaWebFormatDecoder.DownloadAndDecode(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/species.json?format=binary&last_epoch=" + epoch);
+
+        //Format
+        return {
+            "adds": d.content,
+            "removes": [],
+            "epoch": d.customData[0]
+        };
     }
 
 }

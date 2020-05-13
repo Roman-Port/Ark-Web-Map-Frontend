@@ -44,10 +44,14 @@ class DeltaSystemSyncCollectionItems extends DeltaSyncCollection {
         return results;
     }
 
-    GetItemEntryByClassName(classname) {
+    GetItemEntryByClassName(classname, defaultToNull) {
         var s = this.items[classname];
         if (s != null) {
             return s;
+        }
+
+        if (defaultToNull != null && defaultToNull == true) {
+            return null;
         }
 
         //This doesn't exist! Create a template so we don't cause errors
@@ -74,5 +78,17 @@ class DeltaSystemSyncCollectionItems extends DeltaSyncCollection {
             }
         };
     }
+
+    /*async RequestWebData(epoch) {
+        //Fetch and decode
+        var d = await DeltaWebFormatDecoder.DownloadAndDecode(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/items.json?format=binary&last_epoch=" + epoch);
+
+        //Format
+        return {
+            "adds": d.content,
+            "removes": [],
+            "epoch": d.customData[0]
+        };
+    }*/
 
 }

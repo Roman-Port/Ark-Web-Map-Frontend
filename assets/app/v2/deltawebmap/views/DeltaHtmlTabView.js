@@ -9,7 +9,7 @@ class DeltaHtmlTabView extends DeltaTabView {
         this.url = url;
     }
 
-    async Init(mountpoint) {
+    Init(mountpoint) {
         super.Init(mountpoint);
         this.CreateView(mountpoint);
     }

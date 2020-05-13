@@ -12,7 +12,11 @@ delta.serverRequest = function(url, args, callback) {
 
             //Callback
             callback(reply);
-        } else if(this.readyState == 4) {
+        } else if (this.readyState == 4) {
+            if (this.status == 401) {
+                window.location = "/login/?next=" + encodeURIComponent(window.location);
+                return;
+            }
             if(args.failOverride != null) {
                 args.failOverride(this);
             } else {

@@ -1,8 +1,13 @@
 body, html {
-    background-color: #252629;
-    padding:0;
-    margin:0;
-    height:100vh;
+    background-color: #1a1a1c;
+    margin: 0px 80px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
 }
 
 .inner_box {
@@ -17,6 +22,23 @@ body, html {
     border-radius: 5px;
     overflow: hidden;
     position: relative;
+}
+
+@media only screen and (max-width : 660px) {
+    body, html {
+        margin: 0;
+        background-color: #33363c;
+    }
+
+    .inner_box {
+        width: unset;
+        flex-grow: 1;
+        background-color: unset;
+        border: none;
+        box-shadow: none;
+        max-width: unset;
+        width: unset;
+    }
 }
 
 .error_text {
@@ -50,7 +72,7 @@ body, html {
 }
 
 .consent_top_application {
-    color: #43b581;
+    color: #368df7;
     font-size: 30px;
     font-weight: 600;
     text-transform: uppercase;
@@ -64,7 +86,7 @@ body, html {
 }
 
 .consent_mid_accent {
-    color: #43b581;
+    color: #368df7;
 }
 
 .consent_mid ul {

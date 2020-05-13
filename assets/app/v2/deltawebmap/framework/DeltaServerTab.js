@@ -32,7 +32,7 @@ class DeltaServerTab {
         /* Used when tribes are changing */
     }
 
-    async OnInit(mountpoint) {
+    OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
 
         //Create top strip

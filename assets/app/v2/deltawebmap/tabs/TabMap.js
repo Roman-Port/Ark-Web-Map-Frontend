@@ -46,7 +46,7 @@ class TabMap extends DeltaServerTab {
         this._dmap.CloseAllPopouts();
     }
 
-    async OnInit(mountpoint) {
+    OnInit(mountpoint) {
         super.OnInit(mountpoint);
 
         //Create DOM

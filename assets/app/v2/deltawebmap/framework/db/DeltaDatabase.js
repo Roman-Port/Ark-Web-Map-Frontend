@@ -61,9 +61,12 @@ class DeltaDatabase {
 
     async Sync() {
         //Sync all
+        var tasks = [];
         for (var i = 0; i < this.collections.length; i += 1) {
-            await this.collections[i].Sync();
+            tasks.push(this.collections[i].Sync());
         }
+
+        await Promise.all(tasks);
     }
 
 }

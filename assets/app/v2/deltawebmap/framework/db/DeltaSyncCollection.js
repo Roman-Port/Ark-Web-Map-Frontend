@@ -16,8 +16,7 @@ class DeltaSyncCollection {
     }
 
     async Init() {
-        //Sync from server
-        await this.Sync();
+        
     }
 
     GetEpochKeyName() {
@@ -58,11 +57,7 @@ class DeltaSyncCollection {
 
         //Push to DB
         if (!propagateOnly) {
-            for (var i = 0; i < adds.length; i += 1) {
-                await new Promise((resolve, reject) => {
-                    this.GetDbCollection().put(adds[i]).then(resolve());
-                });
-            }
+            await this.GetDbCollection().bulkPut(adds);
         }
 
         //Run post update

@@ -228,7 +228,7 @@ async function ProcessCommand(payload, server, code) {
             "s": size,
             "hit": CreateVectorPoints(metadata, loc_tile_x + globalOffsetX, loc_tile_y + globalOffsetY, rotation, size),
             "has_inventory": data.has_inventory,
-            "id": id
+            "data": data
         });
     }
 

@@ -2,8 +2,13 @@
 
 class DeltaUser {
 
-    constructor() {
-        
+    constructor(app) {
+        this.app = app;
+
+        //Subscribe to server joined event
+        app.rpc.SubscribeGlobal("deltawebmap.user.server_add", 30002, () => {
+
+        });
     }
 
     async RefreshData() {

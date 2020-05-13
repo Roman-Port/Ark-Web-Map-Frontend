@@ -2622,7 +2622,7 @@ a {
     margin-top:50px;
 }
 
-.intro_slide_warning {
+.intro_slide_warning_base {
     z-index: 100;
     position: absolute;
     bottom: -50px;
@@ -2648,11 +2648,19 @@ a {
     width: fit-content;
 }
 
+.intro_slide_warning_box_blue {
+    background-color: #3882dc;
+}
+
 .intro_slide_state_error {
     background-color: #e85a5a;
 }
 
 .intro_slide_state_error .intro_slide_warning {
+    bottom: 60px;
+}
+
+.intro_slide_first_error .intro_slide_first {
     bottom: 60px;
 }
 

@@ -17,8 +17,8 @@ class DeltaApp {
          */
         this.loaderScreen = null;
         this.species = null;
-        this.rpc = null;
-        this.user = null;
+        this.rpc = new DeltaRPC(this);
+        this.user = new DeltaUser(this);
         this.lastServer = null;
         this.structureMetadata = null;
         this.viewUserSettings = new DeltaUserSettingsTabView(this);
@@ -66,9 +66,6 @@ class DeltaApp {
         this.msgViewServerNotFound = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>You don't have access to this ARK server, the server was removed, or it never existed to begin with.");
         this.msgViewServerRequestedNotOk = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>The server you attempted to access is unavailable. Try again later.");
 
-        //Create RPC
-        this.rpc = new DeltaRPC(this);
-
         //Set up servers
         if (this.user.data.servers.length > 0) {
             //Create default cluster
@@ -99,8 +96,8 @@ class DeltaApp {
 
                 //Create server
                 var server = new DeltaServer(this, info, menu);
+                server.menu = menu;
                 var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
-                var canSwitch = await server.Init(m); //TODO: Handle this returning false
 
                 //Finish creating menu
                 for (var j = 0; j < server.tabs.length; j += 1) {
@@ -130,8 +127,10 @@ class DeltaApp {
                 }
 
                 //Add to list of servers
-                server.menu = menu;
                 this.servers[info.id] = server;
+
+                //Start init
+                server.Init(m);
             }
         }
 
@@ -152,18 +151,29 @@ class DeltaApp {
                 this.structureMetadata = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
 
                 //Set up the user
-                this.user = await this.InitUser();
+                await this.user.RefreshData();
 
                 //Get map list
                 this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
 
                 //Init species db
                 this.db = new DeltaSystemDatabase();
-                this.dbInitTask = this.db.Init();
-                await this.dbInitTask;
+                await this.db.Init();
+
+                //If this is the first time, warn
+                if (await this.db.species.GetById("Argent_Character_BP") == null) {
+                    this.TriggerLoaderFirstTime();
+                }
+
+                //Sync species
+                await this.db.Sync();
 
                 break;
-            } catch {
+            } catch (e) {
+                //Log
+                console.error("Hit exception while initializing on attempt " + tries + "!");
+                console.error(e);
+
                 //Set error state
                 if (tries > 0) {
                     this.TriggerLoaderError();
@@ -176,15 +186,15 @@ class DeltaApp {
         }
     }
 
-    GetSpeciesByClassName(classname) {
-        return this.db.species.GetSpeciesByClassName(classname);
+    GetSpeciesByClassName(classname, defaultToNull) {
+        return this.db.species.GetSpeciesByClassName(classname, defaultToNull);
     }
 
-    GetItemEntryByClassName(classname) {
+    GetItemEntryByClassName(classname, defaultToNull) {
         if (classname.endsWith("_C")) {
             classname = classname.substr(0, classname.length - 2);
         }
-        return this.db.items.GetItemEntryByClassName(classname);
+        return this.db.items.GetItemEntryByClassName(classname, defaultToNull);
     }
 
     GetStructureEntryByClassName(name) {
@@ -204,6 +214,10 @@ class DeltaApp {
         this.loaderScreen.classList.add("intro_slide_state_error");
     }
 
+    TriggerLoaderFirstTime() {
+        this.loaderScreen.classList.add("intro_slide_first_error");
+    }
+
     TriggerLoaderHide() {
         this.loaderScreen.classList.add("intro_slide_hide");
     }
@@ -220,8 +234,10 @@ class DeltaApp {
         var introBody = DeltaTools.CreateDom("div", "", introContent);
         DeltaTools.CreateDom("div", "intro_slide_body_title", introBody, "DeltaWebMap");
         DeltaTools.CreateDom("div", "loading_spinner", DeltaTools.CreateDom("div", "intro_slide_body_loader", introBody));
-        var introWarning = DeltaTools.CreateDom("div", "intro_slide_warning", intro);
+        var introWarning = DeltaTools.CreateDom("div", "intro_slide_warning intro_slide_warning_base", intro);
         DeltaTools.CreateDom("div", "intro_slide_warning_box", introWarning, "Hang tight! We're having troubles connecting.");
+        var introSpecies = DeltaTools.CreateDom("div", "intro_slide_first intro_slide_warning_base", intro);
+        DeltaTools.CreateDom("div", "intro_slide_warning_box intro_slide_warning_box_blue", introSpecies, "Hang tight! We're downloading first time information. This may take a moment, but will only happen once.");
         this.loaderScreen = intro;
 
         //Create modal view
@@ -271,12 +287,6 @@ class DeltaApp {
 
         //Now, create the container
         return DeltaTools.CreateDom("div", "", container);
-    }
-
-    async InitUser() {
-        var user = new DeltaUser();
-        await user.RefreshData();
-        return user;
     }
 
     SwitchServer(server) {

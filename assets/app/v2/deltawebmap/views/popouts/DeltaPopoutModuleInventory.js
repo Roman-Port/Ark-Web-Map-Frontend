@@ -2,8 +2,9 @@
 
 class DeltaPopoutModuleInventory extends DeltaPopoutModuleCollapsable {
 
-    constructor(holderType, holderId) {
+    constructor(holderType, holderId, rows) {
         super("Inventory", true);
+        this.rows = rows;
         this.holderType = holderType;
         this.holderId = holderId;
     }
@@ -12,6 +13,7 @@ class DeltaPopoutModuleInventory extends DeltaPopoutModuleCollapsable {
         //Create the basic layout
         this.container = DeltaTools.CreateDom("div", "popoutm2_inventory");
         DeltaTools.CreateDom("div", "loading_spinner", this.container);
+        this.container.style.maxHeight = (78 * this.rows).toString() + "px";
 
         //Fetch inventory data
         ctx.server.db.inventories.GetItemsFromInventory(this.holderType, this.holderId).then((items) => {
@@ -44,7 +46,7 @@ class DeltaPopoutModuleInventory extends DeltaPopoutModuleCollapsable {
         //Create item div
         var d = DeltaTools.CreateDom("div", "popoutm2_inventory_item");
         d.style.backgroundImage = "url('" + info.icon.image_url + "')";
-        DeltaTools.CreateDom("div", "popoutm2_inventory_item_weight", d, (info.baseItemWeight * data.stack_size).toString());
+        DeltaTools.CreateDom("div", "popoutm2_inventory_item_weight", d, (info.baseItemWeight * data.stack_size).toFixed(1));
         DeltaTools.CreateDom("div", "popoutm2_inventory_item_count", d, "x"+data.stack_size.toString());
         DeltaTools.CreateDom("div", "popoutm2_inventory_item_name", d, info.name);
 

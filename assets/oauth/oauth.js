@@ -1,6 +1,8 @@
-var ROOT_URL = "https://deltamap.net";
 var oauth = {};
 oauth.mountpoint = document.getElementById('mountpoint');
+
+var clientId = null;
+var scopes = null;
 
 oauth.parseURLParams = function() { 
 	try {	
@@ -60,13 +62,26 @@ oauth.createDOM = function(data) {
     var btnAccept = delta.createDom("div", "consent_bottom_nav_btn", nav);
     btnAccept.innerText = "Authorize";
     btnAccept.x_data = data;
-    btnAccept.addEventListener("click", function() {
-        window.location = this.x_data.endpoints.authorize;
+    btnAccept.addEventListener("click", function () {
+        //Consented, allow
+        delta.serverRequest(window.LAUNCH_CONFIG.API_ENDPOINT + "/auth/oauth/authorize", {
+            "type": "POST",
+            "body": JSON.stringify({
+                "client_id": window.clientId,
+                "scopes": window.scopes
+            }),
+            "failOverride": function () {
+                oauth.showError("Failed to authorize application");
+                return;
+            }
+        }, (r) => {
+                window.location = r.next_url;
+        });
     });
 
     //Add flag button
-    var btnFlag = delta.createDom("div", "consent_bottom_nav_flag", nav);
-    btnFlag.innerText = "Report";
+    //var btnFlag = delta.createDom("div", "consent_bottom_nav_flag", nav);
+    //btnFlag.innerText = "Report";
 }
 
 oauth.showConsent = function(data) {
@@ -83,21 +98,25 @@ oauth.init = function() {
     var params = oauth.parseURLParams();
 
     //Get the client ID
-    var clientId = params["client_id"];
+    clientId = params["client_id"];
     if(clientId == null) {
         oauth.showError("No application was requested");
         return;
     }
 
     //Get requested scopes
-    if(params["scopes"] == null) {
+    if(params["scope"] == null) {
         oauth.showError("No application scopes were requested");
         return;
     }
-    var scopes = params["scopes"].split(',');
+    scopes = params["scope"];
+    if (isNaN(parseInt(scopes))) {
+        oauth.showError("Application scopes invalid");
+        return;
+    }
 
     //Request the application data
-    delta.serverRequest(ROOT_URL+"/api/auth/oauth/query", {
+    delta.serverRequest(window.LAUNCH_CONFIG.API_ENDPOINT+"/auth/oauth/query", {
         "type":"POST",
         "body":JSON.stringify({
             "client_id":clientId,

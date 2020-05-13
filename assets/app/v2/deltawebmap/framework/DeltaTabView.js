@@ -7,11 +7,7 @@ class DeltaTabView {
         this.mountpoint = null;
     }
 
-    async Init(mountpoint) {
-        /* Called when we are adding this server to the list of servers. */
-        /* Returns null if we can load this server, or else it will return a string that will be displayed as an error. */
-
-        //Create primary mountpoint
+    Init(mountpoint) {
         this.mountpoint = mountpoint;
     }
 

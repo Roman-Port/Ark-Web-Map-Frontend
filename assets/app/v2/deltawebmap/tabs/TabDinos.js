@@ -375,7 +375,7 @@ class TabDinos extends DeltaServerTab {
         this.ShowDefaultLoader();
     }
 
-    async OnInit(mountpoint) {
+    OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
         super.OnInit(mountpoint);
         this.LayoutDom(mountpoint);

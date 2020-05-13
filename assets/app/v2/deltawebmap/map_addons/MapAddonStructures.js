@@ -281,6 +281,36 @@ class MapAddonStructures extends TabMapAddon {
                 interactive._update(x, y);
             });
         });
+        this.activeLayer._container.addEventListener("click", (evt) => {
+            //Loop through tiles
+            var structures = [];
+            var structureIds = [];
+            DeltaTools.ForEachKey(this.activeLayer._tiles, (r) => {
+                var el = r.el;
+                var interactive = el._interactive;
+                if (interactive == null) { return; }
+
+                //Get the mouse pos
+                var rect = interactive.getBoundingClientRect();
+                var x = evt.clientX - rect.left;
+                var y = evt.clientY - rect.top;
+
+                var hits = interactive._getHits(x, y);
+                for (var i = 0; i < hits.length; i += 1) {
+                    if (!structureIds.includes(hits[i].data.structure_id)) {
+                        structureIds.push(hits[i].data.structure_id);
+                        hits[i].m_x = rect.left + x;
+                        hits[i].m_y = rect.top + y;
+                        structures.push(hits[i]);
+                    }
+                }
+            });
+            if (structures.length > 0) {
+                //TODO: Show menu for multiple
+                var i = 0;
+                DeltaPopoutModal.ShowStructureModal(this.map.server.app, structures[i].data, { "x": structures[i].m_x, "y": structures[i].m_y }, this.map.server);
+            }
+        });
     }
 
     async OnUnload(container) {
@@ -347,7 +377,7 @@ class MapAddonStructures extends TabMapAddon {
                 "s": size,
                 "hit": this.CreateVectorPoints(metadata, loc_tile_x + globalOffsetX, loc_tile_y + globalOffsetY, rotation, size),
                 "has_inventory": data.has_inventory,
-                "id": id
+                "data": data
             });
         }
         return found;

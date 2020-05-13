@@ -92,7 +92,31 @@ class DeltaPopoutModal {
 			new DeltaPopoutModuleTitle(entry.icon.image_url, name, entry.screen_name),
 			new DeltaPopoutModuleStatus(data),
 			new DeltaPopoutModuleStatBars(data),
-			new DeltaPopoutModuleInventory(0, data.dino_id)
+			new DeltaPopoutModuleInventory(0, data.dino_id, 2)
+		];
+		var modal = new DeltaPopoutModal(app, pos, modules, server);
+		await modal.Build();
+	}
+
+	static async ShowStructureModal(app, data, pos, server) {
+		//Get defaults
+		var name = data.classname;
+		var icon = "https://icon-assets.deltamap.net/unknown_dino.png";
+
+		//Lookup entry
+		var entry = app.GetStructureEntryByClassName(data.classname);
+		if (entry != null) {
+			var item = app.GetItemEntryByClassName(entry.item);
+			if (item != null) {
+				name = item.name;
+				icon = item.icon.image_url;
+			}
+		}
+
+		//Add modules
+		var modules = [
+			new DeltaPopoutModuleTitle(icon, name, "Structure"),
+			new DeltaPopoutModuleInventory(1, data.structure_id, 4)
 		];
 		var modal = new DeltaPopoutModal(app, pos, modules, server);
 		await modal.Build();

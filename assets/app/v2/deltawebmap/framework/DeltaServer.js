@@ -25,6 +25,7 @@ class DeltaServer extends DeltaTabView {
         this.db_sessions = []; //Managed DB sessions. In format [collection_key, session_token, options];
         this.ready = false; //Set to true when all data has been synced
         this.bottomBanner = null;
+        this.tribes = [];
 
         //Create tabs
         this.tabs = [
@@ -108,10 +109,8 @@ class DeltaServer extends DeltaTabView {
         }
     }
 
-    async Init(mountpoint) {
-        /* Called when we are adding this server to the list of servers. */
-        /* Returns null if we can load this server, or else it will return a string that will be displayed as an error. */
-        await super.Init(mountpoint);
+    Init(mountpoint) {
+        super.Init(mountpoint);
 
         //Add banner mounts
         this.bottomBanner = new DeltaBannerMount(DeltaTools.CreateDom("div", "server_bottom_banner", mountpoint), null);
@@ -124,13 +123,11 @@ class DeltaServer extends DeltaTabView {
         //Init our tabs
         for (var i = 0; i < this.tabs.length; i++) {
             var m = DeltaTools.CreateDom("div", "main_tab", this.mountpoint); //This is the mountpoint for the tab
-            await this.tabs[i].OnInit(m);
+            this.tabs[i].OnInit(m);
         }
 
         //Add RPC events
         this.SubscribeRPCEvent("server", 7, (m) => this.OnCharacterLiveUpdate(m));
-
-        return null;
     }
 
     CheckStatus() {
@@ -168,17 +165,29 @@ class DeltaServer extends DeltaTabView {
         return await DeltaTools.WebRequest(url, args, this.token);
     }
 
-    async DownloadData() {
-        /* Downloads all of the server info */
-        /* Returns true if this loaded OK, or else returns false */
+    async DownloadDataCritical() {
+        //Downloads server data that we need to even begin loading. Returns the status
 
-        //Download data
+        //Fetch tribes
+        try {
+            var tribeListing = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/tribes", {}, this.token);
+            this.tribes = tribeListing.tribes;
+        } catch (e) {
+            this.ForceAbort("Couldn't fetch tribe listing.");
+            return false;
+        }
+
+        //Set up DB
         await this.db.Init();
 
-        this.SetLoaderStatus(false);
-        this.ready = true;
-
         return true;
+    }
+
+    async DownloadDataBackground() {
+        //Downloads server data in the background while the tabs are shown
+
+        //Download data
+        await this.db.Sync();
     }
 
     OnSwitchedTo() {
@@ -187,14 +196,30 @@ class DeltaServer extends DeltaTabView {
 
         //If this hasn't been used yet, init the first tab
         if (this.first) {
-            //Switch
-            this.first = false;
-            this.OnSwitchTab(0);
-
-            //Start downloading
-            this.SetLoaderStatus(true);
-            this.downloadTask = this.DownloadData();
+            this.OnSwitchedToFirst();
         }
+    }
+
+    async OnSwitchedToFirst() {
+        //Called when this server is first switched to and we need to begin downloading
+        this.SetLoaderStatus(true);
+
+        //Download critical data first
+        if (!await this.DownloadDataCritical()) {
+            this.SetLoaderStatus(false);
+            this.ready = true;
+            return;
+        }
+
+        //Switch to the first tab
+        this.OnSwitchTab(0);
+
+        //Begin background loading
+        await this.DownloadDataBackground();
+
+        //Finish
+        this.SetLoaderStatus(false);
+        this.ready = true;
     }
 
     OnSwitchedAway() {

@@ -202,6 +202,9 @@ class DeltaWebFormatDecoder {
             } else if (s.type == 12) {
                 //Double, but interpeted as a float
                 value = this._ReadSingleFloat();
+            } else if (s.type == 13) {
+                //Ushort
+                value = this._ReadUInt16();
             } else {
                 throw "Type not found";
             }

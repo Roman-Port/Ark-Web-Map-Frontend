@@ -152,7 +152,25 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
 
         //Loop through and add items to holders
         for (var i = 0; i < items.length; i += 1) {
-            itemHolders[items[i].classname].inventories.push(items[i]);
+            //Check if we share any holders
+            var found = false;
+            for (var j = 0; j < itemHolders[items[i].classname].inventories.length; j += 1) {
+                if (itemHolders[items[i].classname].inventories[j].holder_id == items[i].holder_id && itemHolders[items[i].classname].inventories[j].holder_type == items[i].holder_type && itemHolders[items[i].classname].inventories[j].tribe_id == items[i].tribe_id) {
+                    itemHolders[items[i].classname].inventories[j].count += items[i].stack_size;
+                    itemHolders[items[i].classname].total += items[i].stack_size;
+                    found = true;
+                }
+            }
+            if (!found) {
+                itemHolders[items[i].classname].inventories.push({
+                    "classname": items[i].classname,
+                    "holder_id": items[i].holder_id,
+                    "holder_type": items[i].holder_type,
+                    "count": items[i].stack_size,
+                    "tribe_id": items[i].tribe_id
+                });
+                itemHolders[items[i].classname].total = items[i].stack_size;
+            }
         }
 
         //Convert this to a list

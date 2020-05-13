@@ -79,6 +79,10 @@ class DeltaSystemSyncCollectionItems extends DeltaSyncCollection {
         };
     }
 
+    async GetItemEntryByStructureClassNameAsync(classname) {
+        return await this.GetDbCollection().get({ "structure_classname": classname });
+    }
+
     /*async RequestWebData(epoch) {
         //Fetch and decode
         var d = await DeltaWebFormatDecoder.DownloadAndDecode(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/items.json?format=binary&last_epoch=" + epoch);

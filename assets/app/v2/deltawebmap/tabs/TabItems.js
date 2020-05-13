@@ -49,6 +49,11 @@ class TabItems extends DeltaServerTab {
         //Get items
         var data = await this.server.db.inventories.GetAllItemsFromInventoriesByName("");
 
+        //Sort
+        data.sort((a, b) => {
+            return b.total - a.total;
+        });
+
         //Add entries
         for (var i = 0; i < data.length; i += 1) {
             this.container.appendChild(this.CreateItemBox(data[i]));
@@ -60,10 +65,7 @@ class TabItems extends DeltaServerTab {
         var entry = this.server.app.GetItemEntryByClassName(data.classname);
 
         //Total the amount of each item
-        var total = 0;
-        for (var i = 0; i < data.inventories.length; i += 1) {
-            total += data.inventories[i].stack_size;
-        }
+        var total = data.total;
 
         //Create container
         var c = DeltaTools.CreateDom("div", "itemlist_item");
@@ -77,6 +79,11 @@ class TabItems extends DeltaServerTab {
 
         //Set up icon
         DeltaTools.CreateDom("div", "itemlist_item_row_icon", icon).style.backgroundImage = "url('" + entry.icon.image_thumb_url + "')";
+
+        //Sort
+        data.inventories.sort((a, b) => {
+            return b.count - a.count;
+        });
 
         //Add inventories
         for (var i = 0; i < data.inventories.length; i += 1) {
@@ -93,7 +100,7 @@ class TabItems extends DeltaServerTab {
 
         //Create template
         var icon = DeltaTools.CreateDom("div", "itemlist_inventory_row itemlist_inventory_row_icon", c);
-        var count = DeltaTools.CreateDom("div", "itemlist_inventory_row itemlist_inventory_row_amount", c, "x" + data.stack_size.toString());
+        var count = DeltaTools.CreateDom("div", "itemlist_inventory_row itemlist_inventory_row_amount", c, "x" + data.count.toString());
         var name = DeltaTools.CreateDom("div", "itemlist_inventory_row", c);
 
         //Set defaults
@@ -142,18 +149,11 @@ class TabItems extends DeltaServerTab {
     async _SetDataStructure(id, iconDiv, nameDiv) {
         var structure = await this.server.db.structures.GetById(parseInt(id));
         if (structure != null) {
-            //Get structure info
-            var info = this.server.app.GetStructureEntryByClassName(structure.classname);
-            if (info != null) {
-                //Get the item that is used with this structure
-                var structureEntry = this.server.app.GetItemEntryByClassName(info.item);
-                if (structureEntry != null) {
-                    nameDiv.innerText = structureEntry.name;
-                    iconDiv.style.backgroundImage = "url('" + structureEntry.icon.image_thumb_url + "')";
-                } else {
-                    nameDiv.innerText = structure.classname;
-                    iconDiv.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";
-                }
+            //Get item data
+            var structureEntry = await this.server.app.GetItemEntryByStructureClassNameAsync(structure.classname);
+            if (structureEntry != null) {
+                nameDiv.innerText = structureEntry.name;
+                iconDiv.style.backgroundImage = "url('" + structureEntry.icon.image_thumb_url + "')";
             } else {
                 nameDiv.innerText = structure.classname;
                 iconDiv.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";

@@ -197,6 +197,10 @@ class DeltaApp {
         return this.db.items.GetItemEntryByClassName(classname, defaultToNull);
     }
 
+    async GetItemEntryByStructureClassNameAsync(classname) {
+        return await this.db.items.GetItemEntryByStructureClassNameAsync(classname);
+    }
+
     GetStructureEntryByClassName(name) {
         for (var i = 0; i < this.structureMetadata.metadata.length; i += 1) {
             if (this.structureMetadata.metadata[i].names.includes(name)) {

@@ -15,7 +15,7 @@ class DeltaSystemDatabase extends DeltaDatabase {
     GetDbStores() {
         return {
             species: 'classname',
-            items: 'classname'
+            items: 'classname, structure_classname'
         }
     }
 

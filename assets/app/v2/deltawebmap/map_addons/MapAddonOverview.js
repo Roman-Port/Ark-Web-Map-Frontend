@@ -19,8 +19,18 @@ class MapAddonOverview {
         this.sidebar = this.map.sidebarContent;
         this.sidebarContent = DeltaTools.CreateDom("div", "", this.sidebar);
 
+        //Add
+        this.topBar = DeltaTools.CreateDom("div", "dino_stats_sort_top", this.map.sidebarContainer);
+        this.searchBar = DeltaTools.CreateDom("input", "dino_stats_sort_top_input", this.topBar);
+        this.searchBar.placeholder = "Search Tribe";
+        this.searchBar.type = "text";
+        this.searchBar.addEventListener("input", () => {
+            this.query = this.searchBar.value.toLowerCase();
+            this.recycler.RefreshSearch();
+        });
+
         //Set up recycler view
-        this.recycler = new DeltaRecyclerView(this.sidebarContent, this.sidebar, 0, 54);
+        this.recycler = new DeltaRecyclerView(this.sidebarContent, this.sidebar, 60, 54);
         this.recycler.SetCreateRowFunction(() => {
             //Create row
             var row = DeltaTools.CreateDom("div", "dino_sidebar_item");
@@ -85,8 +95,7 @@ class MapAddonOverview {
     }
 
     OnSidebarQueryChanged(query) {
-        this.query = query.toLowerCase();
-        this.recycler.RefreshSearch();
+        
     }
 
 }

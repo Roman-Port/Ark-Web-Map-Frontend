@@ -458,12 +458,12 @@
     right: unset;
     left: 0;
     width: 200px;
-    top: 60px;
+    top: 0px;
 }
 
 .v3_nav_server_area {
     position: absolute;
-    top: 0;
+    top: 60px;
     left: 0;
     right: 0;
     bottom: 51px;
@@ -503,7 +503,6 @@
 }
 
 .v3_nav_server {
-    cursor:pointer;
     position: relative;
 }
 
@@ -516,6 +515,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 600;
+    cursor:pointer;
 }
 
 .v3_nav_server_top_icon {
@@ -530,6 +530,7 @@
     display: none;
     padding: 8px 0px;
     background-color: rgba(69, 72, 77, 0.36);
+    position: relative;
 }
 
 .v3_nav_server_bottom_item {
@@ -548,8 +549,9 @@
     font-size: 15px;
     background-repeat: no-repeat;
 
-    margin-left: 29px;
+    margin-left: 40px;
     padding-left: 10px;
+    cursor:pointer;
 
     position:relative;
 }
@@ -638,6 +640,21 @@
     position: absolute;
     left: -20px;
     top: calc(50% - 10px);
+}
+
+.v3_nav_server_bottom_secure {
+    background-color: #45484d;
+    position: absolute;
+    top: 8px;
+    left: 5px;
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+    background-image: url(/assets/app/icons/left_nav_v3/secure_padlock.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    cursor: pointer;
 }
 
 /* Drawer */

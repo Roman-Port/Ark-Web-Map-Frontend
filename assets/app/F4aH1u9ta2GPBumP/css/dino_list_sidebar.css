@@ -531,3 +531,26 @@
 .dino_stats_item_type_gender, #stat_sort_btn_gender {
     width: 26px;
 }
+
+.dino_stats_sort_top {
+    position: absolute;
+    left: 15px;
+    height: 60px;
+    background-color: #33363c;
+    z-index: 99;
+    width: 322px;
+}
+
+.dino_stats_sort_top_input {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #252629;
+    color: white;
+    border: 1px solid #1f2023;
+    font-size: 13px;
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    width: calc(100% - 22px);
+}

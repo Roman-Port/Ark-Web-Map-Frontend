@@ -16,6 +16,18 @@ class DeltaModalBuilder {
         this.extraClassNameElement = extraClassNameElement;
     }
 
+    AddContentTitle(text) {
+        this.AddContentCustomText("modal_preset_title", text);
+    }
+
+    AddContentDescription(text) {
+        this.AddContentCustomText("modal_preset_subtitle", text);
+    }
+
+    AddContentWarningBox(text) {
+        this.AddContentCustomText("modal_preset_warning", text);
+    }
+
     AddContentCustomText(textClass, text) {
         var t = DeltaTools.CreateDom("div", textClass, null, text);
         this._AddContent(t);

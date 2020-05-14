@@ -73,6 +73,40 @@ class TabAdmin extends DeltaServerTab {
             return;
         }
 
+        //Check if we're in secure mode
+        if (this.server.info.secure_mode) {
+            //Show dialog about secure mode
+            if (this.server.IsOwner()) {
+                var modal = this.server.app.modal.AddModal(480, 290);
+                var e = new DeltaModalBuilder();
+                e.AddContentTitle("Server Using Secure Mode");
+                e.AddContentDescription("Secure mode is currently on. This mode prevents admin abuse by blocking admins from viewing information about other tribes.");
+                e.AddContentDescription("You must turn off secure mode before you can use admin mode. Turning it off will remove the padlock from your server.");
+                e.AddContentWarningBox("Changing this setting will notify members, even if you change it back.");
+                e.AddAction("Turn Off", "POSITIVE", () => {
+                    modal.Close();
+                });
+                e.AddAction("Cancel", "NEUTRAL", () => {
+                    modal.Close();
+                });
+                e.Build();
+                modal.AddPage(e.Build());
+            } else {
+                var modal = this.server.app.modal.AddModal(480, 290);
+                var e = new DeltaModalBuilder();
+                e.AddContentTitle("Server Using Secure Mode");
+                e.AddContentDescription("The owner of this server has opted to enable secure mode. Secure mode must be turned off before you can switch to admin mode.");
+                e.AddContentDescription("Only the server owner can change this setting. Please ask them to turn secure mode off.");
+                e.AddAction("Cancel", "NEUTRAL", () => {
+                    modal.Close();
+                });
+                e.Build();
+                modal.AddPage(e.Build());
+            }
+            
+            return;
+        }
+
         //Set UI
         this.active = true;
         this.switch.classList.add("admin_tab_toggle_active");

@@ -2,7 +2,7 @@
     display: none;
     /*background-color: #2c2e33;*/
     position: absolute;
-    top: 60px;
+    top: 0px;
     left: 200px;
     bottom: 0;
     right: 0;
@@ -2839,11 +2839,27 @@ a {
 
 .modal_preset_subtitle {
     font-size: 15px;
-    margin: 20px;
+    margin: 10px 20px;
     text-align: left;
     color: #a2a2a2;
     font-weight: 500;
-    margin-top: 10px;
+}
+
+.modal_preset_warning {
+    font-size: 15px;
+    margin: 10px 20px;
+    text-align: left;
+    color: #ffffff;
+    font-weight: 500;
+    background-color: #f78254;
+    padding: 10px;
+    border-radius: 5px;
+    background-image: url(/assets/app/icons/warning_white.svg);
+    background-repeat: no-repeat;
+    background-position-y: center;
+    padding-left: 45px;
+    background-position-x: 10px;
+    border: 1px solid #0c0c0c;
 }
 
 .modal_builder_label {

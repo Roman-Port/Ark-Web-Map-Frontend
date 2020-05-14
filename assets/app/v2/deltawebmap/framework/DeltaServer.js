@@ -436,4 +436,12 @@ class DeltaServer extends DeltaTabView {
         });
         modal.AddPage(builder.Build());
     }
+
+    IsAdmin() {
+        return true;
+    }
+
+    IsOwner() {
+        return false;
+    }
 }

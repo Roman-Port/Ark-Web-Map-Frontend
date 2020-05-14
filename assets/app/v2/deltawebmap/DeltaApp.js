@@ -94,6 +94,24 @@ class DeltaApp {
                 DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
                 var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
 
+                //Add padlock
+                DeltaTools.CreateDom("div", "v3_nav_server_bottom_secure", bottom).addEventListener("click", () => {
+                    //Show dialog about secure mode
+                    var modal = this.modal.AddModal(480, 290);
+                    var e = new DeltaModalBuilder();
+                    e.AddContentTitle("Server Using Secure Mode");
+                    e.AddContentDescription("The owner of this server has opted to enable secure mode. This prevents any other user, including server admins, from viewing or accessing your tribe information without being in your tribe.");
+                    e.AddContentDescription("Your server owner can opt out of this at any time, but you will be notified. This feature is built to make admin abuse using this app impossible.");
+                    e.AddAction("Close", "NEUTRAL", () => {
+                        modal.Close();
+                    });
+                    e.Build();
+                    modal.AddPage(e.Build());
+                });
+                if (info.secure_mode) {
+
+                }
+
                 //Create server
                 var server = new DeltaServer(this, info, menu);
                 server.menu = menu;
@@ -255,12 +273,12 @@ class DeltaApp {
         var mount = DeltaTools.CreateDom("div", "main_view", parent);
         this.mainHolder = mount;
 
-        var top = DeltaTools.CreateDom("div", "top_nav", mount); //Top strip. Pretty much has no use except to show a darker color at this point, though
-        DeltaTools.CreateDom("span", "delta_nav_badge_beta", DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap"), "BETA");
-
         var leftSidebar = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open v3_nav_area", mount);
         this.serverListHolder = DeltaTools.CreateDom("div", "v3_nav_server_area", leftSidebar);
         var bottom = DeltaTools.CreateDom("div", "v3_nav_bottom", leftSidebar);
+
+        var top = DeltaTools.CreateDom("div", "top_nav", leftSidebar); //Top strip. Pretty much has no use except to show a darker color at this point, though
+        DeltaTools.CreateDom("span", "delta_nav_badge_beta", DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap"), "BETA");
 
         //Add bottom options
         for (var i = 0; i < this.SIDEBAR_OPTIONS.length; i += 1) {

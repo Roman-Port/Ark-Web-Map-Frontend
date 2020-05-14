@@ -63,17 +63,8 @@ class TabMap extends DeltaServerTab {
         this.mapContainer = DeltaTools.CreateDom("div", "map_part smooth_anim", this.mountpoint);
         var mapCanvas = DeltaTools.CreateDom("div", "map_part_canvas", this.mapContainer);
 
-        var sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
-        this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper smooth_anim", sidebarContainer);
-
-        var sidebarSearchContainer = DeltaTools.CreateDom("div", "dino_stats_search_box", this.top);
-        this.searchBar = DeltaTools.CreateDom("input", "dino_stats_search_base dino_stats_search_text dino_stats_search_unimportant", sidebarSearchContainer);
-        this.searchBar.type = "text";
-        this.searchBar.placeholder = "Search Tribe";
-        this.searchBar.addEventListener("input", () => this.addons[2].OnSidebarQueryChanged(this.searchBar.value));
-
-        var sidebarHide = DeltaTools.CreateDom("div", "dino_stats_search_base dino_stats_search_sort", sidebarSearchContainer);
-        sidebarHide.addEventListener("click", () => this.mountpoint.classList.toggle("map_tab_hiddensidebar"));
+        this.sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
+        this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper smooth_anim", this.sidebarContainer);
     }
 
     async OnFirstOpen() {

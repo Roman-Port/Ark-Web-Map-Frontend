@@ -46,6 +46,13 @@ class DeltaModalBuilder {
         return d;
     }
 
+    AddLabledText(label, text) {
+        var d = DeltaTools.CreateDom("div", "modal_preset_text", null, text);
+        var e = this.AddLabeledContent(label, d);
+        e.classList.add("modal_preset_padded");
+        return e;
+    }
+
     AddContentInputSelect(label, optionTexts, optionIds, defaultValue) {
         var s = DeltaTools.CreateDom("select", "modal_builder_select");
         for (var i = 0; i < optionTexts.length; i += 1) {

@@ -108,13 +108,11 @@ class DeltaApp {
                     e.Build();
                     modal.AddPage(e.Build());
                 });
-                if (info.secure_mode) {
-
-                }
 
                 //Create server
                 var server = new DeltaServer(this, info, menu);
                 server.menu = menu;
+                server.SetSecureStatus(info.secure_mode);
                 var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
 
                 //Finish creating menu
@@ -278,7 +276,9 @@ class DeltaApp {
         var bottom = DeltaTools.CreateDom("div", "v3_nav_bottom", leftSidebar);
 
         var top = DeltaTools.CreateDom("div", "top_nav", leftSidebar); //Top strip. Pretty much has no use except to show a darker color at this point, though
-        DeltaTools.CreateDom("span", "delta_nav_badge_beta", DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap"), "BETA");
+        DeltaTools.CreateDom("span", "delta_nav_badge_beta", DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap"), "BETA").addEventListener("click", () => {
+            this.OpenDebugInfoPanel();
+        });
 
         //Add bottom options
         for (var i = 0; i < this.SIDEBAR_OPTIONS.length; i += 1) {
@@ -434,6 +434,27 @@ class DeltaApp {
         builder.AddAction(negativeText, negativeType, () => {
             modal.Close();
             negativeAction();
+        });
+        modal.AddPage(builder.Build());
+    }
+
+    async OpenDebugInfoPanel() {
+        var modal = this.modal.AddModal(480, 590);
+
+        var countDinos = await app.db.species.GetDbCollection().count();
+        var countItems = await app.db.items.GetDbCollection().count();
+
+        var builder = new DeltaModalBuilder();
+        builder.AddContentTitle("Delta Debug Panel");
+        builder.AddContentDescription("Use the information on this page for support during the beta period.");
+        builder.AddLabledText("Account Info", "Delta ID: " + this.user.data.id + "\nSteam ID: " + this.user.data.steam_id + "\nName: " + this.user.data.screen_name);
+        builder.AddLabledText("Account Settings", JSON.stringify(this.user.data.user_settings));
+        builder.AddLabledText("App Version", SYSTEM_RELEASE_ENV + " at " + SYSTEM_VERSION_MAJOR.toString() + "." + SYSTEM_VERSION_MINOR.toString());
+        builder.AddLabledText("Charlie Content", "Species: " + countDinos + " at " + localStorage.getItem("PROD_SYSTEM_species~LAST_EPOCH") + "\nItems: " + countItems + " at " + localStorage.getItem("PROD_SYSTEM_items~LAST_EPOCH"));
+        builder.AddLabledText("Browser Info", "Fast Structures Worker supported: " + MapAddonStructures.IsFastModeSupported().toString());
+
+        builder.AddAction("Close", "NEUTRAL", () => {
+            modal.Close();
         });
         modal.AddPage(builder.Build());
     }

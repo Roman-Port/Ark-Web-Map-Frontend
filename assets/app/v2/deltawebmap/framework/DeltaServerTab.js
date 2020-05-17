@@ -34,6 +34,7 @@ class DeltaServerTab {
 
     OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
+        this.mountpoint = mountpoint;
 
         //Create top strip
         this.top = DeltaTools.CreateDom("div", "server_top_strip", mountpoint);

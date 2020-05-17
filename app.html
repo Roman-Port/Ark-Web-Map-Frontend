@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/nursery.css">
     <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/v2_tab_dinos.css">
     <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/v2_forms.css">
+    <link rel="stylesheet" href="/assets/app/F4aH1u9ta2GPBumP/css/admin.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
 
     <link rel="stylesheet" href="/assets/app/v2/deltawebmap.css/GuildConfig.css">
@@ -49,6 +50,7 @@
     <script src="/enviornment.js"></script>
 
     <script src="/assets/app/external/leaflet.js"></script>
+    <script src="/assets/app/external/moment.min.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
     <script src="/assets/app/F4aH1u9ta2GPBumP/js/statics.js"></script>
@@ -82,6 +84,23 @@
     <script src="/assets/app/v2/deltawebmap/framework/modal/DeltaModalContainer.js"></script>
     <script src="/assets/app/v2/deltawebmap/framework/modal/DeltaModalContext.js"></script>
     <script src="/assets/app/v2/deltawebmap/framework/modal/DeltaModalBuilder.js"></script>
+
+    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModal.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleCollapsable.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleStatBars.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleInventory.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleStatus.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleTitle.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/DeltaUserSettingsTabView.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/SubTabMenuTab.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/DeltaHtmlTabView.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/DeltaRecyclerView.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/form/DeltaForm.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/form/DeltaFormRoot.js"></script>
+    <script src="/assets/app/v2/deltawebmap/views/form/DeltaFormContainerBox.js"></script>
+
+    <script src="/assets/app/v2/deltawebmap/server_admin/AdminTabServerPlayers.js"></script>
+
     <script src="/assets/app/v2/deltawebmap/tabs/TabMap.js"></script>
     <script src="/assets/app/v2/deltawebmap/tabs/TabDinos.js"></script>
     <script src="/assets/app/v2/deltawebmap/tabs/TabItems.js"></script>
@@ -90,18 +109,6 @@
     <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonIcons.js"></script>
     <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonCanvas.js"></script>
     <script src="/assets/app/v2/deltawebmap/map_addons/MapAddonOverview.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModal.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleCollapsable.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleStatBars.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleInventory.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleStatus.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/popouts/DeltaPopoutModuleTitle.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/DeltaUserSettingsTabView.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/DeltaHtmlTabView.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/DeltaRecyclerView.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/form/DeltaForm.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/form/DeltaFormRoot.js"></script>
-    <script src="/assets/app/v2/deltawebmap/views/form/DeltaFormContainerBox.js"></script>
 
     <script>
         var app = new DeltaApp({

@@ -556,6 +556,10 @@
     position:relative;
 }
 
+.v3_nav_server_bottom_item_disabled {
+    display: none;
+}
+
 .v3_nav_server_bottom_item:last-child {
     margin-bottom:0;
 }
@@ -655,13 +659,17 @@
     background-repeat: no-repeat;
     background-size: 16px;
     cursor: pointer;
+    display:none;
+}
+
+.v3_nav_server_flag_secure .v3_nav_server_bottom_secure {
+    display:block;
 }
 
 /* Drawer */
-
 .v1_top_drawer {
-    right:unset;
-    left:10px;
+    right: unset;
+    left: 10px;
     top: -50px;
     height: 38px;
     z-index: 10003;

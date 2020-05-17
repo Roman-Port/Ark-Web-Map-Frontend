@@ -36,7 +36,7 @@ class DeltaPopoutModal {
 
 	OnDismissEvent(evt) {
 		//Check if this was an event inside of this modal
-		var target = evt.toElement;
+		var target = evt.target;
 		while (target != null) {
 			if (target == this.view) {
 				return; //Ignore events on us
@@ -104,13 +104,10 @@ class DeltaPopoutModal {
 		var icon = "https://icon-assets.deltamap.net/unknown_dino.png";
 
 		//Lookup entry
-		var entry = app.GetStructureEntryByClassName(data.classname);
-		if (entry != null) {
-			var item = app.GetItemEntryByClassName(entry.item);
-			if (item != null) {
-				name = item.name;
-				icon = item.icon.image_url;
-			}
+		var item = await app.GetItemEntryByStructureClassNameAsync(data.classname);
+		if (item != null) {
+			name = item.name;
+			icon = item.icon.image_url;
 		}
 
 		//Add modules

@@ -58,6 +58,28 @@ class DeltaServer extends DeltaTabView {
         }
     }
 
+    GetTribeById(id) {
+        for (var i = 0; i < this.tribes.length; i += 1) {
+            if (this.tribes[i].tribe_id == id) {
+                return this.tribes[i];
+            }
+        }
+        return null;
+    }
+
+    GetTribeByIdSafe(id) {
+        var t = this.GetTribeById(id);
+        if (t != null) {
+            return t;
+        }
+        //Return placeholder data
+        return {
+            "last_seen": "1980-01-01T01:00:00.000Z",
+            "tribe_id": id,
+            "tribe_name": "UNKNOWN TRIBE"
+        };
+    }
+
     SubscribeRPCEvent(tag, opcode, event) {
         app.rpc.SubscribeServer(this.info.id, tag, opcode, event);
     }
@@ -118,6 +140,11 @@ class DeltaServer extends DeltaTabView {
         //Check if the current map is compatible
         if (!this.GetIsMapSupported()) {
             this.bottomBanner.AddBanner("advanced_banner_style_red", "This map isn't supported. You won't be able to view map tiles for now. Sorry about that.", [], () => { });
+        }
+
+        //Check if we have a tribe
+        if (!this.info.has_tribe && this.info.secure_mode) {
+            this.bottomBanner.AddBanner("advanced_banner_style_red", "You don't have a tribe on this server, and secure mode is off. Turn off secure mode to view other tribes.", [], () => { });
         }
 
         //Init our tabs
@@ -197,6 +224,7 @@ class DeltaServer extends DeltaTabView {
         //If this hasn't been used yet, init the first tab
         if (this.first) {
             this.OnSwitchedToFirst();
+            this.first = false;
         }
     }
 
@@ -437,11 +465,23 @@ class DeltaServer extends DeltaTabView {
         modal.AddPage(builder.Build());
     }
 
+    SetSecureStatus(status) {
+        if (status) {
+            this.menu.classList.add("v3_nav_server_flag_secure");
+        } else {
+            this.menu.classList.remove("v3_nav_server_flag_secure");
+        }
+    }
+
+    BuildServerRequestUrl(extra) {
+        return LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + extra;
+    }
+
     IsAdmin() {
-        return true;
+        return this.info.is_admin;
     }
 
     IsOwner() {
-        return false;
+        return this.info.owner_uid == this.app.user.data.id;
     }
 }

@@ -2845,6 +2845,17 @@ a {
     font-weight: 500;
 }
 
+.modal_preset_text {
+    font-size: 15px;
+    text-align: left;
+    color: #a2a2a2;
+    font-weight: 500;
+}
+
+.modal_preset_padded {
+    margin: 10px 20px;
+}
+
 .modal_preset_warning {
     font-size: 15px;
     margin: 10px 20px;
@@ -3174,7 +3185,7 @@ a {
     height:74px;
     position:relative;
     background-position:center;
-    background-size:45px;
+    background-size:35px;
     background-repeat:no-repeat;
 }
 
@@ -3219,4 +3230,61 @@ a {
 .popoutm2_dinostatus_status {
     margin:0;
     text-align:center;
+}
+
+.subtab_nav {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    padding: 60px 0;
+    left: 20px;
+    width: 150px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.subtab_nav_label {
+    margin: 5px 8px;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #a9acb1;
+}
+
+.subtab_nav_btn {
+    margin: 2px 0;
+    padding: 5px 8px;
+    color: #e6e6e6;
+    font-size: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.subtab_nav_btn:hover {
+    background-color: rgba(69, 72, 77, 0.58);
+}
+
+.subtab_nav_btn_active {
+    background-color: #45484d !important;
+}
+
+.subtab_holder {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    padding: 60px 0;
+    left: 210px;
+    right: 0;
+    overflow-y: auto;
+    font-family: 'Roboto', sans-serif;
+}
+
+.subtab_content {
+    width: 100%;
+    max-width: 1000px;
+    font-family: 'Roboto', sans-serif;
+    display:none;
+}
+
+.subtab_content_active {
+    display:block;
 }

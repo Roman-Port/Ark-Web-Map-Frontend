@@ -11,12 +11,16 @@ class DeltaSyncCollection {
         this.listenersIndex = 0;
     }
 
+    AddObjectIndexedDbStores(stores) {
+        throw "This must be overriden.";
+    }
+
     async GetAllItems() {
-        return await this.GetDbCollection().toArray();
+        throw "This must be overriden.";
     }
 
     async Init() {
-        
+        throw "This must be overriden.";
     }
 
     GetEpochKeyName() {
@@ -24,20 +28,7 @@ class DeltaSyncCollection {
     }
 
     async Sync() {
-        //Get the epoch (if any)
-        var epoch = localStorage.getItem(this.GetEpochKeyName());
-        if (epoch == null) {
-            epoch = "0";
-        }
-
-        //Get
-        var r = await this.RequestWebData(epoch);
-
-        //Set epoch
-        localStorage.setItem(this.GetEpochKeyName(), r.epoch);
-
-        //Add adds
-        await this._BatchUpdate(r.adds, [], false);
+        throw "This must be overriden.";
     }
 
     async RequestWebData(epoch) {
@@ -55,45 +46,24 @@ class DeltaSyncCollection {
             this.listeners[listenerKeys[i]](adds, removes, this.listenerArgs[listenerKeys[i]]);
         }
 
-        //Push to DB
-        if (!propagateOnly) {
-            await this.GetDbCollection().bulkPut(adds);
-        }
-
-        //Run post update
-        this.OnPostUpdate();
+        //Users should add here what they want to do with incoming data
     }
 
     OnPostUpdate() {
         //You are free to override this in children
     }
 
-    GetDbCollection() {
-        return this.db.db[this.name];
-    }
-
     GetSyncUrlBase() {
         throw "This must be overriden.";
     }
 
-    GetPrimaryKey() {
-        throw "This must be overriden.";
-    }
-
     async GetById(id) {
-        return await this.GetDbCollection().get(id);
+        throw "This must be overriden.";
     }
 
     _ReplaceByPrimaryKey(target, data) {
         //Loops through an array, target, and replaces anything with a matching primary key with data
-        var primaryKey = this.GetPrimaryKey();
-        for (var i = 0; i < target.length; i += 1) {
-            if (target[i][primaryKey] == data[primaryKey]) {
-                target.splice(i, 1);
-                i--;
-            }
-        }
-        target.push(data);
+        throw "This must be overriden.";
     }
 
     AddListener(callback, ctx) {

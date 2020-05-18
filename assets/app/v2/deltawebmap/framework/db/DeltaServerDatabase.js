@@ -12,14 +12,6 @@ class DeltaServerDatabase extends DeltaDatabase {
         return "PROD_GUILD_" + this.server.id;
     }
 
-    GetDbStores() {
-        return {
-            dinos: 'dino_id, tamed_name, classname, level, is_baby',
-            structures: 'structure_id, tribe_id, classname',
-            inventories: 'item_id, holder_id, holder_type, tribe_id, classname'
-        };
-    }
-
     GetDbStoreTypes() {
         return {
             dinos: DeltaServerSyncCollectionDinos,

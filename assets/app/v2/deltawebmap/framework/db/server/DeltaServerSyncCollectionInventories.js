@@ -1,6 +1,6 @@
 "use strict";
 
-class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
+class DeltaServerSyncCollectionInventories extends DeltaDbCollectionMemory {
 
     constructor(db, name) {
         super(db, name);
@@ -20,6 +20,10 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
 
     GetRPCSyncType() {
         return 2;
+    }
+
+    GetDbStore() {
+        return "item_id, holder_id, holder_type, tribe_id, classname";
     }
 
     static ReadStringFromBuffer(buf, offset, len) {
@@ -131,13 +135,13 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
         //Essentially acts as an item search. Returns all items, sorted by item classname, from inventories
 
         //First, find all items matching these classnames
-        var items = await this.GetDbCollection().filter((x) => {
+        var items = this.GetByFilter((x) => {
             var cn = x.classname;
             if (cn.endsWith("_C")) {
                 cn = cn.substr(0, cn.length - 2);
             }
             return classnames.includes(cn);
-        }).toArray();
+        });
 
         //Loop through and add item inventory holders
         var itemHolders = {};
@@ -184,9 +188,9 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
     }
 
     async GetItemsFromInventory(holderType, holderId) {
-        var items = await this.GetDbCollection().filter((x) => {
+        var items = this.GetByFilter((x) => {
             return x.holder_id == holderId && x.holder_type == holderType;
-        }).toArray();
+        });
         return items;
     }
 

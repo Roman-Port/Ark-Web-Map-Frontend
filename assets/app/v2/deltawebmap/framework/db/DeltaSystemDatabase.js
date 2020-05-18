@@ -12,13 +12,6 @@ class DeltaSystemDatabase extends DeltaDatabase {
         return "PROD_SYSTEM";
     }
 
-    GetDbStores() {
-        return {
-            species: 'classname',
-            items: 'classname, structure_classname'
-        }
-    }
-
     GetDbStoreTypes() {
         return {
             species: DeltaSystemSyncCollectionSpecies,

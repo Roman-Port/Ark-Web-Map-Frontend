@@ -1,6 +1,6 @@
 "use strict";
 
-class DeltaServerSyncCollectionDinos extends DeltaServerSyncCollection {
+class DeltaServerSyncCollectionDinos extends DeltaDbCollectionMemory {
 
     constructor(db, name) {
         super(db, name);
@@ -20,6 +20,10 @@ class DeltaServerSyncCollectionDinos extends DeltaServerSyncCollection {
 
     GetRPCSyncType() {
         return 0;
+    }
+
+    GetDbStore() {
+        return "dino_id, tamed_name, classname, level, is_baby";
     }
 
 }

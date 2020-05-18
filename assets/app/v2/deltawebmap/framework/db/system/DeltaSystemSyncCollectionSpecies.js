@@ -1,6 +1,6 @@
 "use strict";
 
-class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
+class DeltaSystemSyncCollectionSpecies extends DeltaDbCollectionIndexedDB {
 
     constructor(db, name) {
         super(db, name);
@@ -24,6 +24,10 @@ class DeltaSystemSyncCollectionSpecies extends DeltaSyncCollection {
 
     OnPostUpdate() {
         
+    }
+
+    GetDbStore() {
+        return "classname";
     }
 
     async BuildMap() {

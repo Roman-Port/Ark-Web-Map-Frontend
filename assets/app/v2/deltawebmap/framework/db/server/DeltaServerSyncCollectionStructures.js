@@ -1,6 +1,6 @@
 "use strict";
 
-class DeltaServerSyncCollectionStructures extends DeltaServerSyncCollection {
+class DeltaServerSyncCollectionStructures extends DeltaDbCollectionMemory {
 
     constructor(db, name) {
         super(db, name);
@@ -22,6 +22,10 @@ class DeltaServerSyncCollectionStructures extends DeltaServerSyncCollection {
 
     GetRPCSyncType() {
         return 3;
+    }
+
+    GetDbStore() {
+        return "structure_id, tribe_id, classname";
     }
 
     async RequestWebData(epoch) {

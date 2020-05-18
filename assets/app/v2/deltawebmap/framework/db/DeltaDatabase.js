@@ -13,21 +13,22 @@ class DeltaDatabase {
 
         //Set up DB
         this.db = new Dexie(this.name);
-        var stores = this.GetDbStores();
-        var storeKeys = Object.keys(stores);
         var storeTypes = this.GetDbStoreTypes();
-        this.db.version(this.GetDbVersion()).stores(stores);
+        var storeTypeKeys = Object.keys(storeTypes);
 
-        //Add collections
+        //Create list of stores
+        var stores = {};
         this.collections = [];
-        for (var i = 0; i < storeKeys.length; i += 1) {
-            var k = storeKeys[i];
-
+        for (var i = 0; i < storeTypeKeys.length; i += 1) {
             //Create
-            var collec = new storeTypes[k](this, k);
+            var collec = new storeTypes[storeTypeKeys[i]](this, storeTypeKeys[i]);
             this.collections.push(collec);
-            this[k] = collec;
+            this[storeTypeKeys[i]] = collec;
+            collec.AddObjectIndexedDbStores(stores);
         }
+
+        //Set DB data
+        this.db.version(this.GetDbVersion()).stores(stores);
     }
 
     GetDbVersion() {

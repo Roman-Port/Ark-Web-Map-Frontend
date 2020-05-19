@@ -112,7 +112,7 @@ class DeltaApp {
                 //Create server
                 var server = new DeltaServer(this, info, menu);
                 server.menu = menu;
-                server.SetSecureStatus(info.secure_mode);
+                server.SetUserInterfaceSecureStatus(info.secure_mode);
                 var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
 
                 //Finish creating menu
@@ -434,6 +434,18 @@ class DeltaApp {
         builder.AddAction(negativeText, negativeType, () => {
             modal.Close();
             negativeAction();
+        });
+        modal.AddPage(builder.Build());
+    }
+
+    OpenNoticeModal(title, subtitle) {
+        var modal = this.modal.AddModal(480, 290);
+
+        var builder = new DeltaModalBuilder();
+        builder.AddContentCustomText("modal_preset_title", title);
+        builder.AddContentCustomText("modal_preset_subtitle", subtitle);
+        builder.AddAction("Okay", "NEUTRAL", () => {
+            modal.Close();
         });
         modal.AddPage(builder.Build());
     }

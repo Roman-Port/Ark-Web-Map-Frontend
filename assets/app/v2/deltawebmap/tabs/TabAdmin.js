@@ -60,21 +60,10 @@ class TabAdmin extends SubTabMenuTab {
     }
 
     OnSwitchToggled(e) {
-        if (this.active) {
-            this.OnSwitchedOff();
-        } else {
-            this.OnSwitchedOn();
-        }
+        //Stop this from toggling anything
         e.stopPropagation();
-    }
 
-    async OnSwitchedOn() {
-        //Check if we're busy
-        if (this.CheckIfBusy()) {
-            return;
-        }
-
-        //Check if we're in secure mode
+        //If we're in secure mode and attempting to turn this on, warn the user
         if (this.server.info.secure_mode) {
             //Show dialog about secure mode
             if (this.server.IsOwner()) {
@@ -85,6 +74,7 @@ class TabAdmin extends SubTabMenuTab {
                 e.AddContentDescription("You must turn off secure mode before you can use admin mode. Turning it off will remove the padlock from your server.");
                 e.AddContentWarningBox("Changing this setting will notify members, even if you change it back.");
                 e.AddAction("Turn Off", "POSITIVE", () => {
+                    this.server.AdminSetSecureMode(false);
                     modal.Close();
                 });
                 e.AddAction("Cancel", "NEUTRAL", () => {
@@ -104,34 +94,20 @@ class TabAdmin extends SubTabMenuTab {
                 e.Build();
                 modal.AddPage(e.Build());
             }
-            
+
             return;
         }
 
-        //Set UI
-        this.active = true;
-        this.switch.classList.add("admin_tab_toggle_active");
-
-        //Change
-        await this.RunWaitingFunction(this.ChangeTribe('*'));
+        //Switch
+        this.server.SetAdminMode(!this.server.admin_mode);
     }
 
-    async OnSwitchedOff() {
-        //Check if we're busy
-        if (this.CheckIfBusy()) {
-            return;
-        }
-
-        //Set UI
-        this.active = false;
-        this.switch.classList.remove("admin_tab_toggle_active");
-        
-        //Change
-        await this.RunWaitingFunction(this.ChangeTribe(this.server.nativeTribe));
+    SetLoadingSymbol(active) {
+        DeltaTools.SetClassStatus(this.loader, "admin_tab_loader_active", active);
     }
 
-    async ChangeTribe(nextTribeId) {
-        await this.server.ChangeTribe(nextTribeId);
+    SetActiveStatus(active) {
+        DeltaTools.SetClassStatus(this.switch, "admin_tab_toggle_active", active);
     }
 
     CheckIfBusy() {

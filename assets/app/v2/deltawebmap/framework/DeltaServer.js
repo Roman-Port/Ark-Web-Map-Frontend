@@ -26,6 +26,7 @@ class DeltaServer extends DeltaTabView {
         this.ready = false; //Set to true when all data has been synced
         this.bottomBanner = null;
         this.tribes = [];
+        this.admin_mode = false;
 
         //Create tabs
         this.tabs = [
@@ -147,6 +148,18 @@ class DeltaServer extends DeltaTabView {
             this.bottomBanner.AddBanner("advanced_banner_style_red", "You don't have a tribe on this server, and secure mode is off. Turn off secure mode to view other tribes.", [], () => { });
         }
 
+        //Check if secure mode has recently been toggled
+        if (true) {
+            this.bottomBanner.AddBanner("advanced_banner_style_red", "Server admins may have viewed your tribe content, as server security settings were recently changed by the server owner. Secure mode is currently " + (this.info.secure_mode ? "on" : "off") + ".", [
+                {
+                    "text": "Learn More",
+                    "callback": () => {
+                        this.app.OpenNoticeModal("About Secure Mode", "Secure mode is a setting that server owners can opt into. Secure mode prevents any other user, including server admins, from viewing or accessing your tribe information without being in your tribe.\n\nThis feature is built to make admin abuse using this app impossible. A padlock will appear next to the name of this server when secure mode is on.");
+                    }
+                }
+            ], () => { });
+        }
+
         //Init our tabs
         for (var i = 0; i < this.tabs.length; i++) {
             var m = DeltaTools.CreateDom("div", "main_tab", this.mountpoint); //This is the mountpoint for the tab
@@ -154,7 +167,30 @@ class DeltaServer extends DeltaTabView {
         }
 
         //Add RPC events
-        this.SubscribeRPCEvent("server", 7, (m) => this.OnCharacterLiveUpdate(m));
+        this.SubscribeRPCEvent("guild-secure-mode", 20004, (m) => this.OnRemoteSecureModeChanged(m));
+    }
+
+    OnRemoteSecureModeChanged(data) {
+        var secure = data.secure;
+        this.info.secure_mode = secure;
+        this.SetUserInterfaceSecureStatus(secure);
+        if (this.IsAdmin()) {
+            if (secure) {
+                this.app.OpenNoticeModal("Secure Mode Enabled", "Secure mode was enabled by the server owner. You may no longer view other tribes.");
+                this.SetAdminMode(false);
+                this.OnApiPermissionsChanged();
+            } else {
+                this.app.OpenNoticeModal("Secure Mode Disabled", "Secure mode was disabled. You may now access other tribes!");
+                this.SetAdminMode(true);
+                this.OnApiPermissionsChanged();
+            }
+        } else {
+            if (secure) {
+                this.app.OpenNoticeModal("Secure Mode Enabled", "Secure mode has been enabled by the server owner. Server admins may no longer access tribe data.");
+            } else {
+                this.app.OpenNoticeModal("Secure Mode Disabled", "Secure mode was disabled. Server admins may now be able to access your tribe data.");
+            }
+        }
     }
 
     CheckStatus() {
@@ -192,6 +228,11 @@ class DeltaServer extends DeltaTabView {
         return await DeltaTools.WebRequest(url, args, this.token);
     }
 
+    //Syncs content from the server locally
+    async SyncContent() {
+        await this.db.Sync();
+    }
+
     async DownloadDataCritical() {
         //Downloads server data that we need to even begin loading. Returns the status
 
@@ -214,7 +255,7 @@ class DeltaServer extends DeltaTabView {
         //Downloads server data in the background while the tabs are shown
 
         //Download data
-        await this.db.Sync();
+        await this.SyncContent();
     }
 
     OnSwitchedTo() {
@@ -231,6 +272,11 @@ class DeltaServer extends DeltaTabView {
     async OnSwitchedToFirst() {
         //Called when this server is first switched to and we need to begin downloading
         this.SetLoaderStatus(true);
+
+        //Set admin mode if we can
+        if (!this.info.has_tribe && this.IsAdmin() && !this.info.secure_mode) {
+            this.SetAdminMode(true);
+        }
 
         //Download critical data first
         if (!await this.DownloadDataCritical()) {
@@ -356,38 +402,6 @@ class DeltaServer extends DeltaTabView {
         return Math.sqrt(Math.pow(a1, 2) + Math.pow(a2, 2));
     }
 
-    OnCharacterLiveUpdate(m) {
-        /* Called when there is a live update for a character. We check if this concerns US, and if it does, we will dispatch an event */
-        /* BUG: This will fail if the user changes tribes without reloading the page, but since this is such a rare occurance, we're not going to worry about it. */
-
-        //Check if our data exists
-        if (this.info.my_profile == null) { return; }
-
-        //Run
-        for (var i = 0; i < m.updates.length; i += 1) {
-            var u = m.updates[i];
-
-            //Check if this is us
-            if (u.type != 0 || u.id != this.info.my_profile.ark_id) { continue; }
-
-            //Check if this is a location update
-            if (u.x == null || u.y == null || u.z == null) { continue; }
-
-            //Create location vector
-            var vector = {
-                "x": u.x,
-                "y": u.y,
-                "z": u.z
-            };
-
-            //Update the location
-            this.myLocation = vector;
-
-            //This is valid. Dispatch
-            this.DispatchEvent(R.server_events.EVT_SERVER_MY_LOCATION_UPDATE, vector);
-        }
-    }
-
     async PushUserPrefs() {
         /* Pushes user prefs for this server */
         this.prefs = await DeltaTools.WebPOSTJson(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/put_user_prefs", this.prefs, this.token);
@@ -465,7 +479,7 @@ class DeltaServer extends DeltaTabView {
         modal.AddPage(builder.Build());
     }
 
-    SetSecureStatus(status) {
+    SetUserInterfaceSecureStatus(status) {
         if (status) {
             this.menu.classList.add("v3_nav_server_flag_secure");
         } else {
@@ -475,6 +489,44 @@ class DeltaServer extends DeltaTabView {
 
     BuildServerRequestUrl(extra) {
         return LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + extra;
+    }
+
+    async AdminSetSecureMode(status) {
+        await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/admin/secure"), {
+            "secure": status
+        }, this.token);
+    }
+
+    //Sets if we're using admin mode
+    SetAdminMode(admin) {
+        var adminTab = this.tabs[3];
+
+        //If we aren't changing anything, abort
+        if (this.admin_mode == admin) {
+            return false;
+        }
+
+        //Set loader and switch
+        this.admin_mode = admin;
+        adminTab.SetLoadingSymbol(true);
+        adminTab.SetActiveStatus(admin);
+
+        //Set loader
+        adminTab.SetLoadingSymbol(false);
+
+        return true;
+    }
+
+    //Called when our access to the API is changed (we're granted admin access, secure mode changed, etc)
+    async OnApiPermissionsChanged() {
+        //Set loader
+        this.SetLoaderStatus(true);
+
+        //Sync
+        await this.SyncContent();
+
+        //Set loader
+        this.SetLoaderStatus(false);
     }
 
     IsAdmin() {

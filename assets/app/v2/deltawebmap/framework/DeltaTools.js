@@ -145,4 +145,12 @@ class DeltaTools {
         });
     }
 
+    static SetClassStatus(e, classname, active) {
+        if (active) {
+            e.classList.add(classname);
+        } else {
+            e.classList.remove(classname);
+        }
+    }
+
 }

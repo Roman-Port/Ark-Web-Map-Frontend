@@ -1,6 +1,6 @@
 "use strict";
 
-class AdminTabServerPlayers extends SubTabMenuTabModule {
+class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
 
     constructor() {
         super("Players");
@@ -10,6 +10,7 @@ class AdminTabServerPlayers extends SubTabMenuTabModule {
 
     Attach() {
         this.mountpoint = DeltaTools.CreateDom("div", null);
+        this._AddTitle("Players");
         return this.mountpoint;
     }
 
@@ -23,82 +24,6 @@ class AdminTabServerPlayers extends SubTabMenuTabModule {
 
         //Add players
         for (var i = 0; i < results.players.length; i += 1) {
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
             this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
         }
     }

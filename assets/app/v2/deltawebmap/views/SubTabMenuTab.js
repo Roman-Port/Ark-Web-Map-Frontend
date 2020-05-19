@@ -4,13 +4,18 @@ class SubTabMenuTab extends DeltaServerTab {
 
     /* This has tabs on the left and a content view in the center */
 
-    constructor(server, layout) {
+    constructor(server) {
         super(server);
 
         //Layout takes in an array. Two kinds can be inside: SubTabMenuTabModule and a string. Strings are used as labels
-        this.layout = layout;
+        this.layout = this.GetCurrentLayout();
         this.tabs = [];
         this.currentTab = -1;
+    }
+
+    GetCurrentLayout() {
+        //Overwrite this
+        return [];
     }
 
     OnInit(mountpoint) {
@@ -33,9 +38,16 @@ class SubTabMenuTab extends DeltaServerTab {
                 var content = this.layout[i].Attach();
                 this.layout[i].content = content;
                 this.layout[i].menu = menu;
+                var tabIndex = this.tabs.length;
                 this.tabs.push(this.layout[i]);
                 content.classList.add("subtab_content");
                 this.holder.appendChild(content);
+
+                //Add event
+                menu.x_index = tabIndex;
+                menu.addEventListener("click", (evt) => {
+                    this.SwitchSubTabs(evt.target.x_index);
+                });
             }
         }
     }
@@ -61,6 +73,7 @@ class SubTabMenuTab extends DeltaServerTab {
         if (this.tabs[this.currentTab].first) {
             this.tabs[this.currentTab].OnFirstOpened();
         }
+        this.tabs[this.currentTab].first = false;
         this.tabs[this.currentTab].OnOpened();
     }
 

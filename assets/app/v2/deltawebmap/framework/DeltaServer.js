@@ -149,7 +149,8 @@ class DeltaServer extends DeltaTabView {
         }
 
         //Check if secure mode has recently been toggled
-        if (true) {
+        //TODO
+        if (false) {
             this.bottomBanner.AddBanner("advanced_banner_style_red", "Server admins may have viewed your tribe content, as server security settings were recently changed by the server owner. Secure mode is currently " + (this.info.secure_mode ? "on" : "off") + ".", [
                 {
                     "text": "Learn More",

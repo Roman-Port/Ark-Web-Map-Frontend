@@ -160,7 +160,7 @@ class DeltaGuildCreator {
         }));
         builder.AddContentCustom(this._CreateWideBtn("Self Hosted", "Choose this option if you host the server from your own computer. You'll know if you need to choose this option.", () => {
             this.settings.host = "SELF";
-            this._ShowModInstallPrompt();
+            this._ShowInsecureWarning();
         }));
 
         builder.AddAction("Cancel", "NEUTRAL", () => {
@@ -185,6 +185,21 @@ class DeltaGuildCreator {
                 this._ShowModInstallPrompt();
         }));
 
+        builder.AddAction("Cancel", "NEUTRAL", () => {
+            this._PromptCancel();
+        });
+        this.modal.AddPage(builder.Build());
+    }
+
+    _ShowInsecureWarning() {
+        var builder = new DeltaModalBuilder();
+
+        builder.AddContentCustomText("gs_title", "Traffic Unencrypted");
+        builder.AddContentWarningBox("Wildcard does not allow us to use an encrypted connection to communicate with your ARK server. Make sure that the network you are running your ARK server on is secure. This won't matter to the majority of server owners.");
+
+        builder.AddAction("Continue", "POSITIVE", () => {
+            this._ShowModInstallPrompt();
+        });
         builder.AddAction("Cancel", "NEUTRAL", () => {
             this._PromptCancel();
         });

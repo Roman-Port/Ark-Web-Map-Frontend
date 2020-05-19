@@ -3,15 +3,24 @@
 class TabAdmin extends SubTabMenuTab {
 
     constructor(server) {
-        super(server, [
-            "Server Settings",
-            "Server Admin",
-            new AdminTabServerPlayers()
-        ]);
+        super(server);
         this.switch = null;
         this.active = false;
         this.loader = null;
         this.busy = false;
+    }
+
+    GetCurrentLayout() {
+        return [
+            "Server Settings",
+            new AdminTabServerOverview(),
+            new AdminTabServerAdmins(),
+            new AdminTabServerSecure(),
+            new AdminTabServerPermissions(),
+            new AdminTabServerPresets(),
+            "Server Admin",
+            new AdminTabServerPlayers()
+        ];
     }
 
     GetDisplayName() {
@@ -137,4 +146,24 @@ class TabAdmin extends SubTabMenuTab {
 
         return r;
     }
+}
+
+class AdminSubTabMenuTabModule extends SubTabMenuTabModule {
+
+    constructor(name) {
+        super(name);
+    }
+
+    _AddTitle(name) {
+        return DeltaTools.CreateDom("div", "admin_title", this.mountpoint, name);
+    }
+
+    _AddText(text) {
+        return DeltaTools.CreateDom("div", "admin_text", this.mountpoint, text);
+    }
+
+    _AddWarning(text) {
+        return DeltaTools.CreateDom("div", "admin_warning_box", this.mountpoint, text);
+    }
+
 }

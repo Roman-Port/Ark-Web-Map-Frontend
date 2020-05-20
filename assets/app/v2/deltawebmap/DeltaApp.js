@@ -35,6 +35,7 @@ class DeltaApp {
         this.topBanner = null;
         this.modal = null;
         this.config = null;
+        this.clusterItems = {};
     }
 
     async Init() {
@@ -66,123 +67,13 @@ class DeltaApp {
         this.msgViewActiveServerErr = this.CreateMessageView("", "D'oh!", "D'oh!<br><br>Looks like the current ARK server has become unavailable. Check back soon!");
         this.msgViewServerNotFound = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>You don't have access to this ARK server, the server was removed, or it never existed to begin with.");
         this.msgViewServerRequestedNotOk = this.CreateMessageView("", "Server Not Found", "Hmph.<br><br>The server you attempted to access is unavailable. Try again later.");
+        this.msgViewServerRemoved = this.CreateMessageView("", "Server Removed", "The server you were viewing has been removed.");
 
-        //Set up servers
-        if (this.user.data.servers.length > 0) {
-            //Create default cluster
-            var clusterMenus = {};
-            var defaultClusterMenu = this.CreateServerListClusterLabel(this.serverListHolder, "UNCATEGORIZED");
-
-            //Add clusters
-            for (var i = 0; i < this.user.data.clusters.length; i += 1) {
-                var cluster = this.user.data.clusters[i];
-                clusterMenus[cluster.id] = this.CreateServerListClusterLabel(this.serverListHolder, cluster.name);
-            }
-
-            //Boot up servers
-            for (var i = 0; i < this.user.data.servers.length; i += 1) {
-                //Get server info
-                var info = this.user.data.servers[i];
-
-                //Create the server on the sidebar
-                var menu = DeltaTools.CreateDom("div", "v3_nav_server");
-                var top = DeltaTools.CreateDom("div", "v3_nav_server_top", menu);
-                DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top).src = info.image_url;
-                var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
-                menu.alertBadge = alertBadge;
-                var loaderBadge = DeltaTools.CreateDom("div", "loading_spinner server_loader", top, "");
-                menu.loaderBadge = loaderBadge;
-                DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
-                var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
-
-                //Add padlock
-                DeltaTools.CreateDom("div", "v3_nav_server_bottom_secure", bottom).addEventListener("click", () => {
-                    //Show dialog about secure mode
-                    var modal = this.modal.AddModal(480, 290);
-                    var e = new DeltaModalBuilder();
-                    e.AddContentTitle("Server Using Secure Mode");
-                    e.AddContentDescription("The owner of this server has opted to enable secure mode. This prevents any other user, including server admins, from viewing or accessing your tribe information without being in your tribe.");
-                    e.AddContentDescription("Your server owner can opt out of this at any time, but you will be notified. This feature is built to make admin abuse using this app impossible.");
-                    e.AddAction("Close", "NEUTRAL", () => {
-                        modal.Close();
-                    });
-                    e.Build();
-                    modal.AddPage(e.Build());
-                });
-
-                //Create server
-                var server = new DeltaServer(this, info, menu);
-                server.menu = menu;
-                server.SetUserInterfaceSecureStatus(info.secure_mode);
-                var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
-
-                //Finish creating menu
-                for (var j = 0; j < server.tabs.length; j += 1) {
-                    var btn = server.tabs[j].CreateMenuItem(bottom);
-                    btn.x_index = j;
-                    btn.x_server = server;
-                    server.tabs[j].menu = btn;
-                    btn.addEventListener("click", function () {
-                        this.x_server.OnSwitchTab(this.x_index);
-                    });
-                }
-
-                //Add context menu
-                DeltaContextMenu.AddContextMenu(menu, server, [
-                    [
-                        {
-                            "name": "Hide Server",
-                            "style": "red",
-                            "callback": (app, server) => {
-                                if (server.IsOwner()) {
-                                    return;
-                                }
-                                app.OpenPromptModal("Hide " + server.info.display_name, "Are you sure you want to hide " + server.info.display_name + "? Hiding a server will make it disappear from Delta Web Map until you rejoin the server in-game.", "Hide", "Cancel", () => {
-                                    if (server.IsAdmin()) {
-                                        //Warn about losing admin
-                                        app.OpenPromptModal("Give Up Admin", "Hiding " + server.info.display_name + " will give up your admin access on this server. Are you sure you want to hide it?", "Accept", "Cancel", () => {
-
-                                        }, () => { }, "NEGATIVE", "NEUTRAL");
-                                    } else {
-                                        //Leave now
-                                    }
-                                }, () => { }, "NEGATIVE", "NEUTRAL");
-                            },
-                            "enabled": !server.IsOwner()
-                        }
-                    ],
-                    [
-                        {
-                            "name": "Copy ID",
-                            "callback": (app, server) => {
-                                DeltaTools.CopyToClipboard(server.info.id);
-                            }
-                        }
-                    ]
-                ]);
-
-                //Add event
-                top.x_id = info.id;
-                top.x_app = this;
-                top.addEventListener("click", function () {
-                    this.x_app.SwitchServer(this.x_app.servers[this.x_id]);
-                });
-
-                //Mount the server menu to the sidebar
-                if (info.cluster_id == null) {
-                    //Add to default cluster
-                    defaultClusterMenu.appendChild(menu);
-                } else {
-                    //Mount to this cluster ID
-                    clusterMenus[info.cluster_id].appendChild(menu);
-                }
-
-                //Add to list of servers
-                this.servers[info.id] = server;
-
-                //Start init
-                server.Init(m);
-            }
+        //Boot up servers
+        for (var i = 0; i < this.user.data.servers.length; i += 1) {
+            //Get server info
+            var info = this.user.data.servers[i];
+            this.BootServer(info);
         }
 
         //Add "add server" button
@@ -192,6 +83,42 @@ class DeltaApp {
 
         //Swtich to the default server
         this.SwitchServer(this.GetDefaultServer());
+    }
+
+    BootServer(info) {
+        //Get a cluster to place this in
+        var clusterTarget;
+        if (info.cluster_id == null) {
+            clusterTarget = "_UNCLUSTERED";
+        } else {
+            clusterTarget = info.cluster_id;
+        }
+        var cluster;
+        /*if (this.clusterItems[clusterTarget] == null) {
+            //We must create it
+            if (info.cluster_id == null) {
+                cluster = this.CreateServerListClusterLabel(this.serverListHolder, "UNCATEGORIZED");
+            } else {
+                cluster = this.CreateServerListClusterLabel(this.serverListHolder, "UNCATEGORIZED");
+            }
+            this.clusterItems[clusterTarget] = cluster;
+        } else {
+            //Already exists
+            cluster = this.clusterItems[clusterTarget];
+        }*/
+        cluster = this.serverListHolder;
+
+        //Create server and it's menu
+        var server = new DeltaServer(this, info);
+        this.servers[info.id] = server;
+
+        //Create menu
+        cluster.appendChild(server.CreateMenuItem());
+        server.SetUserInterfaceSecureStatus(info.secure_mode);
+
+        //Create mountpoint and init
+        var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
+        server.Init(m);
     }
 
     async InitNetworkResources() {

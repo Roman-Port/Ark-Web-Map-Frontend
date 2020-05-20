@@ -2,12 +2,12 @@
 
 class DeltaServer extends DeltaTabView {
 
-    constructor(app, info, menu) {
+    constructor(app, info) {
         super(app);
 
         //Set vars
         this.info = info;
-        this.menu = menu;
+        this.menu = null;
         this.mountpoint = null; //This is the main location where we will be able to attach our own stuff
         this.dispatcher = new DeltaEventDispatcher();
         this.id = info.id;
@@ -57,6 +57,107 @@ class DeltaServer extends DeltaTabView {
         } else {
             return this.info.id + "/" + this.tabs[this.activeTab].GetId();
         }
+    }
+
+    CreateMenuItem() {
+        //Get server info
+        var info = this.info;
+
+        //Create the server on the sidebar
+        var menu = DeltaTools.CreateDom("div", "v3_nav_server");
+        this.menu = menu;
+        var top = DeltaTools.CreateDom("div", "v3_nav_server_top", menu);
+        DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top).src = info.image_url;
+        var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
+        menu.alertBadge = alertBadge;
+        var loaderBadge = DeltaTools.CreateDom("div", "loading_spinner server_loader", top, "");
+        menu.loaderBadge = loaderBadge;
+        DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
+        var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
+
+        //Add padlock
+        DeltaTools.CreateDom("div", "v3_nav_server_bottom_secure", bottom).addEventListener("click", () => {
+            //Show dialog about secure mode
+            var modal = this.modal.AddModal(480, 290);
+            var e = new DeltaModalBuilder();
+            e.AddContentTitle("Server Using Secure Mode");
+            e.AddContentDescription("The owner of this server has opted to enable secure mode. This prevents any other user, including server admins, from viewing or accessing your tribe information without being in your tribe.");
+            e.AddContentDescription("Your server owner can opt out of this at any time, but you will be notified. This feature is built to make admin abuse using this app impossible.");
+            e.AddAction("Close", "NEUTRAL", () => {
+                modal.Close();
+            });
+            e.Build();
+            modal.AddPage(e.Build());
+        });
+
+        //Finish creating menu
+        for (var j = 0; j < this.tabs.length; j += 1) {
+            var btn = this.tabs[j].CreateMenuItem(bottom);
+            btn.x_index = j;
+            btn.x_server = this;
+            this.tabs[j].menu = btn;
+            btn.addEventListener("click", function () {
+                this.x_server.OnSwitchTab(this.x_index);
+            });
+        }
+
+        //Add context menu
+        DeltaContextMenu.AddContextMenu(menu, this, [
+            [
+                {
+                    "name": "Hide Server",
+                    "style": "red",
+                    "callback": (app, server) => {
+                        if (server.IsOwner()) {
+                            return;
+                        }
+                        app.OpenPromptModal("Hide " + server.info.display_name, "Are you sure you want to hide " + server.info.display_name + "? Hiding a server will make it disappear from Delta Web Map until you rejoin the server in-game.", "Hide", "Cancel", () => {
+                            if (server.IsAdmin()) {
+                                //Warn about losing admin
+                                app.OpenPromptModal("Give Up Admin", "Hiding " + server.info.display_name + " will give up your admin access on this server. Are you sure you want to hide it?", "Accept", "Cancel", () => {
+                                    //Leave now
+                                    server.HideServer();
+                                }, () => { }, "NEGATIVE", "NEUTRAL");
+                            } else {
+                                //Leave now
+                                server.HideServer();
+                            }
+                        }, () => { }, "NEGATIVE", "NEUTRAL");
+                    },
+                    "enabled": !this.IsOwner()
+                }
+            ],
+            [
+                {
+                    "name": "Copy ID",
+                    "callback": (app, server) => {
+                        DeltaTools.CopyToClipboard(server.info.id);
+                    }
+                }
+            ]
+        ]);
+
+        //Add event
+        top.x_id = info.id;
+        top.x_app = this.app;
+        top.addEventListener("click", function () {
+            this.x_app.SwitchServer(this.x_app.servers[this.x_id]);
+        });
+
+        return menu;
+    }
+
+    RemoveServer() {
+        //If we're currently viewing this server, switch
+        if (this.app.lastServer.id == this.id) {
+            this.app.SwitchServer(this.app.msgViewServerRemoved);
+        }
+
+        //Remove menu
+        this.menu.remove();
+
+        //Remove our mountpoint. This might cause errors but the user won't see them
+        this.mountpoint.remove();
     }
 
     GetTribeById(id) {
@@ -175,6 +276,9 @@ class DeltaServer extends DeltaTabView {
         this.SubscribeRPCEvent("guild-permissions", 20005, (m) => {
             this.info.permission_flags = m.flags;
             this.ApplyNewPermissions();
+        });
+        this.SubscribeRPCEvent("guild-leave", 30004, (m) => {
+            this.RemoveServer();
         });
     }
 
@@ -571,5 +675,11 @@ class DeltaServer extends DeltaTabView {
     //Applies new permissions to the user interface
     ApplyNewPermissions() {
 
+    }
+
+    async HideServer() {
+        await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/hide"), {
+            
+        }, this.token);
     }
 }

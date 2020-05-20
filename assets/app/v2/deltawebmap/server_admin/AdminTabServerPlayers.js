@@ -61,7 +61,7 @@ class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
             ],
             [
                 {
-                    "name": "Ban Player",
+                    "name": "Ban " + data.name,
                     "style": "red",
                     "callback": (app, d) => {
                         //TODO

@@ -34,6 +34,7 @@ class DeltaApp {
         ];
         this.topBanner = null;
         this.modal = null;
+        this.config = null;
     }
 
     async Init() {
@@ -163,6 +164,9 @@ class DeltaApp {
         var tries = 0;
         while (true) {
             try {
+                //Get config
+                this.config = await DeltaTools.WebRequest(LAUNCH_CONFIG.CONFIG_API_ENDPOINT + "/prod/frontend/config.json", {"noauth":true}, null);
+
                 //Get structure metadata
                 this.structureMetadata = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
 

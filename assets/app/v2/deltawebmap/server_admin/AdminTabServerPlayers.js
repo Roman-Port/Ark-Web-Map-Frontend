@@ -11,6 +11,7 @@ class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
     Attach() {
         this.mountpoint = DeltaTools.CreateDom("div", null);
         this._AddTitle("Players");
+        this._AddText("Only players that have joined since you added Delta Web Map to your server will be shown.");
         return this.mountpoint;
     }
 

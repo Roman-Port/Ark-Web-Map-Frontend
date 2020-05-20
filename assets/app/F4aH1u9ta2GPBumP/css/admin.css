@@ -29,6 +29,8 @@
     border: 1px solid #0c0c0c;
 }
 
+/* Players tab */
+
 .admintab_players_user {
     position: relative;
     height: 40px;
@@ -115,4 +117,99 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+
+/* Permissions tab */
+.admintab_permissions_perm {
+    position: relative;
+    min-height: 40px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    padding: 2px 0px;
+    padding-right:86px;
+}
+
+.admintab_permissions_perm_name {
+    font-size: 15px;
+    color: white;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height: 38px;
+}
+
+.admintab_permissions_perm_description {
+    font-size: 15px;
+    color: #adadad;
+}
+
+.admintab_permissions_perm_select {
+    position: absolute;
+    width: 76px;
+    height: 28px;
+    right: 0px;
+    top: 5px;
+}
+
+.admintab_permissions_perm_select_tribe {
+    border: 1px solid #18191c;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 36px;
+    background-color: #252629;
+    cursor: pointer;
+    z-index: 1;
+    background-image: url(/assets/app/icons/admin/permissions/tribe.svg);
+    background-repeat: no-repeat;
+    background-size: 16px;
+    background-position: center;
+}
+
+.admintab_permissions_perm_select_admin {
+    border: 1px solid #18191c;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    background-color: #252629;
+    cursor: pointer;
+    z-index: 1;
+    background-image: url(/assets/app/icons/admin/permissions/admin.svg);
+    background-repeat: no-repeat;
+    background-size: 16px;
+    background-position: center;
+}
+
+.admintab_permissions_perm_select_label {
+    color: white;
+    font-weight: 800;
+    font-size: 10px;
+    left: 0;
+    right: 0;
+    position: absolute;
+    top: -20px;
+    text-transform: uppercase;
+    text-align: center;
+    pointer-events: none;
+}
+
+.admintab_permissions_perm_select_tribe_active {
+    background-color: #43b581;
+    border-color: #43b581;
+    z-index: 2;
+    background-image: url(/assets/app/icons/admin/permissions/tribe_selected.svg);
+}
+
+.admintab_permissions_perm_select_admin_active {
+    background-color: #f04747;
+    border-color: #f04747;
+    z-index: 2;
+    background-image: url(/assets/app/icons/admin/permissions/admin_selected.svg);
 }

@@ -167,8 +167,15 @@ class DeltaServer extends DeltaTabView {
             this.tabs[i].OnInit(m);
         }
 
+        //Apply settings
+        this.ApplyNewPermissions();
+
         //Add RPC events
         this.SubscribeRPCEvent("guild-secure-mode", 20004, (m) => this.OnRemoteSecureModeChanged(m));
+        this.SubscribeRPCEvent("guild-permissions", 20005, (m) => {
+            this.info.permission_flags = m.flags;
+            this.ApplyNewPermissions();
+        });
     }
 
     OnRemoteSecureModeChanged(data) {
@@ -536,5 +543,33 @@ class DeltaServer extends DeltaTabView {
 
     IsOwner() {
         return this.info.owner_uid == this.app.user.data.id;
+    }
+
+    //Reads the permission index directly
+    ReadPermissionValue(index) {
+        return 1 == ((this.info.permission_flags >> index) & 1);
+    }
+
+    //Sets a permission and saves it to the server
+    async SetPermissionValue(index, value) {
+        //Set
+        if (value) {
+            this.info.permission_flags |= 1 << index;
+        } else {
+            this.info.permission_flags &= ~(1 << index);
+        }
+
+        //Send
+        await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/admin/permissions"), {
+            "flags": this.info.permission_flags
+        }, this.token);
+
+        //Apply
+        this.ApplyNewPermissions();
+    }
+
+    //Applies new permissions to the user interface
+    ApplyNewPermissions() {
+
     }
 }

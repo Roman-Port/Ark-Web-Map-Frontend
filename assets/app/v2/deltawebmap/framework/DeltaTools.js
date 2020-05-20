@@ -153,4 +153,26 @@ class DeltaTools {
         }
     }
 
+    static IsElementInEventPath(event, check) {
+        var target = event.target;
+        while (target.parentNode != null) {
+            if (check == target) {
+                return true;
+            }
+            target = target.parentNode;
+        }
+        return false;
+    }
+
+    static CopyToClipboard(text) {
+        var copy = DeltaTools.CreateDom("input", null, document.body);
+        copy.style.position = "fixed";
+        copy.style.top = "-5000px";
+        copy.type = "text";
+        copy.value = text;
+        copy.select();
+        document.execCommand("copy");
+        copy.remove();
+    }
+
 }

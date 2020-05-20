@@ -37,8 +37,38 @@ class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
         }
         DeltaTools.CreateDom("div", "admintab_players_user_name", d, data.name);
         DeltaTools.CreateDom("div", "admintab_players_user_tribe", d, data.tribe_id.toString() + " / " + this.server.GetTribeByIdSafe(data.tribe_id).tribe_name);
-        //DeltaTools.CreateDom("div", "admintab_players_user_time_label", d, "LAST SEEN");
         DeltaTools.CreateDom("div", "admintab_players_user_time", d, new moment(data.last_seen).format('MMMM Do, YYYY - h:mm A '));
+        DeltaContextMenu.AddContextMenu(d, data, [
+            [
+                {
+                    "name": "Open Steam Profile",
+                    "callback": (app, dd) => {
+                        window.open("http://steamcommunity.com/profiles/" + dd.steam_id, "_blank");
+                    }
+                },
+                {
+                    "name": "Copy Steam ID",
+                    "callback": (app, dd) => {
+                        DeltaTools.CopyToClipboard(dd.steam_id);
+                    }
+                },
+                {
+                    "name": "Copy ARK ID",
+                    "callback": (app, dd) => {
+                        DeltaTools.CopyToClipboard(dd.ark_id);
+                    }
+                }
+            ],
+            [
+                {
+                    "name": "Ban Player",
+                    "style": "red",
+                    "callback": (app, d) => {
+                        //TODO
+                    }
+                }
+            ]
+        ]);
         return d;
     }
 

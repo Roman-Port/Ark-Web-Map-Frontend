@@ -127,6 +127,40 @@ class DeltaApp {
                     });
                 }
 
+                //Add context menu
+                DeltaContextMenu.AddContextMenu(menu, server, [
+                    [
+                        {
+                            "name": "Hide Server",
+                            "style": "red",
+                            "callback": (app, server) => {
+                                if (server.IsOwner()) {
+                                    return;
+                                }
+                                app.OpenPromptModal("Hide " + server.info.display_name, "Are you sure you want to hide " + server.info.display_name + "? Hiding a server will make it disappear from Delta Web Map until you rejoin the server in-game.", "Hide", "Cancel", () => {
+                                    if (server.IsAdmin()) {
+                                        //Warn about losing admin
+                                        app.OpenPromptModal("Give Up Admin", "Hiding " + server.info.display_name + " will give up your admin access on this server. Are you sure you want to hide it?", "Accept", "Cancel", () => {
+
+                                        }, () => { }, "NEGATIVE", "NEUTRAL");
+                                    } else {
+                                        //Leave now
+                                    }
+                                }, () => { }, "NEGATIVE", "NEUTRAL");
+                            },
+                            "enabled": !server.IsOwner()
+                        }
+                    ],
+                    [
+                        {
+                            "name": "Copy ID",
+                            "callback": (app, server) => {
+                                DeltaTools.CopyToClipboard(server.info.id);
+                            }
+                        }
+                    ]
+                ]);
+
                 //Add event
                 top.x_id = info.id;
                 top.x_app = this;
@@ -305,6 +339,9 @@ class DeltaApp {
                 this.x_app.SwitchServer(this.x_view);
             });
         }
+
+        //Add context menu listener
+        DeltaContextMenu.AddContextListener(parent, this);
     }
 
     CreateServerListClusterLabel(container, name) {
@@ -426,7 +463,7 @@ class DeltaApp {
     }
 
     OpenPromptModal(title, subtitle, positiveText, negativeText, positiveAction, negativeAction, positiveType, negativeType) {
-        var modal = this.modal.AddModal(480, 190);
+        var modal = this.modal.AddModal(480, 250);
 
         var builder = new DeltaModalBuilder();
         builder.AddContentCustomText("modal_preset_title", title);

@@ -2771,31 +2771,31 @@ a {
 .modal_view_builder {
     font-family: 'Roboto', sans-serif;
     background-color: #33363c;
-    padding-bottom: 55px;
+    padding-bottom: 95px;
     overflow-y: auto;
     overflow-x: hidden;
-    min-height: calc(100% - 55px);
+    min-height: calc(100% - 95px);
 }
 
 .modal_view_nav {
     background-color: #42454a;
-    padding:10px;
-    height:35px;
-    position:absolute;
-    bottom:0;
-    left:0;
-    right:0;
+    padding: 20px;
+    height: 39px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 .modal_view_nav_btn {
-    padding: 10px 15px;
-    line-height:15px;
-    height:15px;
+    padding: 12px 25px;
+    line-height: 15px;
+    height: 15px;
     font-size: 15px;
     color: white;
     border-radius: 5px;
-    float:right;
-    cursor:pointer;
+    float: right;
+    cursor: pointer;
 }
 
 .modal_view_nav_btn_positive {
@@ -3289,4 +3289,48 @@ a {
 
 .subtab_content_active {
     display:block;
+}
+
+/* Context menu */
+
+.contextmenu_container {
+    padding: 5px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #252629;
+    position: fixed;
+    border-radius: 5px;
+    box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.27);
+}
+
+.contextmenu_option {
+    padding: 7px 10px;
+    margin: 2px;
+    border-radius: 2px;
+    color: #d8d8d8;
+    padding-right: 50px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    min-width:100px;
+}
+
+.contextmenu_option:hover {
+    background-color: #3882dc;
+    color: white;
+}
+
+.contextmenu_option_style_red {
+    color: #f04747;
+}
+
+.contextmenu_option_style_red:hover {
+    background-color: #f04747;
+    color: white;
+}
+
+
+.contextmenu_seperator {
+    margin: 4px;
+    height: 1px;
+    background-color: #45484d;
 }

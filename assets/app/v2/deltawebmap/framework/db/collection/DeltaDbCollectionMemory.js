@@ -5,7 +5,12 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
     constructor(db, name) {
         super(db, name);
 
+        this.OnFilteredDataAdded = new DeltaBasicEventDispatcher();
+        this.OnFilteredDataRemoved = new DeltaBasicEventDispatcher();
+        this.OnFilteredDatasetUpdated = new DeltaBasicEventDispatcher();
+
         this.memoryMap = {}; //Maps primary key to items
+        this.filter = null;
     }
 
     AddObjectIndexedDbStores(stores) {
@@ -13,6 +18,15 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
     }
 
     async GetAllItems() {
+        var items = [];
+        var keys = Object.keys(this.memoryMap);
+        for (var i = 0; i < keys.length; i += 1) {
+            items.push(this.memoryMap[keys[i]]);
+        }
+        return items;
+    }
+
+    GetAllItemsSynchronous() {
         var items = [];
         var keys = Object.keys(this.memoryMap);
         for (var i = 0; i < keys.length; i += 1) {
@@ -58,6 +72,9 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
             }
         }
 
+        //Run events
+        this._SendFilteredEvents(adds, removes);
+
         //Run post update
         this.OnPostUpdate();
     }
@@ -88,5 +105,72 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
             }
         }
         target.push(data);
+    }
+
+    _SendFilteredEvents(adds, removes) {
+        //Run adds
+        var filteredAdds = [];
+        var filteredRemoves = removes;
+        var k = this.GetPrimaryKey();
+        for (var i = 0; i < adds.length; i += 1) {
+            if (this.CheckFilter(adds[i])) {
+                filteredAdds.push(adds[i]); //Add
+            } else {
+                filteredRemoves.push(adds[i][k]); //We'll remove this too
+            }
+        }
+
+        //Send to clients
+        this.OnFilteredDataAdded.Fire(filteredAdds);
+        this.OnFilteredDataRemoved.Fire(filteredRemoves);
+        this.OnFilteredDatasetUpdated.Fire(this.GetFilteredDataset());
+    }
+
+    GetFilteredDataset() {
+        var items = [];
+        var keys = Object.keys(this.memoryMap);
+        for (var i = 0; i < keys.length; i += 1) {
+            if (this.CheckFilter(this.memoryMap[keys[i]])) {
+                items.push(this.memoryMap[keys[i]]);
+            }
+        }
+        return items;
+    }
+
+    //Subscribes a recycler view to the filtered events
+    SubscribeRecyclerViewToFiltered(recycler) {
+        //Add events
+        this.OnFilteredDatasetUpdated.Subscribe("deltawebmap.dbcollec.auto", (m) => recycler.SetData(m));
+
+        //Set filtered data now
+        recycler.BulkAddItems(this.GetFilteredDataset());
+    }
+
+    CheckFilter(data) {
+        if (this.filter == null) {
+            return true;
+        } else {
+            return this.filter.CheckFilter();
+        }
+    }
+
+    //Refreshes the filter and updates data
+    RefreshFilter() {
+        //Get adds and removes
+        var adds = [];
+        var removes = [];
+        var keys = Object.keys(this.memoryMap);
+        for (var i = 0; i < keys.length; i += 1) {
+            if (this.CheckFilter(this.memoryMap[keys[i]])) {
+                adds.push(this.memoryMap[keys[i]]);
+            } else {
+                removes.push(this.memoryMap[keys[i]]);
+            }
+        }
+
+        //Send events
+        this.OnFilteredDataAdded.Fire(adds);
+        this.OnFilteredDataRemoved.Fire(removes);
+        this.OnFilteredDatasetUpdated.Fire(adds);
     }
 }

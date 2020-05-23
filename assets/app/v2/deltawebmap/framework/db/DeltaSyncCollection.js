@@ -46,6 +46,9 @@ class DeltaSyncCollection {
             this.listeners[listenerKeys[i]](adds, removes, this.listenerArgs[listenerKeys[i]]);
         }
 
+        //Send filtered events
+        
+
         //Users should add here what they want to do with incoming data
     }
 

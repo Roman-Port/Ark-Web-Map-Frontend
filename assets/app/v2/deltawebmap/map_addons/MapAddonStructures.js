@@ -10,6 +10,7 @@ class MapAddonStructures extends TabMapAddon {
     }
 
     static IsFastModeSupported() {
+        return false;
         return window.Worker != null && window.OffscreenCanvas != null && window.Blob != null;
     }
 
@@ -305,12 +306,35 @@ class MapAddonStructures extends TabMapAddon {
                     }
                 }
             });
-            if (structures.length > 0) {
-                //TODO: Show menu for multiple
-                var i = 0;
-                DeltaPopoutModal.ShowStructureModal(this.map.server.app, structures[i].data, { "x": structures[i].m_x, "y": structures[i].m_y }, this.map.server);
+            if (structures.length == 1) {
+                DeltaPopoutModal.ShowStructureModal(this.map.server.app, structures[0].data, { "x": structures[0].m_x, "y": structures[0].m_y }, this.map.server);
+            } else if (structures.length > 1) {
+                //Prompt user for which one to open
+                this.BuildPopoutMultiplePickerMenu(structures).then((menu) => {
+                    DeltaContextMenu.ForceOpenContextMenu(structures[0].m_x, structures[0].m_y, this.map.server.app, this.map.server, [menu]);
+                });
             }
         });
+    }
+
+    async BuildPopoutMultiplePickerMenu(structures) {
+        var o = [];
+        for (var i = 0; i < structures.length; i += 1) {
+            var d = await this.map.server.app.GetItemEntryByStructureClassNameAsync(structures[i].data.classname);
+            var name = structures[i].data.classname;
+            if (d != null) {
+                name = d.name;
+            }
+            o.push({
+                "name": name,
+                "btnContext": structures[i],
+                "callback": (app, server, structurePicked) => {
+                    DeltaPopoutModal.ShowStructureModal(app, structurePicked.data, { "x": structurePicked.m_x, "y": structurePicked.m_y }, server);
+                }
+            });
+        }
+        return o;
+        
     }
 
     async OnUnload(container) {

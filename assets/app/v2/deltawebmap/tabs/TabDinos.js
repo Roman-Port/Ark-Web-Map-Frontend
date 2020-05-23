@@ -525,13 +525,7 @@ class TabDinos extends DeltaServerTab {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.server.CreateManagedDinoDbListener((adds) => {
-                this.recycler.BulkAddItems(adds);
-            }, (removes) => {
-                this.recycler.BulkRemoveItems(removes);
-            }, () => {
-                this.recycler.Reset();
-            });
+            this.server.db.dinos.SubscribeRecyclerViewToFiltered(this.recycler);
         });
     }
 

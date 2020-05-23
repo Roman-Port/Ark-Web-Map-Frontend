@@ -463,34 +463,6 @@ class DeltaServer extends DeltaTabView {
         this.app.RefreshBrowserMetadata();
     }
 
-    async ResetTabs() {
-        /* Clears out all information in tabs and resets them entirely. */
-        /* Usually used when switching data tracks */
-
-        //Clear cached info
-        this.icons = null;
-        this.overview = null;
-
-        //Cancel token and create new 
-        this.token.Cancel();
-        this.token = new DeltaCancellationToken(null);
-
-        //Loop through and deinit tabs
-        for (var i = 0; i < this.tabs.length; i += 1) {
-            var menu = this.tabs[i].menu; //Get a ref to the menu
-            await this.tabs[i].OnDeinit(); //Deinit
-            this.tabs[i] = new this.tabs[i].constructor(this); //Create new 
-            this.tabs[i].menu = menu; //Set menu
-            var m = DeltaTools.CreateDom("div", "main_tab", this.mountpoint); //Create mountpoint
-            await this.tabs[i].OnInit(m); //Init
-        }
-
-        //Open first tab
-        var t = this.activeTab;
-        this.activeTab = -1;
-        this.OnSwitchTab(t);
-    }
-
     SubscribeEvent(sourceTag, eventTag, callback) {
         this.dispatcher.PushSubscription(this.id, sourceTag, eventTag, callback);
     }
@@ -680,6 +652,12 @@ class DeltaServer extends DeltaTabView {
     async HideServer() {
         await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/hide"), {
             
+        }, this.token);
+    }
+
+    async DeleteServer() {
+        await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/admin/delete"), {
+
         }, this.token);
     }
 }

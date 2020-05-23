@@ -34,36 +34,37 @@ class MapAddonIcons extends TabMapAddon {
         this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
 
         //Add DB events
-        this.map.server.CreateManagedDinoDbListener((adds) => {
-            //Use adds
-            for (var i = 0; i < adds.length; i += 1) {
-                //Check if we have a pin for this
-                var key = "dinos@" + adds[i].dino_id;
-                var pin = this.pins[key];
-                var cd = statics.MAP_ICON_ADAPTERS["dinos"](adds[i], this.map);
-                if (pin == null) {
-                    //Add
-                    this.AddPin(cd);
-                } else {
-                    //Update pos
-                    if (Math.abs(pin.marker.x_last_data.location.x - cd.location.x) > 10 || Math.abs(pin.marker.x_last_data.location.y - cd.location.y) > 10) {
-                        var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, cd.location.x, cd.location.y);
-                        pin.marker.setLatLng(pos);
-                        console.log("UPDATE ONE");
-                    }
-
-                    //Finish updating
-                    pin.marker.x_last_data = cd;
-                }
-            }
-        }, (removes) => {
+        this.map.server.db.dinos.OnFilteredDataAdded.Subscribe("deltawebmap.tabs.map.addons.icons", (adds) => {
+            this.AddDinoDataPins(adds);
+        });
+        this.map.server.db.dinos.OnFilteredDataRemoved.Subscribe("deltawebmap.tabs.map.addons.icons", (removes) => {
             //Use removes
             for (var i = 0; i < removes.length; i += 1) {
-                this.RemovePin("dinos", removes[i].dino_id);
+                this.RemovePin("dinos", removes[i]);
             }
-        }, () => {
-            this.RemoveAllPins();
         });
+        this.AddDinoDataPins(this.map.server.db.dinos.GetFilteredDataset());
+    }
+
+    AddDinoDataPins(adds) {
+        //Use adds
+        for (var i = 0; i < adds.length; i += 1) {
+            //Check if we have a pin for this
+            var key = "dinos@" + adds[i].dino_id;
+            var pin = this.pins[key];
+            var cd = statics.MAP_ICON_ADAPTERS["dinos"](adds[i], this.map);
+            if (pin == null) {
+                //Add
+                this.AddPin(cd);
+            } else {
+                //Update pos
+                var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, cd.location.x, cd.location.y);
+                pin.marker.setLatLng(pos);
+
+                //Finish updating
+                pin.marker.x_last_data = cd;
+            }
+        }
     }
 
     OnMapMarkerInteractionEvent(evt) {

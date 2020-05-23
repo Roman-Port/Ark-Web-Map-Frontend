@@ -2822,7 +2822,7 @@ a {
     justify-content: center;
     position:absolute;
     top:0;
-    bottom:0;
+    bottom:60px;
     left:0;
     right:0;
 }
@@ -3281,10 +3281,10 @@ a {
 }
 
 .subtab_content {
-    width: 100%;
+    margin-right: 20px;
     max-width: 600px;
     font-family: 'Roboto', sans-serif;
-    display:none;
+    display: none;
 }
 
 .subtab_content_active {

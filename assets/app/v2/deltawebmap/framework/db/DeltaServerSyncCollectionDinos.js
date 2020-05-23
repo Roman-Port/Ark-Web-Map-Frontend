@@ -1,6 +1,6 @@
 "use strict";
 
-class DeltaServerSyncCollectionDinos extends DeltaDbCollectionMemory {
+class DeltaServerSyncCollectionDinos extends DeltaServerSyncCollection {
 
     constructor(db, name) {
         super(db, name);

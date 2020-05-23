@@ -29,6 +29,16 @@
     border: 1px solid #0c0c0c;
 }
 
+.admin_btn_red {
+    padding: 10px 15px;
+    color: white;
+    background-color: #f04747;
+    border-radius: 5px;
+    font-size: 15px;
+    display: inline-block;
+    cursor: pointer;
+}
+
 /* Players tab */
 
 .admintab_players_user {

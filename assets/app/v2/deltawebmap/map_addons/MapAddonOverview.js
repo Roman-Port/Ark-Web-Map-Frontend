@@ -80,13 +80,15 @@ class MapAddonOverview {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.map.server.CreateManagedDinoDbListener((adds) => {
+            /*this.map.server.CreateManagedDinoDbListener((adds) => {
                 this.recycler.BulkAddItems(adds);
             }, (removes) => {
                 this.recycler.BulkRemoveItems(removes);
             }, () => {
                 this.recycler.Reset();
-            });
+            });*/
+
+            this.map.server.db.dinos.SubscribeRecyclerViewToFiltered(this.recycler);
         });
     }
 

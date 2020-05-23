@@ -51,9 +51,6 @@ class TabMap extends DeltaServerTab {
 
         //Create DOM
         this.LayoutDom(mountpoint);
-
-        //Subscribe RPC events
-        this.server.SubscribeRPCEvent("tab.map", 7, (m) => this.OnRPCLiveUpdate(m)); 
     }
 
     LayoutDom(mountpoint) {

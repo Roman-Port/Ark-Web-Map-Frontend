@@ -89,7 +89,7 @@ class DeltaPopoutModal {
 
 		//Add modules
 		var modules = [
-			new DeltaPopoutModuleTitle(entry.icon.image_url, name, entry.screen_name),
+			new DeltaPopoutModuleTitle(entry.icon.image_url, name, entry.screen_name, data.dino_id),
 			new DeltaPopoutModuleStatus(data),
 			new DeltaPopoutModuleStatBars(data),
 			new DeltaPopoutModuleInventory(0, data.dino_id, 2)
@@ -112,7 +112,7 @@ class DeltaPopoutModal {
 
 		//Add modules
 		var modules = [
-			new DeltaPopoutModuleTitle(icon, name, "Structure"),
+			new DeltaPopoutModuleTitle(icon, name, "Structure", data.structure_id.toString()),
 			new DeltaPopoutModuleInventory(1, data.structure_id, 4)
 		];
 		var modal = new DeltaPopoutModal(app, pos, modules, server);

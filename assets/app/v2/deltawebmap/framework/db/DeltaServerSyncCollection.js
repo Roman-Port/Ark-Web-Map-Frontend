@@ -1,6 +1,6 @@
 "use strict";
 
-class DeltaServerSyncCollection extends DeltaDbCollectionIndexedDB {
+class DeltaServerSyncCollection extends DeltaDbCollectionMemory {
 
     constructor(db, name) {
         super(db, name);
@@ -15,7 +15,7 @@ class DeltaServerSyncCollection extends DeltaDbCollectionIndexedDB {
             }
 
             //Update
-            this.HandleRPCUpdate(d);
+            this._BatchUpdate([d.content], []);
         });
     }
 
@@ -27,7 +27,4 @@ class DeltaServerSyncCollection extends DeltaDbCollectionIndexedDB {
         throw "Not implimented!";
     }
 
-    HandleRPCUpdate(d) {
-        this._BatchUpdate([d.content], []);
-    }
 }

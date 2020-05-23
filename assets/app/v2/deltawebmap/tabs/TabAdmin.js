@@ -18,6 +18,7 @@ class TabAdmin extends SubTabMenuTab {
             new AdminTabServerSecure(),
             new AdminTabServerPermissions(),
             new AdminTabServerPresets(),
+            new AdminTabServerDelete(),
             "Server Admin",
             new AdminTabServerPlayers()
         ];
@@ -164,6 +165,12 @@ class AdminSubTabMenuTabModule extends SubTabMenuTabModule {
 
     _AddWarning(text) {
         return DeltaTools.CreateDom("div", "admin_warning_box", this.mountpoint, text);
+    }
+
+    _AddRedBtn(text, callback) {
+        var btn = DeltaTools.CreateDom("div", "admin_btn_red", this.mountpoint, text);
+        btn.addEventListener("click", callback);
+        return btn;
     }
 
 }

@@ -189,8 +189,6 @@ class DeltaRecyclerView {
     }
 
     SetData(d) {
-        /* OLD */
-        console.warn("[RecyclerView] Called SetData! This is not recommended, as it causes more slowdowns than needed. Use AddItem and RemoveItem next time.");
         this.data = d;
         this._OnDatasetUpdated();
     }
@@ -314,7 +312,7 @@ class DeltaRecyclerView {
     _PushRemoves(updates) {
         //Removes all of the elements specified
         for (var i = 0; i < updates.length; i += 1) {
-            var index = this._GetDataIndexByKey(this._GetDataKey(updates[i]));
+            var index = this._GetDataIndexByKey(updates[i]);
             if (index != null) {
                 this.data.splice(index, 1);
             }

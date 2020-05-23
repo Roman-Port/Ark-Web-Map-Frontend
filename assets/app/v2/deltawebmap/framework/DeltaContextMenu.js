@@ -3,7 +3,9 @@
 class DeltaContextMenu {
 
     constructor(target, context, options) {
-        target.__contextMenu = this;
+        if (target != null) {
+            target.__contextMenu = this;
+        }
         this.options = options;
         this.context = context;
     }
@@ -19,7 +21,7 @@ class DeltaContextMenu {
             var target = evt.target;
             while (target.parentNode != null) {
                 if (target.__contextMenu != null) {
-                    target.__contextMenu.Show(evt.x, evt.y, this.__contextMenuApp, target, evt);
+                    target.__contextMenu.Show(evt.x, evt.y, this.__contextMenuApp);
                     evt.stopPropagation();
                     break;
                 }
@@ -33,7 +35,13 @@ class DeltaContextMenu {
         return new DeltaContextMenu(target, context, options);
     }
 
-    Show(x, y, app, target, evt) {
+    //Shows a context menu now
+    static ForceOpenContextMenu(x, y, app, context, options) {
+        var m = new DeltaContextMenu(null, context, options);
+        m.Show(x, y, app);
+    }
+
+    Show(x, y, app) {
         //If a menu is already open, close it
         if (this.menu != null) {
             this.Close();
@@ -59,6 +67,7 @@ class DeltaContextMenu {
                     console.warn("Context menu created with no callback!");
                 }
                 var enabled = true;
+                var btnContext = true;
 
                 //Read settings
                 if (item.name != null) {
@@ -72,6 +81,9 @@ class DeltaContextMenu {
                 }
                 if (item.enabled != null) {
                     enabled = item.enabled;
+                }
+                if (item.btnContext != null) {
+                    btnContext = item.btnContext;
                 }
 
                 //Cancel if needed
@@ -88,10 +100,11 @@ class DeltaContextMenu {
                 btn._callback = callback;
                 btn._menu = this;
                 btn._app = app;
+                btn._btnContext = btnContext;
                 btn.addEventListener("click", function () {
                     this._menu.Close();
                     if (this._callback != null) {
-                        this._callback(this._app, this._menu.context);
+                        this._callback(this._app, this._menu.context, this._btnContext);
                     }
                 });
             }

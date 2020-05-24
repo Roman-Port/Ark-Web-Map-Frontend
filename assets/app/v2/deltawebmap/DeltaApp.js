@@ -36,6 +36,7 @@ class DeltaApp {
         this.modal = null;
         this.config = null;
         this.clusterItems = {};
+        this.structureTool = null;
     }
 
     async Init() {
@@ -126,7 +127,11 @@ class DeltaApp {
         while (true) {
             try {
                 //Get config
-                this.config = await DeltaTools.WebRequest(LAUNCH_CONFIG.CONFIG_API_ENDPOINT + "/prod/frontend/config.json", {"noauth":true}, null);
+                this.config = await DeltaTools.WebRequest(LAUNCH_CONFIG.CONFIG_API_ENDPOINT + "/prod/frontend/config.json", { "noauth": true }, null);
+
+                //Begin init of structure tool (this will take a bit)
+                this.structureTool = new DeltaStructureTool(this);
+                var structureToolSetup = this.structureTool.Init();
 
                 //Get structure metadata
                 this.structureMetadata = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
@@ -148,6 +153,9 @@ class DeltaApp {
 
                 //Sync species
                 await this.db.Sync();
+
+                //Wait for structure setup to finish
+                await structureToolSetup;
 
                 break;
             } catch (e) {

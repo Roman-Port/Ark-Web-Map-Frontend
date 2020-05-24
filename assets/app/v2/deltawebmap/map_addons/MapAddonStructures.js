@@ -11,45 +11,9 @@ class MapAddonStructures extends TabMapAddon {
 
     static IsFastModeSupported() {
         return false;
-        return window.Worker != null && window.OffscreenCanvas != null && window.Blob != null;
     }
 
-    static async SendCommandToWorker(serverId, opcode, payload) {
-        //Make sure we have a worker
-        if (MapAddonStructures._worker == null) {
-            MapAddonStructures._worker = new Worker("/assets/app/v2/deltawebmap/worker/StructureImageWorker.js");
-            MapAddonStructures._promises = {};
-            MapAddonStructures._promiseIndex = 0;
-            MapAddonStructures._worker.onmessage = function (e) {
-                var rCode = e.data.code;
-                var rPayload = e.data.payload;
-                MapAddonStructures._promises[rCode](rPayload);
-                delete MapAddonStructures._promises[rCode];
-            };
-        }
-
-        //Get a code
-        var code = MapAddonStructures._promiseIndex;
-        MapAddonStructures._promiseIndex++;
-
-        //Create message to send
-        var d = {
-            "code": code,
-            "command": opcode,
-            "server": serverId,
-            "payload": payload
-        }
-
-        //Create a promise and add it to the queue, then send
-        return new Promise((resolve, reject) => {
-            //Add
-            MapAddonStructures._promises[code] = resolve;
-
-            //Send
-            MapAddonStructures._worker.postMessage(d);
-        });
-    }
-
+    //Called to create a tile
     async ProcessInteractableStructuresTileV2(tileSize, tileX, tileY, tileZ, holder) {
         //Create and attach the static tile
         var staticTile = await this.ProcessStructuresTileV2(tileSize, tileX, tileY, tileZ);
@@ -139,26 +103,6 @@ class MapAddonStructures extends TabMapAddon {
         };
     }
 
-    async _ProcessQuick(tileSize, tileX, tileY, tileZ, canvasContext) {
-        //Create args
-        var d = {
-            "tileSize": tileSize,
-            "tileX": tileX,
-            "tileY": tileY,
-            "tileZoom": tileZ,
-            "captureSize": this.map.server.GetMapInfo().captureSize,
-            "tribeFilter": null
-        }
-
-        //Submit
-        var data = await MapAddonStructures.SendCommandToWorker(this.map.server.id, "DELTAWEBMAP_PROCESS", d);
-
-        //Write
-        canvasContext.putImageData(data.canvas, 0, 0);
-
-        return data.found;
-    }
-
     async _ProcessFallback(tileSize, tileX, tileY, tileZ, canvasContext) {
         //Wait for downloading of store to finish
         await STRUCTURE_TILES_CACHE_TASK;
@@ -185,6 +129,14 @@ class MapAddonStructures extends TabMapAddon {
     async OnLoad(container) {
         /* Called when we load the map */
 
+        this.session = new DeltaStructureSession(this.map.server.app.structureTool, this.map.map, this.map.server);
+        this.map.server.db.structures.OnFilteredDatasetUpdated.Subscribe("deltawebmap.tabs.map.addons.structures.session", (d) => {
+            this.session.SetNewDataset(d);
+        });
+        //this.session.SetNewDataset(this.map.server.db.structures.GetFilteredDataset());
+    }
+
+    OldLoad(container) {
         //Create the map layer
         var mapSettings = {
             updateWhenZooming: true,
@@ -503,24 +455,6 @@ var MapAddonStructuresLayer = L.GridLayer.extend({
         var et = DeltaTools.CreateDom("div", "leaflet-tile map_structure_tile_image");
         et.width = tsize.x;
         et.height = tsize.y;
-
-        //Process
-        /*addon.ProcessStructuresTileV2(256, coords.x, coords.y, coords.z).then((data) => {
-            et.appendChild(data.canvas);
-
-            var ctx = data.canvas.getContext("2d");
-            for (var i = 0; i < data.found.length; i += 1) {
-                var f = data.found[i];
-                ctx.beginPath();
-                ctx.moveTo(f.hit[0][0], f.hit[0][1]);
-                for (var j = 1; j < f.hit.length; j += 1) {
-                    var hit = f.hit[j];
-                    ctx.lineTo(hit[0], hit[1]);
-                }
-                ctx.lineTo(f.hit[0][0], f.hit[0][1]);
-                ctx.stroke();
-            }
-        });*/
 
         addon.ProcessInteractableStructuresTileV2(256, coords.x, coords.y, coords.z, et);
 

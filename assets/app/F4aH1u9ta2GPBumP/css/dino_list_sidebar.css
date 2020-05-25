@@ -6,41 +6,41 @@
     width: 360px;
     color: white;
     font-family: 'Roboto', sans-serif;
-    background-color: #33363c;
+    background-color: #252629;
     transition: all 250ms;
     transition-timing-function: cubic-bezier(0.51, 0.62, 0.23, 0.96);
-    z-index:3;
+    z-index: 3;
 }
 
 .dino_sidebar_filter {
     position: absolute;
     bottom: 0px;
-    left:0;
-    right:0;
+    left: 0;
+    right: 0;
     height: 45px;
 }
 
 .dino_sidebar_filter_cursor {
     position: absolute;
-    width:calc(100% / 5);
-    height:3px;
-    background-color:#5585e6;
-    bottom:0;
-    left:0;
-    transition:all 100ms;
+    width: calc(100% / 5);
+    height: 3px;
+    background-color: #5585e6;
+    bottom: 0;
+    left: 0;
+    transition: all 100ms;
     transition-timing-function: ease-in-out;
 }
 
 .dino_sidebar_filter_item {
-    background-size:24px;
+    background-size: 24px;
     background-repeat: no-repeat;
     background-position: center;
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .dino_sidebar_noresults_title {
-    font-size:18px;
-    color:white;
+    font-size: 18px;
+    color: white;
 }
 
 .dino_sidebar_noresults_sub {
@@ -66,11 +66,10 @@
 }
 
 .dino_sidebar_section_header {
-    color:white;
+    color: white;
     font-size: 15px;
     padding-top: 4px;
     padding-bottom: 8px;
-
     width: 320px;
     height: 4px;
     background-color: #50545b;
@@ -83,23 +82,23 @@
 .dino_sidebar_item {
     width: 320px;
     margin-top: 6px;
-    background-color: #252629;
+    background-color: #33363c;
     color: white;
     border-radius: 5px;
-    border: 1px solid #1f2023;
+    border: 1px solid #45484d;
     position: relative;
     cursor: pointer;
     font-size: 0;
-    position:absolute;
-    height:46px;
+    position: absolute;
+    height: 46px;
 }
 
-.dino_sidebar_item img {
-    margin: 8px 10px;
-    height: 30px;
-    width: 30px;
-    border-radius: 5px;
-}
+    .dino_sidebar_item img {
+        margin: 8px 10px;
+        height: 30px;
+        width: 30px;
+        border-radius: 5px;
+    }
 
 .dino_sidebar_item_templateimg {
     margin: 10px;
@@ -124,7 +123,7 @@
     overflow: hidden;
     height: 16px;
     text-overflow: ellipsis;
-    right:10px;
+    right: 10px;
     right: 120px;
     white-space: nowrap;
 }
@@ -144,7 +143,7 @@
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
     text-overflow: ellipsis;
-    right:10px;
+    right: 10px;
 }
 
 .dino_sidebar_item_sub_state {
@@ -160,22 +159,22 @@
 }
 
 .dino_sidebar_item_status {
-    position:absolute;
+    position: absolute;
     top: 26px;
     left: 30px;
     border: 2px solid #252629;
-    width:10px;
-    height:10px;
-    border-radius:50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
 }
 
 .dino_sidebar_togglebtn {
     border-radius: 100%;
     position: absolute;
-    top:15px;
-    left:-65px;
-    width:50px;
-    height:50px;
+    top: 15px;
+    left: -65px;
+    width: 50px;
+    height: 50px;
     vertical-align: center;
     text-align: center;
     background-color: #33363c;
@@ -198,43 +197,42 @@
     overflow: hidden;
 }
 
-.dino_sidebar_topsearch input {
-    position: absolute;
-    top: 10px;
-    width: 320px;
-    left: 10px;
-    bottom: 50px;
-    border-radius: 5px;
-    background-color: #33363c;
-    color: white;
-    padding: 5px 10px;
-    outline: none;
-    border: 1px solid #50545b;
-}
+    .dino_sidebar_topsearch input {
+        position: absolute;
+        top: 10px;
+        width: 320px;
+        left: 10px;
+        bottom: 50px;
+        border-radius: 5px;
+        background-color: #33363c;
+        color: white;
+        padding: 5px 10px;
+        outline: none;
+        border: 1px solid #50545b;
+    }
 
 .dino_entry_mini {
-    height:30px;
+    height: 30px;
 }
 
-.dino_entry_mini .dino_entry_sub {
-    left: 85px;
-    top: 10px;
-    right:10px;
+    .dino_entry_mini .dino_entry_sub {
+        left: 85px;
+        top: 10px;
+        right: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+    .dino_entry_mini .dino_entry_title {
+        display: none;
+    }
 
-.dino_entry_mini .dino_entry_title {
-    display:none;
-}
-
-.dino_entry_mini img {
-    margin: 5px;
-    height: 20px;
-    width: 20px;
-}
+    .dino_entry_mini img {
+        margin: 5px;
+        height: 20px;
+        width: 20px;
+    }
 
 .dino_sidebar_item .sidebar_item_search_entry_icon {
     top: 0;
@@ -242,7 +240,7 @@
 }
 
 .dino_sidebar_item .dino_entry_offset {
-    padding-left:50px;
+    padding-left: 50px;
 }
 
 .dino_sidebar_item .sidebar_item_search_entry_dinos {
@@ -250,43 +248,45 @@
 }
 
 .dino_sidebar_itemsearch_overflowdinos {
-    display:none;
+    display: none;
 }
 
 .dino_entry_overflowwarn img {
-    display:none;
+    display: none;
 }
 
 .dino_entry_overflowwarn .dino_entry_sub {
-    left:55px;
+    left: 55px;
 }
 
 .dino_sidebar_item:hover .dino_sidebar_itemsearch_overflowdinos {
-    display:block;
+    display: block;
 }
 
 .dino_sidebar_item:hover .dino_entry_overflowwarn {
-    display:none;
+    display: none;
 }
 
 @keyframes stillloading_items {
     from {
-        color:#c3c6cb;
+        color: #c3c6cb;
     }
+
     50% {
-        color:#e4e5e7
+        color: #e4e5e7
     }
+
     to {
-        color:#c3c6cb;
+        color: #c3c6cb;
     }
 }
 
 .dino_sidebar_stillloading {
-    animation-name:stillloading_items;
+    animation-name: stillloading_items;
     animation-timing-function: ease-in-out;
     animation-duration: 1800ms;
     animation-iteration-count: infinite;
-    text-align:center;
+    text-align: center;
 }
 
 .dino_sidebar_top_nav {
@@ -318,7 +318,7 @@
 
 .dino_sidebar_top_nav_right {
     background-image: url(/assets/icons/baseline-sort-24px.svg);
-    float:right;
+    float: right;
 }
 
 .dino_sidebar_top_nav_sort_type {
@@ -329,26 +329,26 @@
 
 /* For expanding into tribe tools */
 .dino_sidebar_tribe_tools {
-    width:100vw;
+    width: 100vw;
 }
 
-.dino_sidebar_tribe_tools .dino_sidebar_helper {
-    opacity: 0;
-}
+    .dino_sidebar_tribe_tools .dino_sidebar_helper {
+        opacity: 0;
+    }
 
-.dino_sidebar_tribe_tools .bottom_nav_me_badge {
-    opacity: 0;
-}
+    .dino_sidebar_tribe_tools .bottom_nav_me_badge {
+        opacity: 0;
+    }
 
 /* Stats list */
 .dino_stats_list_item_title {
-    padding:3px;
-    height:20px;
-    line-height:20px;
-    color:white;
+    padding: 3px;
+    height: 20px;
+    line-height: 20px;
+    color: white;
     position: relative;
     font-family: 'Roboto', sans-serif;
-    font-size:15px;
+    font-size: 15px;
     text-align: left;
     padding-top: 5px;
     border-top: 3px solid transparent;
@@ -356,46 +356,46 @@
 }
 
 .dino_stats_list_item_title_img {
-    background-position:center;
-    background-size:18px;
-    width:20px;
+    background-position: center;
+    background-size: 18px;
+    width: 20px;
     background-repeat: no-repeat;
     background-position-x: 3px;
 }
 
 .dino_stats_list_item {
-    padding:5px 3px;
-    height:20px;
-    line-height:20px;
-    color:white;
+    padding: 5px 3px;
+    height: 20px;
+    line-height: 20px;
+    color: white;
     position: relative;
     font-family: 'Roboto', sans-serif;
-    font-size:15px;
+    font-size: 15px;
 }
 
 .dino_stats_list_item_img {
-    background-position:center;
-    background-size:20px;
-    width:20px;
+    background-position: center;
+    background-size: 20px;
+    width: 20px;
     background-repeat: no-repeat;
     background-position-x: 3px;
     filter: invert(1);
 }
 
 .dino_stats_list_item_img_i {
-    width:20px;
+    width: 20px;
 }
 
 .dino_stats_list_item_gender {
-    width:12px;
-    height:12px;
+    width: 12px;
+    height: 12px;
     border-radius: 6px;
-    margin:4px;
-    background-color:#f086d4;
+    margin: 4px;
+    background-color: #f086d4;
 }
 
 .dino_stats_list_item_gender_male {
-    background-color:#28b7eb;
+    background-color: #28b7eb;
 }
 
 .dino_stats_list_item_color_container {
@@ -406,8 +406,8 @@
 }
 
 .dino_stats_list_item_color_container_item {
-    width:12px;
-    height:12px;
+    width: 12px;
+    height: 12px;
     border-radius: 6px;
     margin-left: -4px;
     display: inline-block;
@@ -454,8 +454,8 @@
 }
 
 .dino_stats_header_sortable {
-    border-top-color:#8f8f8f;
-    cursor:pointer;
+    border-top-color: #8f8f8f;
+    cursor: pointer;
 }
 
 .dino_stats_header_sort_selected {
@@ -467,7 +467,7 @@
 }
 
 .dino_stats_stat_major {
-    color:#76b1e8;
+    color: #76b1e8;
 }
 
 .dino_stats_stat_sort {
@@ -496,7 +496,7 @@
     background-color: #33363c;
     border-radius: 5px;
     color: white;
-    transition:top 120ms ease-in-out;
+    transition: top 120ms ease-in-out;
 }
 
 .dino_stats_search_text {
@@ -511,10 +511,10 @@
 .dino_stats_search_sort {
     right: 0;
     width: 36px;
-    cursor:pointer;
-    background-size:24px;
-    background-repeat:no-repeat;
-    background-position:center;
+    cursor: pointer;
+    background-size: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .dino_stats_search_base:focus {
@@ -536,7 +536,7 @@
     position: absolute;
     left: 15px;
     height: 60px;
-    background-color: #33363c;
+    background-color: #252629;
     z-index: 99;
     width: 322px;
 }
@@ -544,9 +544,9 @@
 .dino_stats_sort_top_input {
     padding: 10px;
     border-radius: 5px;
-    background-color: #252629;
+    background-color: #33363c;
     color: white;
-    border: 1px solid #1f2023;
+    border: 1px solid #45484d;
     font-size: 13px;
     position: absolute;
     bottom: 10px;

@@ -32,6 +32,13 @@ class DeltaRecyclerView {
         this.scrollProxy.addEventListener("scroll", () => this._OnScroll());
 
         this._OnDatasetUpdated();
+
+        /*window.requestAnimationFrame(() => {
+            this._AddTemplateDOMs();
+        });*/
+        window.addEventListener("resize", () => {
+            this._AddTemplateDOMs();
+        });
     }
 
     AddEventListener(type, callback) {
@@ -149,9 +156,12 @@ class DeltaRecyclerView {
     }
 
     _CreateTemplateDOMs() {
+        this._AddTemplateDOMs();
+    }
+
+    _AddTemplateDOMs() {
         //Get number of DOMs needed
-        var needed = Math.ceil((this._GetContainerHeight()) / this.rowHeight) + 15;
-        console.log(needed + " nodes created");
+        var needed = Math.max((Math.ceil((this._GetContainerHeight()) / this.rowHeight) + 20) - this.nodes.length, 0);
 
         //Generate and position these many
         for (var i = 0; i < needed; i += 1) {

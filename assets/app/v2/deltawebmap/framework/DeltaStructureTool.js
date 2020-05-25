@@ -323,6 +323,11 @@ class DeltaStructureSession {
         var context = interactive.getContext("2d");
         context.clearRect(0, 0, interactive.width, interactive.height);        
 
+        //Check if content exists
+        if (interactive._found == null) {
+            return;
+        }
+
         for (var i = 0; i < interactive._found.length; i += 1) {
             var zoomMeta = interactive._found[i];
             var metadata = this.tool.metadata[zoomMeta.data.classname];

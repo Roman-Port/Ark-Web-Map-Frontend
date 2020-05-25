@@ -439,7 +439,6 @@ class DeltaApp {
         builder.AddLabledText("Account Settings", JSON.stringify(this.user.data.user_settings));
         builder.AddLabledText("App Version", SYSTEM_RELEASE_ENV + " at " + SYSTEM_VERSION_MAJOR.toString() + "." + SYSTEM_VERSION_MINOR.toString());
         builder.AddLabledText("Charlie Content", "Species: " + countDinos + " at " + localStorage.getItem("PROD_SYSTEM_species~LAST_EPOCH") + "\nItems: " + countItems + " at " + localStorage.getItem("PROD_SYSTEM_items~LAST_EPOCH"));
-        builder.AddLabledText("Browser Info", "Fast Structures Worker supported: " + MapAddonStructures.IsFastModeSupported().toString());
 
         builder.AddAction("Close", "NEUTRAL", () => {
             modal.Close();

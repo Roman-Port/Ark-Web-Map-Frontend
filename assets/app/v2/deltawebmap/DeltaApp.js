@@ -25,13 +25,6 @@ class DeltaApp {
         this.maps = {};
         this.db = null;
         this.dbInitTask = null; //This should be awaited before be activate any tabs
-        this.SIDEBAR_OPTIONS = [
-            {
-                "name": "User Settings",
-                "view": this.viewUserSettings,
-                "icon": "/assets/app/icons/left_nav_v3/user_settings.svg"
-            }
-        ];
         this.topBanner = null;
         this.modal = null;
         this.config = null;
@@ -254,29 +247,22 @@ class DeltaApp {
         });
 
         //Add bottom options
-        for (var i = 0; i < this.SIDEBAR_OPTIONS.length; i += 1) {
-            var o = this.SIDEBAR_OPTIONS[i];
+        this._AddBottomButton(bottom, "v3_nav_bottom_btn_settings", () => {
 
-            //Create view
-            var view = o.view;
-            var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
-            view.Init(m);
+        });
+        this._AddBottomButton(bottom, "v3_nav_bottom_btn_flag", () => {
 
-            //Create menu
-            var c = DeltaTools.CreateDom("div", "v3_nav_server", bottom);
-            var cc = DeltaTools.CreateDom("div", "v3_nav_server_top", c);
-            DeltaTools.CreateDom("img", "v3_nav_server_top_icon", cc).src = o.icon;
-            DeltaTools.CreateDom("span", "", cc).innerText = o.name;
-            view.menu = c;
-            c.x_app = this;
-            c.x_view = view;
-            c.addEventListener("click", function () {
-                this.x_app.SwitchServer(this.x_view);
-            });
-        }
+        });
 
         //Add context menu listener
         DeltaContextMenu.AddContextListener(parent, this);
+    }
+
+    _AddBottomButton(mount, icon, callback) {
+        var b = DeltaTools.CreateDom("div", "v3_nav_bottom_btn", mount);
+        b.classList.add(icon);
+        b.addEventListener("click", callback);
+        return b;
     }
 
     CreateServerListClusterLabel(container, name) {

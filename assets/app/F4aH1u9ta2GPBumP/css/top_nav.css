@@ -600,18 +600,41 @@
     font-weight: 600;
 }
 
-    .v3_nav_server_add:hover {
-        background-color: #45484dFF;
-        cursor: pointer;
-    }
+.v3_nav_server_add:hover {
+    background-color: #45484dFF;
+    cursor: pointer;
+}
 
 .v3_nav_bottom {
     position: absolute;
     bottom: 0;
-    padding: 5px 0px;
-    border-top: 1px solid #44474b;
-    width: 100%;
+    padding: 10px;
+    left:0;
+    right:0;
     background-color: #252629;
+    text-align:center;
+}
+
+.v3_nav_bottom_btn {
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    background-color: #45484d;
+    border: 1px solid #606367;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.v3_nav_bottom_btn_settings {
+    background-image: url(/assets/app/icons/left_nav_v3/options/settings.svg);
+}
+
+.v3_nav_bottom_btn_flag {
+    background-image: url(/assets/app/icons/left_nav_v3/options/flag.svg);
 }
 
 .v3_nav_server_alert_container {

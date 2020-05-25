@@ -7,6 +7,9 @@ class DeltaBasicEventDispatcher {
     }
 
     Subscribe(tag, callback) {
+        if (tag == null) {
+            throw "No subscription tag specified!";
+        }
         this._subscriptions[tag] = callback;
     }
 

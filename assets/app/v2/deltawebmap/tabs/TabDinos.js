@@ -13,6 +13,7 @@ class TabDinos extends DeltaServerTab {
         this.dinoLoadTask = null;
         this.dinosLoaded = false;
         this.query = "";
+        this.DEFAULT_SORT_INDEX = 6;
         this.SORT_COLUMNS = [
             {
                 "name": "",
@@ -33,6 +34,9 @@ class TabDinos extends DeltaServerTab {
                 "name": "Name",
                 "render": function (e, data, sortIndex, species) {
                     e.innerText = data./*dino.*/tamed_name;
+                    if (data./*dino.*/tamed_name.length == 0) {
+                        e.innerText = species.screen_name;
+                    }
                 },
                 "create": function (e) {
                     
@@ -70,6 +74,30 @@ class TabDinos extends DeltaServerTab {
                 "size_min": 90,
                 "size_default": 200,
                 "size_max": 400,
+                "has_handle": true,
+                "array_size": 1
+            },
+            {
+                "name": "Tribe",
+                "render": (e, data, sortIndex, species) => {
+                    e._tribe._name.innerText = this.server.GetTribeByIdSafe(data.tribe_id).tribe_name;
+                    e._tribe._id.innerText = "ID " + data.tribe_id;
+                },
+                "create": (e) => {
+                    e._tribe = DeltaTools.CreateTribeLabel(this.server, -1, e);
+                    e._tribe.classList.add("tribelabel_container_fill");
+                },
+                "sort_modes": [
+                    (a, b) => {
+                        return this.server.GetTribeByIdSafe(a.tribe_id).tribe_name.localeCompare(this.server.GetTribeByIdSafe(b.tribe_id).tribe_name);
+                    },
+                    (a, b) => {
+                        return this.server.GetTribeByIdSafe(b.tribe_id).tribe_name.localeCompare(this.server.GetTribeByIdSafe(a.tribe_id).tribe_name);
+                    }
+                ],
+                "size_min": 90,
+                "size_default": 150,
+                "size_max": 300,
                 "has_handle": true,
                 "array_size": 1
             },
@@ -389,9 +417,15 @@ class TabDinos extends DeltaServerTab {
     LayoutDom(mountpoint) {
         this.mountpoint = mountpoint;
 
-        var search = DeltaTools.CreateDom("input", "dino_stats_search", this.mountpoint);
+        this.top = DeltaTools.CreateDom("div", "v2tab_top", this.mountpoint);
+        this.topCounts = DeltaTools.CreateDom("div", "v2tab_top_counts_container", this.top);
+        this.countTotal = this._CreateCount("TOTAL");
+        this.countFound = this._CreateCount("FOUND");
+        //this.countCryo = this._CreateCount("CRYO");
+
+        var search = DeltaTools.CreateDom("input", "v2tab_top_search", this.top);
         search.type = "text";
-        search.placeholder = "Search Tribe Dinos";
+        search.placeholder = "Search Dinos";
         search.addEventListener("input", (search) => this._OnSearchChanged(search.target.value));
 
         this.dataContainer = DeltaTools.CreateDom("div", "dino_stats_container", this.mountpoint);
@@ -439,6 +473,9 @@ class TabDinos extends DeltaServerTab {
             if (this.query == "") { return true; }
             return a.tamed_name.toLowerCase().includes(this.query) || this.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
         });
+        this.recycler.OnPostDatasetUpdated.Subscribe("deltawebmap.tab.dinos.counts", () => {
+            this._RefreshCounts();
+        });
 
         this.recycler.AddEventListener("click", (data, originalEvent, originalDom) => {
             //Show the dino modal
@@ -447,6 +484,13 @@ class TabDinos extends DeltaServerTab {
             var y = pos.top + 35;
             DeltaPopoutModal.ShowDinoModal(this.server.app, data, { "x": x, "y": y }, this.server);
         });
+    }
+
+    _CreateCount(label) {
+        var c = DeltaTools.CreateDom("div", "v2tab_top_count", this.topCounts);
+        var n = DeltaTools.CreateDom("div", "v2tab_top_count_number", c, "0");
+        DeltaTools.CreateDom("div", "v2tab_top_count_label", c, label);
+        return n;
     }
 
     CreateHeader() {
@@ -472,7 +516,7 @@ class TabDinos extends DeltaServerTab {
                 });
                 e.style.cursor = "pointer";
             }
-            if (globalIndex == 5) {
+            if (globalIndex == this.DEFAULT_SORT_INDEX) {
                 //Janky way of setting the sort label on the default item
                 e.classList.add("v2tab_header_sort_down");
             }
@@ -525,7 +569,7 @@ class TabDinos extends DeltaServerTab {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.server.db.dinos.SubscribeRecyclerViewToFiltered(this.recycler);
+            this.server.db.dinos.SubscribeRecyclerViewToFiltered(this.recycler, "deltawebmap.tabs.dinos.recycler");
         });
     }
 
@@ -593,6 +637,7 @@ class TabDinos extends DeltaServerTab {
         this.dinosLoaded = true;
         this.RefreshView();
         this.recycler.SetData(this.dinos);
+        this._RefreshCounts();
     }
 
     static StaticOnHeaderSortBtnClicked() {
@@ -613,6 +658,7 @@ class TabDinos extends DeltaServerTab {
     }
 
     RefreshView() {
+        this._RefreshCounts();
         return;
         
     }
@@ -678,6 +724,8 @@ class TabDinos extends DeltaServerTab {
 
         //Refresh
         this.RefreshView();
+
+        this._RefreshCounts();
     }
 
     UpdateFullDino(m) {
@@ -693,6 +741,8 @@ class TabDinos extends DeltaServerTab {
 
         //Update
         this.UpdateOrReplaceDino(replacement);
+
+        this._RefreshCounts();
     }
 
     UpdateOrReplaceDino(replacement) {
@@ -709,11 +759,19 @@ class TabDinos extends DeltaServerTab {
         if (!exists) {
             this.dinos.push(replacement);
         }
+
+        this._RefreshCounts();
     }
 
     _OnSearchChanged(query) {
         this.query = query.toLowerCase();
         this.recycler.RefreshSearch();
+        this._RefreshCounts();
+    }
+
+    _RefreshCounts() {
+        this.countTotal.innerText = this.recycler._GetTotalUnsearchedDataLength();
+        this.countFound.innerText = this.recycler._GetDataLength();
     }
 
 }

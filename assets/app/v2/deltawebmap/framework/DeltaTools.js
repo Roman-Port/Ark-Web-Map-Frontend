@@ -175,4 +175,11 @@ class DeltaTools {
         copy.remove();
     }
 
+    static CreateTribeLabel(server, id, parent) {
+        var d = DeltaTools.CreateDom("div", "tribelabel_container", parent);
+        d._name = DeltaTools.CreateDom("div", "tribelabel_name", d, server.GetTribeByIdSafe(id));
+        d._id = DeltaTools.CreateDom("div", "tribelabel_id", d, "ID " + id);
+        return d;
+    }
+
 }

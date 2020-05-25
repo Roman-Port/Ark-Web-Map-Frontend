@@ -138,12 +138,12 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
     }
 
     //Subscribes a recycler view to the filtered events
-    SubscribeRecyclerViewToFiltered(recycler) {
+    SubscribeRecyclerViewToFiltered(recycler, tag) {
         //Add events
-        this.OnFilteredDatasetUpdated.Subscribe("deltawebmap.dbcollec.auto", (m) => recycler.SetData(m));
+        this.OnFilteredDatasetUpdated.Subscribe(tag, (m) => recycler.SetData(m));
 
         //Set filtered data now
-        recycler.BulkAddItems(this.GetFilteredDataset());
+        recycler.SetData(this.GetFilteredDataset());
     }
 
     CheckFilter(data) {

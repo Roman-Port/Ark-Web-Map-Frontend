@@ -12,6 +12,10 @@
     display: block;
 }
 
+input:focus {
+    outline: none;
+}
+
 .map_part {
     position: absolute;
     top: 0;
@@ -3338,4 +3342,25 @@ a {
     margin: 4px;
     height: 1px;
     background-color: #45484d;
+}
+
+.tribelabel_container_fill {
+    width: -webkit-fill-available;
+}
+
+.tribelabel_name {
+    display:block;
+}
+
+.tribelabel_id {
+    display: none;
+    font-style: italic;
+}
+
+.tribelabel_container:hover .tribelabel_name {
+    display:none;
+}
+
+.tribelabel_container:hover .tribelabel_id {
+    display:block;
 }

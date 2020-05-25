@@ -88,7 +88,7 @@ class MapAddonOverview {
                 this.recycler.Reset();
             });*/
 
-            this.map.server.db.dinos.SubscribeRecyclerViewToFiltered(this.recycler);
+            this.map.server.db.dinos.SubscribeRecyclerViewToFiltered(this.recycler, "deltawebmap.tabs.map.addons.overview.recycler");
         });
     }
 

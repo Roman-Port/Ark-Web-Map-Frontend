@@ -27,6 +27,8 @@ class DeltaRecyclerView {
         this.removeCollateTimeout = null;
         this.removeCollateQueue = [];
 
+        this.OnPostDatasetUpdated = new DeltaBasicEventDispatcher();
+
         this.scrollProxy.addEventListener("scroll", () => this._OnScroll());
 
         this._OnDatasetUpdated();
@@ -80,6 +82,10 @@ class DeltaRecyclerView {
         return (index * this.rowHeight) + this.scrollOffset;
     }
 
+    _GetTotalUnsearchedDataLength() {
+        return this.data.length;
+    }
+
     _GetDataLength() {
         return this.dataMap.length;
     }
@@ -126,6 +132,9 @@ class DeltaRecyclerView {
 
         //Update all
         this.RefreshAllItemsInView();
+
+        //Call events
+        this.OnPostDatasetUpdated.Fire(null);
     }
 
     _CallEvent(type, evt) {
@@ -141,7 +150,7 @@ class DeltaRecyclerView {
 
     _CreateTemplateDOMs() {
         //Get number of DOMs needed
-        var needed = Math.ceil((this._GetContainerHeight()) / this.rowHeight) + 5;
+        var needed = Math.ceil((this._GetContainerHeight()) / this.rowHeight) + 15;
         console.log(needed + " nodes created");
 
         //Generate and position these many
@@ -360,6 +369,7 @@ class DeltaRecyclerView {
     RefreshSearch() {
         this._Remap();
         this.RefreshAllItemsInView();
+        this.mount.style.height = ((this._GetDataLength() * this.rowHeight) + this.scrollOffset).toString() + "px";
         this._ScrollToTop();
     }
 }

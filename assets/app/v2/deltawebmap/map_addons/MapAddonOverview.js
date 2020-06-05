@@ -30,7 +30,7 @@ class MapAddonOverview {
         });
 
         //Set up recycler view
-        this.recycler = new DeltaRecyclerView(this.sidebarContent, this.sidebar, 60, 54);
+        this.recycler = new DeltaRecyclerView(this.sidebarContent, this.sidebar, 60, 48);
         this.recycler.SetCreateRowFunction(() => {
             //Create row
             var row = DeltaTools.CreateDom("div", "dino_sidebar_item");

@@ -41,6 +41,19 @@ class DeltaContextMenu {
         m.Show(x, y, app);
     }
 
+    static AddSpecial_DinoContextMenu(m, dino) {
+        return DeltaContextMenu.AddContextMenu(m, dino, [
+            [
+                {
+                    "name": "Copy ID",
+                    "callback": (app, ddd) => {
+                        DeltaTools.CopyToClipboard(ddd.id);
+                    }
+                }
+            ]
+        ]);
+    }
+
     Show(x, y, app) {
         //If a menu is already open, close it
         if (this.menu != null) {

@@ -123,7 +123,7 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
         //Send to clients
         this.OnFilteredDataAdded.Fire(filteredAdds);
         this.OnFilteredDataRemoved.Fire(filteredRemoves);
-        this.OnFilteredDatasetUpdated.Fire(this.GetFilteredDataset());
+        //this.OnFilteredDatasetUpdated.Fire(this.GetFilteredDataset());
     }
 
     GetFilteredDataset() {
@@ -140,7 +140,9 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
     //Subscribes a recycler view to the filtered events
     SubscribeRecyclerViewToFiltered(recycler, tag) {
         //Add events
-        this.OnFilteredDatasetUpdated.Subscribe(tag, (m) => recycler.SetData(m));
+        //this.OnFilteredDatasetUpdated.Subscribe(tag, (m) => recycler.SetData(m));
+        this.OnFilteredDataAdded.Subscribe(tag, (m) => recycler.BulkAddItems(m));
+        this.OnFilteredDataRemoved.Subscribe(tag, (m) => recycler.BulkRemoveItems(m));
 
         //Set filtered data now
         recycler.SetData(this.GetFilteredDataset());

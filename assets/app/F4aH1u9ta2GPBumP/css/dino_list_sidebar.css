@@ -82,19 +82,18 @@
 .dino_sidebar_item {
     width: 320px;
     margin-top: 6px;
-    background-color: #33363c;
     color: white;
     border-radius: 5px;
-    border: 1px solid #45484d;
     position: relative;
     cursor: pointer;
     font-size: 0;
     position: absolute;
     height: 46px;
+    background-color: #33363c;
 }
 
     .dino_sidebar_item img {
-        margin: 8px 10px;
+        margin: 7px 10px;
         height: 30px;
         width: 30px;
         border-radius: 5px;
@@ -114,7 +113,7 @@
 
 .dino_sidebar_item_title {
     position: absolute;
-    top: 9px;
+    top: 8px;
     left: 50px;
     font-size: 15px;
     color: white;
@@ -135,7 +134,7 @@
 
 .dino_sidebar_item_sub {
     position: absolute;
-    top: 27px;
+    top: 28px;
     left: 50px;
     font-size: 12px;
     color: #bfbfbf;

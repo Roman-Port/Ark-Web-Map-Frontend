@@ -15,16 +15,6 @@ class DeltaPopoutModuleTitle {
         i.style.backgroundImage = "url('" + this.icon + "')";
         DeltaTools.CreateDom("div", "popoutm2_top_textt", d, this.title);
         DeltaTools.CreateDom("div", "popoutm2_top_textb", d, this.subtitle);
-        DeltaContextMenu.AddContextMenu(d, this, [
-            [
-                {
-                    "name": "Copy ID",
-                    "callback": (app, ddd) => {
-                        DeltaTools.CopyToClipboard(ddd.id);
-                    }
-                }
-            ]
-        ]);
         return d;
     }
 

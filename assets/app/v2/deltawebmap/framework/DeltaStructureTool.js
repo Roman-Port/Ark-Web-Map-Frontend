@@ -88,6 +88,7 @@ class DeltaStructureSession {
     }
 
     SetNewDataset(d) {
+        return;
         //Set
         this.dataset = d;
 
@@ -405,6 +406,11 @@ class DeltaStructureSession {
         var tileX = e._tileX;
         var tileY = e._tileY;
         var tileZ = e._tileZ;
+
+        //Check if content exists
+        if (interactive._found == null) {
+            return [];
+        }
 
         //Calculate
         var calcOffset = this.mapInfo.captureSize / 2;

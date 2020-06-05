@@ -44,7 +44,7 @@ class DeltaApp {
                 this.mainHolder.style.top = "0px";
             } else {
                 window.requestAnimationFrame(() => {
-                    this.mainHolder.style.top = b.clientHeight.toString() + "px";
+                    //this.mainHolder.style.top = b.clientHeight.toString() + "px"; //TODO: This seems to cause random problems because of a race condition?
                 });
             }
         });
@@ -430,6 +430,34 @@ class DeltaApp {
             modal.Close();
         });
         modal.AddPage(builder.Build());
+    }
+
+    async CaptureScreenshot() {
+        //Show loader
+        var loader = DeltaTools.CreateDom("div", "screenshot_working", this.settings.mountpoint);
+        DeltaTools.CreateDom("div", "loading_spinner", loader);
+
+        //Load JS script
+        var script = document.createElement('script');
+        var scriptLoad = new Promise(function (resolve, reject) {
+            script.onload = function () {
+                resolve();
+            };
+            script.onerror = function () {
+                reject();
+            }
+        });
+        script.src = "/assets/app/external/html2canvas.min.js";
+        document.head.appendChild(script);
+        await scriptLoad;
+
+        //Capture
+        var canvas = html2canvas(this.settings.mountpoint, {
+            useCORS: true,
+            ignoreElements: loader
+        });
+
+        console.log(canvas);
     }
 
 }

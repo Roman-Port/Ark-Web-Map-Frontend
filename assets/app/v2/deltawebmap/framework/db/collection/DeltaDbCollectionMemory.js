@@ -67,6 +67,7 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
         //Push to DB
         var pKey = this.GetPrimaryKey();
         if (!propagateOnly) {
+            console.log(pKey);
             for (var i = 0; i < adds.length; i += 1) {
                 this.memoryMap[adds[i][pKey]] = adds[i];
             }
@@ -123,7 +124,7 @@ class DeltaDbCollectionMemory extends DeltaSyncCollection {
         //Send to clients
         this.OnFilteredDataAdded.Fire(filteredAdds);
         this.OnFilteredDataRemoved.Fire(filteredRemoves);
-        //this.OnFilteredDatasetUpdated.Fire(this.GetFilteredDataset());
+        this.OnFilteredDatasetUpdated.Fire(this.GetFilteredDataset());
     }
 
     GetFilteredDataset() {

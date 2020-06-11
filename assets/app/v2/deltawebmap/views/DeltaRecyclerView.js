@@ -300,7 +300,7 @@ class DeltaRecyclerView {
 
     _PushAdds(updates) {
         //First, try to update all of these using a quick modify
-        for (var i = 0; i < updates.length; i += 1) {
+        /*for (var i = 0; i < updates.length; i += 1) {
             if (this._TryQuickModifyElementData(updates[i])) {
                 //Quick update OK!
                 i--;
@@ -311,7 +311,7 @@ class DeltaRecyclerView {
         //Check if quick updates were enough
         if (updates.length == 0) {
             return 0;
-        }
+        }*/
 
         //Add or modify all of these
         for (var i = 0; i < updates.length; i += 1) {

@@ -23,7 +23,9 @@ class DeltaServerSyncCollection extends DeltaDbCollectionMemory {
 
         //Start update loop
         this.updateLoop = window.setInterval(() => {
-            this._BatchUpdate(this.addQueue, []);
+            if (this.addQueue.length > 0) {
+                this._BatchUpdate(this.addQueue, []);
+            }
             this.addQueue = [];
         }, 2000);
     }

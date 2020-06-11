@@ -20,7 +20,8 @@ class TabAdmin extends SubTabMenuTab {
             new AdminTabServerPresets(),
             new AdminTabServerDelete(),
             "Server Admin",
-            new AdminTabServerPlayers()
+            new AdminTabServerPlayers(),
+            new AdminTabServerTribes()
         ];
     }
 

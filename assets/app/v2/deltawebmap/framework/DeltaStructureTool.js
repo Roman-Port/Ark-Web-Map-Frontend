@@ -88,7 +88,6 @@ class DeltaStructureSession {
     }
 
     SetNewDataset(d) {
-        return;
         //Set
         this.dataset = d;
 

@@ -3061,6 +3061,9 @@ a {
     line-height: 19px;
     height: 19px;
     display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .popoutm2_top_textb {

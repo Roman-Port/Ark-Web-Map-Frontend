@@ -374,42 +374,17 @@ class TabMap extends DeltaServerTab {
         return [x, y];
     }
 
+    FlyToLocation(location) {
+        var pos = TabMap.ConvertFromGamePosToMapPos(this.server, location.x, location.y);
+        this.map.flyTo(pos, 9, {
+            "animate": true,
+            "duration":0.75
+        });
+    }
+
     /*
      * RPC EVENTS
      */
-
-    OnRPCLiveUpdate(payload) {
-        /* This handles opcode 7, LiveUpdate */
-        //Run all updates
-        for (var i = 0; i < payload.updates.length; i += 1) {
-            this.HandleRPCLiveUpdate(payload.updates[i]);
-        }
-    }
-
-    HandleRPCLiveUpdate(update) {
-        //Find the map target
-        var target = null;
-        switch (update.type) {
-            case 0: if (this.markers["players"] != null) { target = this.markers["players"][update.id]; } break;
-            case 1: if (this.markers["dinos"] != null) { target = this.markers["dinos"][update.id]; } break;
-        }
-        if (target == null) { return; }
-
-        //Run updates
-        if (update.x != null && update.y != null && update.z != null) {
-            target.setLatLng(TabMap.ConvertFromGamePosToMapPos(this.server.session, update.x, update.y));
-        }
-
-        //Show damage indicator, if any
-        if (target.x_last_health != null && update.health != null) {
-            this.CreateHitIndicator(target, update.health - target.x_last_health);
-        }
-
-        //Set last stats
-        if (update.health != null) {
-            target.x_last_health = update.health;
-        }
-    }
 
     CreateHitIndicator(target, amount) {
         var e = DeltaTools.CreateDom("div", "map_damage_indicator_v2", target._icon);

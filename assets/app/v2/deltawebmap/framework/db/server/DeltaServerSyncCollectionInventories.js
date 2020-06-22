@@ -120,7 +120,25 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
     }
 
     HandleRPCUpdate(d) {
-        debugger;
+        //Unpack
+        var ignoreIds = [];
+        for (var i = 0; i < d.content.items.length; i += 1) {
+            var item = d.content.items[i];
+            item.holder_id = d.content.holder_id;
+            item.holder_type = d.content.holder_type;
+            item.tribe_id = d.content.tribe_id;
+            this.addQueue.push(item);
+            ignoreIds.push(item.item_id);
+        }
+
+        //Find other items that are no longer in this inventory
+        var k = Object.keys(this.memoryMap);
+        for (var i = 0; i < k.length; i += 1) {
+            if (!ignoreIds.includes(this.memoryMap[k[i]].item_id) && this.memoryMap[k[i]].holder_id == d.content.holder_id) {
+                this.memoryMap[k[i]].holder_id = "-1";
+                this.memoryMap[k[i]].holder_type = -1;
+            }
+        }
     }
 
     async GetAllItemsFromInventoriesByName(query) {
@@ -162,6 +180,7 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
                 if (itemHolders[items[i].classname].inventories[j].holder_id == items[i].holder_id && itemHolders[items[i].classname].inventories[j].holder_type == items[i].holder_type && itemHolders[items[i].classname].inventories[j].tribe_id == items[i].tribe_id) {
                     itemHolders[items[i].classname].inventories[j].count += items[i].stack_size;
                     itemHolders[items[i].classname].total += items[i].stack_size;
+                    //itemHolders[items[i].classname].total = 9000;
                     found = true;
                 }
             }
@@ -182,6 +201,15 @@ class DeltaServerSyncCollectionInventories extends DeltaServerSyncCollection {
         var keys = Object.keys(itemHolders);
         for (var i = 0; i < keys.length; i += 1) {
             output.push(itemHolders[keys[i]]);
+        }
+
+        //Total
+        for (var i = 0; i < output.length; i++) {
+            var total = 0;
+            for (var j = 0; j < output[i].inventories.length; j++) {
+                total += output[i].inventories[j].count;
+            }
+            output[i].total = total;
         }
 
         return output;

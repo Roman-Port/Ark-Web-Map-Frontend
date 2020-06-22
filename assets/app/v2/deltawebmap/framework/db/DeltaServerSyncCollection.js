@@ -18,7 +18,7 @@ class DeltaServerSyncCollection extends DeltaDbCollectionMemory {
             }
 
             //Update
-            this.addQueue.push(d.content);
+            this.HandleRPCUpdate(d);
         });
 
         //Start update loop
@@ -28,6 +28,10 @@ class DeltaServerSyncCollection extends DeltaDbCollectionMemory {
             }
             this.addQueue = [];
         }, 2000);
+    }
+
+    HandleRPCUpdate(d) {
+        this.addQueue.push(d.content);
     }
 
     GetServerId() {

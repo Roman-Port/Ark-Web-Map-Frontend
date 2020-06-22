@@ -109,18 +109,26 @@ class TabItems extends DeltaServerTab {
         //Get content
         if (data.holder_type == 0) {
             //Dino
-            this._SetDataDino(data.holder_id, icon, name);
+            this._SetDataDino(data.holder_id, c, icon, name);
         } else if (data.holder_type == 1) {
             //Structure
             this._SetDataStructure(data.holder_id, icon, name);
+        } else if (data.holder_type == -1) {
+            //Unknown item location (happens when an item is moved)
+            name.innerText = "Unknown Location";
+            icon.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";
+            icon.firstChild.remove();
         } else {
             //Unknown
+            name.innerText = "UNKNOWN TYPE";
+            icon.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";
+            icon.firstChild.remove();
         }
 
         return c;
     }
 
-    async _SetDataDino(id, iconDiv, nameDiv) {
+    async _SetDataDino(id, container, iconDiv, nameDiv) {
         var dino = await this.server.db.dinos.GetById(id);
         if (dino != null) {
             //Set info
@@ -134,9 +142,32 @@ class TabItems extends DeltaServerTab {
                     //If this is a valid dino, set the invert
                     iconDiv.classList.add("itemlist_inventory_row_icon_invert");
                 }
+                if (dino.tamed_name == "") {
+                    //Set default name
+                    nameDiv.innerText = species.screen_name;
+                }
             } else {
                 iconDiv.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";
             }
+
+            //Also add an event listener
+            container._dino = dino;
+            container.addEventListener("click", (e) => {
+                //Find dino data
+                var dd = e.target._dino;
+                var dt = e.target;
+                while (dd == null) {
+                    dt = dt.parentNode;
+                    dd = dt._dino;
+                }
+
+                //Show
+                DeltaPopoutModal.ShowDinoModal(this.server.app, dd, {
+                    "x": e.x,
+                    "y": e.y
+                }, this.server);
+            });
+            container.classList.add("itemlist_inventory_clickable");
         } else {
             nameDiv.innerText = "MISSING DINO (" + id + ")";
             iconDiv.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";
@@ -147,21 +178,31 @@ class TabItems extends DeltaServerTab {
     }
 
     async _SetDataStructure(id, iconDiv, nameDiv) {
+        var sName = "Unknown";
+        var sIcon = "https://icon-assets.deltamap.net/unknown_dino.png";
         var structure = await this.server.db.structures.GetById(parseInt(id));
         if (structure != null) {
             //Get item data
             var structureEntry = await this.server.app.GetItemEntryByStructureClassNameAsync(structure.classname);
             if (structureEntry != null) {
-                nameDiv.innerText = structureEntry.name;
-                iconDiv.style.backgroundImage = "url('" + structureEntry.icon.image_thumb_url + "')";
+                sName = structureEntry.name;
+                sIcon = structureEntry.icon.image_thumb_url;
             } else {
-                nameDiv.innerText = structure.classname;
-                iconDiv.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";
+                sName = structure.classname;
+            }
+
+            //Cover some weird edge cases
+            if (structure.classname.startsWith("DeathItemCache")) {
+                sName = "Dead Creature";
+                sIcon = "https://icon-assets.deltamap.net/unknown_dino.png";
             }
         } else {
-            nameDiv.innerText = "MISSING STRUCTURE (" + id + ")";
-            iconDiv.style.backgroundImage = "url('https://icon-assets.deltamap.net/unknown_dino.png')";
+            sName = "MISSING STRUCTURE (" + id + ")";
         }
+
+        //Set data
+        nameDiv.innerText = sName;
+        iconDiv.style.backgroundImage = "url('" + sIcon + "')";
 
         //Clear icon loader
         iconDiv.firstChild.remove();

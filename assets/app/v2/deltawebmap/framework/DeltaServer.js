@@ -660,4 +660,85 @@ class DeltaServer extends DeltaTabView {
 
         }, this.token);
     }
+
+    FlyToLocation(location) {
+        this.tabs[0].FlyToLocation(location);
+        this.OnSwitchTab(0);
+    }
+
+    RunArkRpcEndpoint(url, params, callback, failedCallback) {
+        //Request
+        DeltaTools.WebPOSTJson(url, params, null).then((r) => {
+            //Get the RPC ID
+            var id = r.rpc_id;
+
+            //Create timeout
+            var t = window.setTimeout(() => {
+                //Unsubscribe
+                this.UnsubscribeRPCEvent("deltawebmap.server.arkrpc." + id);
+
+                //Fire
+                failedCallback();
+            }, 10000);
+
+            //Subscribe to RPC event
+            this.SubscribeRPCEvent("deltawebmap.server.arkrpc." + id, 20008, (d) => {
+                //Make sure this is the correct token
+                if (d.rpc_id != id) { return; }
+
+                //Unsubscribe
+                this.UnsubscribeRPCEvent("deltawebmap.server.arkrpc." + id);
+
+                //Cancel
+                window.clearTimeout(t);
+
+                //Fire
+                callback(d.custom_data);
+            });
+        });
+    }
+
+    RunArkRpcEndpointInterface(url, params, successTitle, successText, failTitle, failText) {
+        //Create modal
+        var modal = this.app.modal.AddModal(480, 300);
+        modal.AddPage(DeltaModalBuilder.GetLoadingView());
+
+        //Start
+        this.RunArkRpcEndpoint(url, params, () => {
+            var builder = new DeltaModalBuilder();
+            builder.AddContentTitle(successTitle);
+            builder.AddContentDescription(successText);
+            modal.AddPage(builder.Build());
+            builder.AddAction("Close", "NEUTRAL", () => {
+                modal.Close();
+            });
+        }, () => {
+            var builder = new DeltaModalBuilder();
+            builder.AddContentTitle(failTitle);
+            builder.AddContentDescription(failText);
+            modal.AddPage(builder.Build());
+            builder.AddAction("Cancel", "NEUTRAL", () => {
+                modal.Close();
+            });
+        });
+
+        return modal;
+    }
+
+    PromptBanMember(userName, userSteamId) {
+        //Prompt
+        this.app.OpenPromptModal("Ban " + userName, "This will ban " + userName + " from both the ARK game server and Delta Web Map.", "Ban", "Cancel", () => {
+            //Ban
+            this.RunArkRpcEndpointInterface(this.BuildServerRequestUrl("/admin/ban_player"), {
+                "steam_id": userSteamId
+            },
+                "Ban Successful",
+                userName + " has successfully been banned from the game server and Delta Web Map.",
+                "Ban Failed",
+                "Could not communicate with the ARK server. It might not be running. Your ban will process next time it connects to DeltaWebMap."
+            );
+        }, () => {
+            //Ignore
+        }, "NEGATIVE", "NEUTRAL");
+    }
 }

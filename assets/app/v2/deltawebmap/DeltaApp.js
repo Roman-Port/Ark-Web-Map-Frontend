@@ -44,7 +44,7 @@ class DeltaApp {
                 this.mainHolder.style.top = "0px";
             } else {
                 window.requestAnimationFrame(() => {
-                    //this.mainHolder.style.top = b.clientHeight.toString() + "px"; //TODO: This seems to cause random problems because of a race condition?
+                    this.mainHolder.style.top = b.clientHeight.toString() + "px"; //TODO: This seems to cause random problems because of a race condition?
                 });
             }
         });

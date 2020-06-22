@@ -63,8 +63,20 @@ class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
                 {
                     "name": "Ban " + data.name,
                     "style": "red",
-                    "callback": (app, d) => {
-                        //TODO
+                    "callback": (app, dd) => {
+                        //Check if this is an admin
+                        if (dd.is_admin) {
+                            var modal = this.server.app.modal.AddModal(480, 300);
+                            var builder = new DeltaModalBuilder();
+                            builder.AddContentTitle("Can't Ban " + dd.name);
+                            builder.AddContentDescription("You cannot ban other admins or the server owner. Please remove them as an admin before banning them.");
+                            modal.AddPage(builder.Build());
+                            builder.AddAction("Cancel", "NEUTRAL", () => {
+                                modal.Close();
+                            });
+                            return;
+                        }
+                        this.server.PromptBanMember(dd.name, dd.steam_id);
                     }
                 }
             ]

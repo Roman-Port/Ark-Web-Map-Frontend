@@ -89,7 +89,12 @@ class DeltaStructureSession {
 
     SetNewDataset(d) {
         //Set
-        this.dataset = d;
+        this.dataset = [];
+        for (var i = 0; i < d.length; i += 1) {
+            if (this.tool.metadata[d[i].classname] != null) {
+                this.dataset.push(d[i]);
+            }
+        }
 
         //Sort
         this.dataset.sort((a, b) => {

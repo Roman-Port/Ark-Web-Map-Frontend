@@ -2639,10 +2639,11 @@ a {
     left: 0;
     right: 0;
     transition: bottom 150ms ease-in-out;
+    display: flex;
 }
 
 .intro_slide_warning_box {
-    display: block;
+    display: inline-block;
     margin: auto;
     color: white;
     background-color: #e85a5a;
@@ -2655,7 +2656,6 @@ a {
     background-position-y: center;
     background-position-x: 20px;
     padding-left: 64px;
-    width: fit-content;
 }
 
 .intro_slide_warning_box_blue {

@@ -11,9 +11,28 @@ function FinishLogon() {
     }, 2000);
 }
 
-function Reject(msg) {
-    alert(msg);
-    window.location = DELTA_LOGON_DATA.reject_url;
+function CreateDom(type, classname, parent, text) {
+    var e = document.createElement(type);
+    if (classname != null) {
+        e.className = classname;
+    }
+    if (parent != null) {
+        parent.appendChild(e);
+    }
+    if (text != null) {
+        e.innerText = text;
+    }
+    return e;
+}
+
+function Reject(message) {
+    document.getElementById('og_content').remove();
+    var a = CreateDom("div", "content auth_content", document.body);
+    CreateDom("div", "auth_fail_title", a, "There was an error");
+    CreateDom("div", null, a, message);
+    CreateDom("div", "accept_btn", a, "Try Again").addEventListener("click", () => {
+        window.location = DELTA_LOGON_DATA.reject_url;
+    });
 }
 
 async function RequestBetaKey() {

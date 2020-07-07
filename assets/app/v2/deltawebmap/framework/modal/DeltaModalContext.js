@@ -12,7 +12,7 @@ class DeltaModalContext {
         this.pages = [];
 
         //Create view
-        this.view = DeltaTools.CreateDom("div", "modal_holder", container.area);
+        this.view = DeltaTools.CreateDom("div", "modal_holder modal_holder_active", container.area);
 
         //Create internal view
         this.insideView = DeltaTools.CreateDom("div", "modal_view_container", this.view);

@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 var SYSTEM_VERSION_MAJOR = 0;
 var SYSTEM_VERSION_MINOR = 1;
@@ -77,6 +77,14 @@ class DeltaApp {
 
         //Swtich to the default server
         this.SwitchServer(this.GetDefaultServer());
+
+        //Bind to RPC events
+        this.rpc.SubscribeGlobal("app-server-joined", 30001, (m) => {
+            //We've just joined a server. Add it to the server list
+            this.user.data.servers.push(m.guild);
+            var server = this.BootServer(m.guild);
+            this.SwitchServer(server);
+        });
     }
 
     BootServer(info) {
@@ -113,6 +121,8 @@ class DeltaApp {
         //Create mountpoint and init
         var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
         server.Init(m);
+
+        return server;
     }
 
     async InitNetworkResources() {
@@ -279,6 +289,28 @@ class DeltaApp {
         //Check if we're already on this server
         if (this.lastServer == server) {
             return;
+        }
+
+        //If this server hasn't been set up yet, do so
+        if (server.info != null) {
+            if (server.info.flags == 3) {
+                //TODO, fix these args
+                if (this.active_creator != null) {
+                    if (this.active_creator.guild == null) {
+                        this.active_creator._OnFoundServer(server);
+                        return;
+                    } else {
+                        //Ignore for now
+                        return;
+                    }
+                }
+
+                //Open guild creator
+                new DeltaGuildCreator(this, server);
+
+                //TODO
+                return;
+            }
         }
 
         //Check status (if needed)
@@ -452,12 +484,41 @@ class DeltaApp {
         await scriptLoad;
 
         //Capture
-        var canvas = html2canvas(this.settings.mountpoint, {
+        var canvas = await html2canvas(this.settings.mountpoint, {
             useCORS: true,
             ignoreElements: loader
         });
 
         console.log(canvas);
+    }
+
+    ShowNews() {
+        var modal = this.modal.AddModal(480, 590);
+
+        var builder = new DeltaModalBuilder();
+        builder.AddContentTitle("👋 Welcome to Delta Web Map!");
+        builder.AddContentDescription("Thanks for using Delta Web Map! We're so excited to bring you the latest news and updates to the app.");
+
+        builder.AddLabledText("How do I get started?", "To get started with Delta Web Map, you can either join an ARK server with Delta Web Map installed using Steam, or you can add Delta Web Map to your own server.");
+
+        builder.AddBulletList("Features on the horizon", [
+            "Steam Workshop mod support",
+            "ARK Smart Breeder Integration",
+            "Interactive map canvases, shared with your tribe",
+            "Dinosaur raising features"
+        ]);
+
+        builder.AddBulletList("Features planned a little farther out", [
+            "Fully-featured Android app",
+            "Push notifications"
+        ]);
+
+        builder.AddContentDescription("Don't forget to [join our Discord server](https://discord.gg/99TcfCT) for the latest news and updates! You can also use the flag button in the bottom left of the app to report any problems.");
+
+        builder.AddAction("Okay", "NEUTRAL", () => {
+            modal.Close();
+        });
+        modal.AddPage(builder.Build());
     }
 
 }

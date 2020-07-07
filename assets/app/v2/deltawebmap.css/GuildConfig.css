@@ -110,3 +110,106 @@
     height:200px;
     width:100%;
 }
+
+.gs_iconmaker_dino_holder {
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+.gs_iconmaker_dino {
+    width: 30px;
+    height: 30px;
+    padding: 3px;
+    filter: invert(1);
+    border: 1px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.gs_iconmaker_dino_selected {
+    border-color: black;
+}
+
+.gs_iconmaker_canvas {
+    border-radius: 10px;
+    height: 100px;
+    width: 100px;
+    margin: auto;
+    background-color: hsl(0, 74%, 57%);
+    position: relative;
+    overflow: hidden;
+}
+
+.gs_iconmaker_canvas_dino {
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    top: 8px;
+    filter: invert(1);
+}
+
+.gs_iconmaker_canvas_dino_left {
+    right: 20px;
+}
+
+.gs_iconmaker_canvas_dino_right {
+    left: 20px;
+}
+
+.gs_iconmaker_colorbar {
+    background: linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%));
+    height: 10px;
+    position: relative;
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.gs_iconmaker_colorbar_grabber {
+    border: 1px solid white;
+    width: 20px;
+    height: 20px;
+    background-color: hsl(0, 74%, 57%);
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.gs_name {
+    width: 400px;
+    padding: 10px;
+    border: 1px solid #141517;
+    border-radius: 5px;
+    margin: 20px auto;
+    display: block;
+    background-color: #42454a;
+    color: white;
+}
+
+.gs_name_invalid {
+    border-color: #f92b2b;
+    color: #ff9393;
+}
+
+.gs_icon_upload {
+    margin: 15px;
+    color: white;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 20px 15px;
+    background-color: #42454a;
+    border-radius: 5px;
+    border: 2px dashed #ffffff;
+    cursor: pointer;
+}
+
+.gs_iconmaker_title {
+    margin: 15px;
+    color: white;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+}

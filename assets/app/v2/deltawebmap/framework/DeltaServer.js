@@ -67,12 +67,18 @@ class DeltaServer extends DeltaTabView {
         var menu = DeltaTools.CreateDom("div", "v3_nav_server");
         this.menu = menu;
         var top = DeltaTools.CreateDom("div", "v3_nav_server_top", menu);
-        DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top).src = info.image_url;
+
+        this.menu_icon = DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top);
+        this.menu_icon.src = info.image_url;
+
         var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
         menu.alertBadge = alertBadge;
         var loaderBadge = DeltaTools.CreateDom("div", "loading_spinner server_loader", top, "");
         menu.loaderBadge = loaderBadge;
-        DeltaTools.CreateDom("span", "", top).innerText = info.display_name;
+
+        this.menu_name = DeltaTools.CreateDom("span", "", top);
+        this.menu_name.innerText = info.display_name;
+
         var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
 
         //Add padlock
@@ -279,6 +285,19 @@ class DeltaServer extends DeltaTabView {
         });
         this.SubscribeRPCEvent("guild-leave", 30004, (m) => {
             this.RemoveServer();
+        });
+        this.SubscribeRPCEvent("guild-update", 20010, (m) => {
+            //Update info
+            this.info.display_name = m.guild.display_name;
+            this.info.image_url = m.guild.image_url;
+            this.info.flags = m.guild.flags;
+            this.info.permission_flags = m.guild.permission_flags;
+            this.info.permissions_template = m.guild.permissions_template;
+            this.info.secure_mode = m.guild.secure_mode;
+
+            //Update UI
+            this.menu_icon.src = m.guild.image_url;
+            this.menu_name.innerText = m.guild.display_name;
         });
     }
 
@@ -644,6 +663,49 @@ class DeltaServer extends DeltaTabView {
         this.ApplyNewPermissions();
     }
 
+    async SetPermissionTemplate(data) {
+        //Set
+        this.info.permission_flags = data.flags;
+
+        //Send
+        await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/admin/permissions"), {
+            "flags": this.info.permission_flags,
+            "template": data.id
+        }, this.token);
+
+        //Apply
+        this.ApplyNewPermissions();
+    }
+
+    async SetName(name) {
+        //Set
+        this.info.display_name = name;
+
+        //Send
+        await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/admin/rename"), {
+            "name": name
+        }, this.token);
+    }
+
+    async SetLocked(isLocked) {
+        //Send
+        await DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/admin/locked"), {
+            "locked": isLocked
+        }, this.token);
+
+        //Update locally, just in case RPC is down
+        //Clear setup flag
+        this.info.flags &= ~(1 << 1);
+
+        //Change lock flag
+        if (isLocked) {
+            this.info.flags |= 1 << 0;
+        }
+        else {
+            this.info.flags &= ~(1 << 0);
+        }
+    }
+
     //Applies new permissions to the user interface
     ApplyNewPermissions() {
 
@@ -740,5 +802,9 @@ class DeltaServer extends DeltaTabView {
         }, () => {
             //Ignore
         }, "NEGATIVE", "NEUTRAL");
+    }
+
+    async UploadNewIcon(data) {
+        await DeltaTools._BaseWebRequest(this.BuildServerRequestUrl("/admin/upload_icon"), "json", "POST", data, null, {});
     }
 }

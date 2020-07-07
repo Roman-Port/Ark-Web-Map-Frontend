@@ -29,7 +29,8 @@ class DeltaModalBuilder {
     }
 
     AddContentCustomText(textClass, text) {
-        var t = DeltaTools.CreateDom("div", textClass, null, text);
+        var t = DeltaTools.CreateDom("div", textClass, null);
+        DeltaModalBuilder.ParseMarkdown(t, text);
         this._AddContent(t);
         return t;
     }
@@ -48,6 +49,16 @@ class DeltaModalBuilder {
 
     AddLabledText(label, text) {
         var d = DeltaTools.CreateDom("div", "modal_preset_text", null, text);
+        var e = this.AddLabeledContent(label, d);
+        e.classList.add("modal_preset_padded");
+        return e;
+    }
+
+    AddBulletList(label, texts) {
+        var d = DeltaTools.CreateDom("ul", "modal_preset_text", null);
+        for (var i = 0; i < texts.length; i += 1) {
+            DeltaTools.CreateDom("li", null, d, texts[i]);
+        }
         var e = this.AddLabeledContent(label, d);
         e.classList.add("modal_preset_padded");
         return e;
@@ -82,6 +93,69 @@ class DeltaModalBuilder {
 
     Build() {
         return this.working;
+    }
+
+    static ParseMarkdown(parent, markdown) {
+        //Supports a very small subset of markdown
+        //It's probably a poor idea to accept user input into this
+        var currentStore = DeltaTools.CreateDom("span", null, parent);
+        for (var ci = 0; ci < markdown.length; ci += 1) {
+            var c = markdown[ci];
+            if (c == "[") {
+                //This might be the start of a markdown link. Peek ahead to see if we can find the rest
+                var lastChar = "[";
+                var state = -1; //-1: Not valid, 0: End not found, 1: End of link not found
+                var endTilePos = -1;
+                var endUrlPos = -1;
+
+                //Look for the title
+                for (var ai = 0; ai < markdown.length - ci; ai += 1) {
+                    if (markdown[ci + ai] == "]" && lastChar != "[") {
+                        //End of the title. Verify that a link follows
+                        if (markdown[ci + ai + 1] == "(") {
+                            state = 1;
+                            endTilePos = ai;
+                            break;
+                        } else {
+                            state = -1;
+                            break;
+                        }
+                    }
+                    lastChar = markdown[ci + ai];
+                }
+
+                //If check failed, abort
+                if (state == -1) {
+                    continue;
+                }
+
+                //Seek for the end of the link
+                for (var ai = endTilePos+1; ai < markdown.length - ci; ai += 1) {
+                    if (markdown[ci + ai] == ")") {
+                        //End of URL
+                        endUrlPos = ai;
+                        state = 2;
+                    }
+                }
+
+                //If check failed, abort
+                if (state == 1) {
+                    continue;
+                }
+
+                //Found all parts. Create
+                currentStore = DeltaTools.CreateDom("a", null, parent);
+                currentStore.innerText = markdown.substr(ci + 1, endTilePos - 1);
+                currentStore.href = markdown.substr(endTilePos + 2 + ci, endUrlPos - endTilePos - 2);
+                currentStore.target = "_blank";
+
+                //Fix state
+                ci += endUrlPos;
+                currentStore = DeltaTools.CreateDom("span", null, parent);
+            } else {
+                currentStore.innerText += c;
+            }
+        }
     }
 
     static GetLoadingView() {

@@ -182,4 +182,41 @@ class DeltaTools {
         return d;
     }
 
+    static RemoveAllChildren(node) {
+        while (node.firstChild) {
+            node.removeChild(node.lastChild);
+        }
+    }
+
+    static async DownloadImageAsync(url) {
+        return await new Promise((resolve, reject) => {
+            let img = new Image();
+            img.setAttribute('crossorigin', 'anonymous');
+            img.onload = function () {
+                resolve(img);
+            };
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
+
+    static OpenFileDialog(accept, callback) {
+        var input = DeltaTools.CreateDom("input", null, document.body);
+        input.style.position = "fixed";
+        input.style.top = "-5000px";
+        input.type = "file";
+        input.accept = accept;
+        input.click();
+        input.addEventListener("change", () => {
+            if (input.files.length > 0) {
+                callback(input.files[0]);
+            }
+            input.remove();
+        });
+    }
+
+    static OpenImageFileDialog(callback) {
+        this.OpenFileDialog("image/png, image/jpeg", callback);
+    }
+
 }

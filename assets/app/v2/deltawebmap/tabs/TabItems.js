@@ -23,16 +23,34 @@ class TabItems extends DeltaServerTab {
     LayoutDom(mountpoint) {
         this.mountpoint = mountpoint;
         this.container = DeltaTools.CreateDom("div", "itemlist_container", mountpoint);
+
+        //Create area where inventories would go 
+        this.holder = DeltaTools.CreateDom("div", null, this.container);
+        this.holder.style.width = "100%";
+        this.holder.style.position = "relative";
+
+        //Add events
+        this.holder.parentNode.addEventListener("scroll", () => {
+            this.RefreshVisibleData();
+        });
+
+        //Create sidebar
+        var sidebar = DeltaTools.CreateDom("div", "itemsearch_sidebar", this.mountpoint);
+
+        //Create query box
+        var query = DeltaTools.CreateDom("input", "itemsearch_query", sidebar);
+        query.type = "text";
+        query.placeholder = "Search Items";
     }
 
     async OnFirstOpen() {
         /* Called when this tab is opened for the first time */
-
+        this.RefreshResults();
     }
 
     async OnOpen() {
         /* Called when this tab is switched to */
-        this.LoadResults();
+        
     }
 
     async OnClose() {
@@ -45,7 +63,7 @@ class TabItems extends DeltaServerTab {
         
     }
 
-    async LoadResults() {
+    async RefreshResults() {
         //Get items
         var data = await this.server.db.inventories.GetAllItemsFromInventoriesByName("");
 
@@ -53,14 +71,30 @@ class TabItems extends DeltaServerTab {
         data.sort((a, b) => {
             return b.total - a.total;
         });
+        this.currentData = data;
 
-        //Add entries
+        //Calculate the height of all inventories
+        var totalHeight = 0;
         for (var i = 0; i < data.length; i += 1) {
-            this.container.appendChild(this.CreateItemBox(data[i]));
+            data[i]._hpos = totalHeight;
+            var height = this.GetHeightOfSection(data[i].inventories.length);
+            data[i]._htop = totalHeight;
+            data[i]._hbottom = totalHeight + height;
+            totalHeight += height;
         }
+
+        //Clear holder
+        DeltaTools.RemoveAllChildren(this.holder);
+        this.holder.parentNode.scrollTop = 0;
+
+        //Update height
+        this.holder.style.height = totalHeight.toString() + "px";
+
+        //Update now
+        this.RefreshVisibleData();
     }
 
-    CreateItemBox(data) {
+    AddItemBox(data) {
         //Fetch item entry
         var entry = this.server.app.GetItemEntryByClassName(data.classname);
 
@@ -68,8 +102,11 @@ class TabItems extends DeltaServerTab {
         var total = data.total;
 
         //Create container
-        var c = DeltaTools.CreateDom("div", "itemlist_item");
+        var c = DeltaTools.CreateDom("div", "itemlist_item", this.holder);
         var top = DeltaTools.CreateDom("div", "itemlist_item_top", c);
+
+        //Position container
+        c.style.top = data._hpos.toString() + "px";
 
         //Add entries to the top
         var icon = DeltaTools.CreateDom("div", "itemlist_item_row", top);
@@ -206,5 +243,36 @@ class TabItems extends DeltaServerTab {
 
         //Clear icon loader
         iconDiv.firstChild.remove();
+    }
+
+    /* Interface */
+
+    GetHeightOfSection(entryCount) {
+        var h = 10; //Margin
+        h += 43; //Top
+        h += (entryCount * 30); //Entries
+        return h;
+    }
+
+    RefreshVisibleData() {
+        //Get the top and bottom of the visible area
+        var top = this.holder.parentNode.scrollTop;
+        var bottom = this.holder.parentNode.scrollTop + this.holder.parentNode.clientHeight;
+
+        //Find all elements within this viewport
+        for (var i = 0; i < this.currentData.length; i += 1) {
+            if (this.currentData[i]._hbottom > top && this.currentData[i]._htop < bottom) {
+                //Add
+                if (this.currentData[i]._node == null) {
+                    this.currentData[i]._node = this.AddItemBox(this.currentData[i]);
+                }
+            } else {
+                //Remove
+                if (this.currentData[i]._node != null) {
+                    this.currentData[i]._node.remove();
+                    this.currentData[i]._node = null;
+                }
+            }
+        }
     }
 }

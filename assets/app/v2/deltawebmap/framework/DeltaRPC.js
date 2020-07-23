@@ -86,9 +86,6 @@ class DeltaRPC {
         this.fails += 1;
         this.Log("CLOSE", "RPC closed. Fail #" + this.fails);
 
-        //Show banner
-        this.app.topBanner.AddBanner("advanced_banner_style_red_disconnected", "Disconnected. Attempting to reconnect...", [], null, "TAG_RPC_DISCONNECT");
-
         //Calculate the amount of time to wait to reconnect. If this is one of the first fails, we'll wait a short amount of time. If we haven't been able to connect for a while, wait longer
         var time = 2000;
         if (this.fails > 2) {

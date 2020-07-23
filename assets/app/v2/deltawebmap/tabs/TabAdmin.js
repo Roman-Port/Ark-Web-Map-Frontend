@@ -174,4 +174,49 @@ class AdminSubTabMenuTabModule extends SubTabMenuTabModule {
         return btn;
     }
 
+    _AddPianoKeys(options, currentOption, callback) {
+        //Accepts type {name, description, color, id}. Calls back with the data when changed
+        var c = DeltaTools.CreateDom("div", null, this.mountpoint);
+        c._lastItem = null;
+        c._callback = callback;
+        for (var i = 0; i < options.length; i += 1) {
+            var d = DeltaTools.CreateDom("div", "gs_widebtn admin_piano_key", c);
+            DeltaTools.CreateDom("div", "gs_widebtn_title", d, options[i].name);
+            DeltaTools.CreateDom("div", null, d, options[i].description);
+            d._data = options[i];
+
+            //Set as active if it is
+            if (options[i].id == currentOption) {
+                d.style.backgroundColor = options[i].color;
+                d.style.borderColor = options[i].color;
+                d.style.color = "white";
+                c._lastItem = d;
+            }
+
+            //Add event
+            d.addEventListener("click", (evt) => {
+                //Get data
+                var t = evt.currentTarget;
+                var o = t._data;
+
+                //Clear
+                if (t.parentNode._lastItem != null) {
+                    t.parentNode._lastItem.style.backgroundColor = null;
+                    t.parentNode._lastItem.style.borderColor = null;
+                    t.parentNode._lastItem.style.color = null;
+                }
+
+                //Set the status of the current button
+                t.style.backgroundColor = o.color;
+                t.style.borderColor = o.color;
+                t.style.color = "white";
+                t.parentNode._lastItem = t;
+
+                //Callback
+                t.parentNode._callback(o);
+            });
+        }
+        return c;
+    }
+
 }

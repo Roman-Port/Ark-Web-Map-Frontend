@@ -25,7 +25,6 @@ class DeltaApp {
         this.maps = {};
         this.db = null;
         this.dbInitTask = null; //This should be awaited before be activate any tabs
-        this.topBanner = null;
         this.modal = null;
         this.config = null;
         this.clusterItems = {};
@@ -37,17 +36,6 @@ class DeltaApp {
 
         //Create DOM
         this.LayoutDom(this.settings.mountpoint);
-
-        //Create top banner
-        this.topBanner = new DeltaBannerMount(DeltaTools.CreateDom("div", "app_banner_container", this.settings.mountpoint), "app_banner_class", (b) => {
-            if (b == null) {
-                this.mainHolder.style.top = "0px";
-            } else {
-                window.requestAnimationFrame(() => {
-                    this.mainHolder.style.top = b.clientHeight.toString() + "px"; //TODO: This seems to cause random problems because of a race condition?
-                });
-            }
-        });
 
         //Load network resources
         await this.InitNetworkResources();

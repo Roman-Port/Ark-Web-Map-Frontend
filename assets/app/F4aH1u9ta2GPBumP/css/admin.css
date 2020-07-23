@@ -39,6 +39,10 @@
     cursor: pointer;
 }
 
+.admin_piano_key {
+    margin: 10px 0px;
+}
+
 /* Players tab */
 
 .admintab_players_user {

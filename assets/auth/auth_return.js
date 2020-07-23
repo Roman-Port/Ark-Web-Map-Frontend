@@ -23,11 +23,25 @@ async function FinishLogon() {
     }
 }
 
+function CreateDom(type, classname, parent, text) {
+    var e = document.createElement(type);
+    if (classname != null) {
+        e.className = classname;
+    }
+    if (parent != null) {
+        parent.appendChild(e);
+    }
+    if (text != null) {
+        e.innerText = text;
+    }
+    return e;
+}
+
 function Reject(msg) {
-    RemoveLoader();
+    document.getElementById('loader').remove();
     var a = CreateDom("div", "content auth_content", document.body);
     CreateDom("div", "auth_fail_title", a, "There was an error");
-    CreateDom("div", null, a, message);
+    CreateDom("div", null, a, msg);
     CreateDom("div", "accept_btn", a, "Try Again").addEventListener("click", () => {
         window.location = "/auth/?client_id=" + window.LAUNCH_CONFIG.AUTH.AUTH_CLIENT_ID;
     });

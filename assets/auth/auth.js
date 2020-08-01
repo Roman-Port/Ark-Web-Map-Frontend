@@ -83,13 +83,19 @@ async function Init() {
     }
     localStorage.setItem("delta_logon_nonce", nonce);
 
+    //Get the client ID
+    var clientId = params.client_id;
+    if(clientId == "DEFAULT_LOGIN") {
+        clientId = window.LAUNCH_CONFIG.AUTH.AUTH_CLIENT_ID;
+    }
+
     //Fetch data
     var response = null;
     try {
         response = await WebPost(window.LAUNCH_CONFIG.API_ENDPOINT + "/auth/begin", "POST", JSON.stringify({
             "nonce": nonce,
             "referrer": document.referrer,
-            "application_id": params.client_id,
+            "application_id": clientId,
             "custom": params.payload,
             "scope": params.scope
         }));

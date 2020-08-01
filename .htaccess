@@ -7,8 +7,7 @@ ErrorDocument 502 /assets/error_pages/502.php
 ErrorDocument 503 /assets/error_pages/503.php
 
 Redirect /privacy/ /legal/privacy/
-Redirect /d/win https://github.com/deltawebmap/DeltaClientServer/releases/download/v0.1/windows.zip
-Redirect /d/linux https://github.com/deltawebmap/DeltaClientServer/releases/download/v0.1/linux.zip
+Redirect /login/ /auth/?client_id=DEFAULT_LOGIN
 
 RewriteEngine on
 RewriteRule ^/?app/(.+)$ /app.html [PT]

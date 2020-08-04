@@ -42,7 +42,7 @@ class DeltaDbCollectionIndexedDB extends DeltaSyncCollection {
         localStorage.setItem(this.GetEpochKeyName(), r.epoch);
 
         //Add adds
-        await this._BatchUpdate(r.adds, [], false);
+        await this._BatchUpdate(r.content, [], false);
     }
 
     async _BatchUpdate(adds, removes, propagateOnly) {

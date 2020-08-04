@@ -21,8 +21,6 @@ class DeltaServer extends DeltaTabView {
         this.downloadTask = null; //Task that is run to create a session on this server
         this.error = null;
         this.token = new DeltaCancellationToken(null);
-        this.db = new DeltaServerDatabase(this);
-        this.db_sessions = []; //Managed DB sessions. In format [collection_key, session_token, options];
         this.ready = false; //Set to true when all data has been synced
         this.bottomBanner = null;
         this.tribes = [];
@@ -34,6 +32,16 @@ class DeltaServer extends DeltaTabView {
             new TabDinos(this),
             new TabItems(this),
             new TabAdmin(this)
+        ];
+
+        //Create server data packages
+        this.dinos = new ServerDataPackageDinos(this);
+        this.inventories = new ServerDataPackageInventories(this);
+        this.structures = new ServerDataPackageStructures(this);
+        this._packages = [
+            this.dinos,
+            this.inventories,
+            this.structures
         ];
 
         //Set some content
@@ -348,6 +356,10 @@ class DeltaServer extends DeltaTabView {
         return LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/" + this.id + "/tribes/*" + /*this.tribe + */extra;
     }
 
+    GetEchoEndpointUrl(extra) {
+        return LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/v1/" + this.id + extra;
+    }
+
     async WebRequestToEndpoint(extra, args, replacements) {
         var url = this.GetTribesEndpointUrl(extra);
         if (replacements !== undefined) {
@@ -361,7 +373,38 @@ class DeltaServer extends DeltaTabView {
 
     //Syncs content from the server locally
     async SyncContent() {
-        await this.db.Sync();
+        //Create interface
+        var dialog = DeltaTools.CreateDom("div", "contentdownload_container", this.mountpoint);
+        var label = DeltaTools.CreateDom("div", "contentdownload_text", dialog, "Downloading content...");
+        var bar = DeltaTools.CreateDom("div", "contentdownload_bar", dialog);
+        var filling = DeltaTools.CreateDom("div", "contentdownload_filling", bar);
+
+        //Get the total count for all
+        var totalEntityCount = 0;
+        var totalEntitiesDownloaded = 0;
+        for (var i = 0; i < this._packages.length; i += 1) {
+            totalEntityCount += await this._packages[i].FetchCount();
+        }
+
+        //Add UI update event to all
+        var uiC = (e) => {
+            totalEntitiesDownloaded += e.delta;
+            filling.style.width = ((totalEntitiesDownloaded / totalEntityCount) * 100).toString() + "%";
+            label.innerText = "Downloading " + e.source.name.toLowerCase() + "...";
+        };
+        for (var i = 0; i < this._packages.length; i += 1) {
+            this._packages[i].OnContentChunkReceived.Subscribe("deltawebmap.server.synccontent.ui", uiC);
+        }
+
+        //Download content for all packages
+        for (var i = 0; i < this._packages.length; i += 1) {
+            console.log("[DeltaServer-SyncContent] Beginning download of package \"" + this._packages[i].name + "\"...");
+            await this._packages[i].LoadContent();
+            console.log("[DeltaServer-SyncContent] Download of package \"" + this._packages[i].name + "\" completed successfully.");
+        }
+
+        //Remove UI
+        dialog.remove();
     }
 
     async DownloadDataCritical() {
@@ -375,9 +418,6 @@ class DeltaServer extends DeltaTabView {
             this.ForceAbort("Couldn't fetch tribe listing.");
             return false;
         }
-
-        //Set up DB
-        await this.db.Init();
 
         return true;
     }
@@ -509,35 +549,6 @@ class DeltaServer extends DeltaTabView {
         /* Pushes user prefs for this server */
         this.prefs = await DeltaTools.WebPOSTJson(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/put_user_prefs", this.prefs, this.token);
         return this.prefs;
-    }
-
-    CreateManagedDinoDbListener(add, remove, reset) {
-        //Create
-        var token = this.db["dinos"].AddManagedFilterListener((adds, removes) => {
-            if (adds.length > 0) {
-                add(adds);
-            }
-            if (removes.length > 0) {
-                remove(removes);
-            }
-        }, (item) => {
-            return this.CheckFilterDino(item);
-        });
-
-        //Add to collection
-
-        return token;
-    }
-
-    CreateManagedStructureDbListener(callback) {
-        //Create
-        var token = this.db["structures"].AddManagedFilterListener((add, remove) => callback(add, remove), (item) => {
-            return this.CheckFilterStructure(item);
-        });
-
-        //Add to collection
-
-        return token;
     }
 
     CheckFilterDino(dino) {

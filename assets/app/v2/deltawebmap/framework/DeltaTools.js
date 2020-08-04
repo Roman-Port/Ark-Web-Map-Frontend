@@ -15,19 +15,29 @@ class DeltaTools {
             args = {};
         }
 
+        //ARGS API PARAMS:
+        //getLoadedClientCallback : A callback that is called with the xhr client whem we successfully load, before we resolve
+        //noauth : When set to true, does not send auth data
+
         return new Promise(function (resolve, reject) {
             var xmlhttp = new XMLHttpRequest();
             xmlhttp.onreadystatechange = function () {
                 if (this.readyState === 4 && this.status === 200) {
+                    //Handle
                     if (token.IsValid()) {
+                        //If requested, allow the handler to use the raw client
+                        if (args.getLoadedClientCallback != null) {
+                            args.getLoadedClientCallback(xmlhttp);
+                        }
+
+                        //Respond
                         resolve(this.response);
                     }
                 } else if (this.readyState === 4) {
                     if (token.IsValid()) {
                         //Check if we're logged out
                         if (this.status == 401) {
-                            var url = "/login/?next=" + encodeURIComponent(document.location.href);
-                            window.location = url;
+                            window.location = "/auth/?client_id=" + window.LAUNCH_CONFIG.AUTH.AUTH_CLIENT_ID;
                         } else {
                             reject({
                                 status: this.status
@@ -67,11 +77,11 @@ class DeltaTools {
         return JSON.parse(r);
     }
 
-    static async WebRequestBinary(url, token) {
+    static async WebRequestBinary(url, token, args) {
         /* Responds with a DataView to use */
 
         //Launch
-        var r = await DeltaTools._BaseWebRequest(url, "arraybuffer", "GET", null, token);
+        var r = await DeltaTools._BaseWebRequest(url, "arraybuffer", "GET", null, token, args);
         return new DataView(r);
     }
 

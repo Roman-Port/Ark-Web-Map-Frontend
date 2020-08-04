@@ -569,7 +569,7 @@ class TabDinos extends DeltaServerTab {
             this.recycler._CreateTemplateDOMs();
 
             //Set dataset
-            this.server.db.dinos.SubscribeRecyclerViewToFiltered(this.recycler, "deltawebmap.tabs.dinos.recycler");
+            this.server.dinos.SubscribeRecycler("deltawebmap.tabs.dinos.recycler", this.recycler);
         });
     }
 

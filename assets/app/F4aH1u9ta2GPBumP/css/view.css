@@ -3440,3 +3440,50 @@ a {
     right: 23px;
     width: 300px;
 }
+
+.contentdownload_container {
+    background-color: #252629;
+    z-index: 9999;
+    left: 15px;
+    bottom: 15px;
+    width: calc(100% - 30px);
+    height: 60px;
+    position: absolute;
+    border-radius: 5px;
+    border: 1px solid #33363c;
+    max-width: 400px;
+    -webkit-box-shadow: 0px 3px 20px 0px rgba(0,0,0,0.17);
+    -moz-box-shadow: 0px 3px 20px 0px rgba(0,0,0,0.17);
+    box-shadow: 0px 3px 20px 0px rgba(0,0,0,0.17);
+    font-family: 'Roboto', sans-serif;
+}
+
+.contentdownload_text {
+    color: #d6d6d6;
+    font-size: 15px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+}
+
+.contentdownload_bar {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    height: 12px;
+    border-radius: 5px;
+    background-color: #33363c;
+    border: 1px solid #1a1b1d;
+    overflow: hidden;
+}
+
+.contentdownload_filling {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background-color: #3882dc;
+    transition: width 80ms ease-in-out;
+}

@@ -134,11 +134,8 @@ class DeltaStructureSession {
             };
         }
 
-        //Redraw now if first, else queue
-        if (this.firstSet && d.length > 0) {
-            this.RedrawAll();
-            this.firstSet = false;
-        }
+        //Redraw
+        this.RedrawAll();
     }
 
     RedrawAll() {

@@ -34,16 +34,16 @@ class MapAddonIcons extends TabMapAddon {
         this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
 
         //Add DB events
-        this.map.server.db.dinos.OnFilteredDataAdded.Subscribe("deltawebmap.tabs.map.addons.icons", (adds) => {
-            this.AddDinoDataPins(adds);
-        });
-        this.map.server.db.dinos.OnFilteredDataRemoved.Subscribe("deltawebmap.tabs.map.addons.icons", (removes) => {
-            //Use removes
-            for (var i = 0; i < removes.length; i += 1) {
-                this.RemovePin("dinos", removes[i]);
+        this.map.server.dinos.OnContentAddRemoved.Subscribe("deltawebmap.tabs.map.addons.icons", (d) => {
+            //Add
+            this.AddDinoDataPins(d.adds);
+
+            //Remove
+            for (var i = 0; i < d.removes.length; i += 1) {
+                this.RemovePin("dinos", d.removes[i]);
             }
         });
-        this.AddDinoDataPins(this.map.server.db.dinos.GetFilteredDataset());
+        this.AddDinoDataPins(this.map.server.dinos.filteredContent);
     }
 
     AddDinoDataPins(adds) {

@@ -84,8 +84,7 @@ class DeltaSystemSyncCollectionSpecies extends DeltaDbCollectionIndexedDB {
 
         //Format
         return {
-            "adds": d.content,
-            "removes": [],
+            "content": d.content,
             "epoch": d.customData[0]
         };
     }

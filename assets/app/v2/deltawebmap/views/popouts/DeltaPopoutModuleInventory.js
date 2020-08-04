@@ -12,29 +12,25 @@ class DeltaPopoutModuleInventory extends DeltaPopoutModuleCollapsable {
     BuildCollapseArea(ctx, rootHolder) {
         //Create the basic layout
         this.container = DeltaTools.CreateDom("div", "popoutm2_inventory");
-        DeltaTools.CreateDom("div", "loading_spinner", this.container);
         this.container.style.maxHeight = (78 * this.rows).toString() + "px";
 
         //Fetch inventory data
-        ctx.server.db.inventories.GetItemsFromInventory(this.holderType, this.holderId).then((items) => {
-            //Remove loading spinner
-            this.container.firstChild.remove();
-
-            if (items.length == 0) {
-                this.container.classList.add("popoutm2_inventory_empty");
-                this.container.innerText = "No Inventory Items";
-            } else {
-                //Add each item
-                for (var i = 0; i < items.length; i += 1) {
-                    this.container.appendChild(this.CreateItem(ctx, items[i]));
-                }
-
-                this.container.classList.add("popoutm2_inventory_ready");
+        var items = ctx.server.inventories.GetItemsFromInventory(this.holderType, this.holderId);
+        if (items.length == 0) {
+            this.container.classList.add("popoutm2_inventory_empty");
+            this.container.innerText = "No Inventory Items";
+        } else {
+            //Add each item
+            for (var i = 0; i < items.length; i += 1) {
+                this.container.appendChild(this.CreateItem(ctx, items[i]));
             }
 
-            //Trigger resize
-            ctx.OnResize();
-        });
+            this.container.classList.add("popoutm2_inventory_ready");
+        }
+
+        //Trigger resize
+        ctx.OnResize();
+        
 
         return this.container;
     }

@@ -18,6 +18,11 @@ class TabItems extends DeltaServerTab {
         /* Called when this tab (and thus, the server) is initially created */
         super.OnInit(mountpoint);
         this.LayoutDom(mountpoint);
+
+        //Subscribe
+        this.server.inventories.OnContentUpdated.Subscribe("deltawebmap.tabs.items.run", () => {
+            this.RefreshResults();
+        });
     }
 
     LayoutDom(mountpoint) {
@@ -45,7 +50,9 @@ class TabItems extends DeltaServerTab {
 
     async OnFirstOpen() {
         /* Called when this tab is opened for the first time */
-        this.RefreshResults();
+        window.requestAnimationFrame(() => {
+            this.RefreshVisibleData();
+        });
     }
 
     async OnOpen() {
@@ -63,9 +70,9 @@ class TabItems extends DeltaServerTab {
         
     }
 
-    async RefreshResults() {
+    RefreshResults() {
         //Get items
-        var data = await this.server.db.inventories.GetAllItemsFromInventoriesByName("");
+        var data = this.server.inventories.GetAllItemsFromInventoriesByName("");
 
         //Sort
         data.sort((a, b) => {
@@ -166,7 +173,7 @@ class TabItems extends DeltaServerTab {
     }
 
     async _SetDataDino(id, container, iconDiv, nameDiv) {
-        var dino = await this.server.db.dinos.GetById(id);
+        var dino = await this.server.dinos.GetById(id);
         if (dino != null) {
             //Set info
             nameDiv.innerText = dino.tamed_name;
@@ -217,7 +224,7 @@ class TabItems extends DeltaServerTab {
     async _SetDataStructure(id, iconDiv, nameDiv) {
         var sName = "Unknown";
         var sIcon = "https://icon-assets.deltamap.net/unknown_dino.png";
-        var structure = await this.server.db.structures.GetById(parseInt(id));
+        var structure = await this.server.structures.GetById(id);
         if (structure != null) {
             //Get item data
             var structureEntry = await this.server.app.GetItemEntryByStructureClassNameAsync(structure.classname);

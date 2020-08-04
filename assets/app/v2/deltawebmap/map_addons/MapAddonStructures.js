@@ -14,11 +14,15 @@ class MapAddonStructures extends TabMapAddon {
     async OnLoad(container) {
         /* Called when we load the map */
 
+        //Create
         this.session = new DeltaStructureSession(this.map.server.app.structureTool, this.map.map, this.map.server);
-        this.map.server.db.structures.OnFilteredDatasetUpdated.Subscribe("deltawebmap.tabs.map.addons.structures.session", (d) => {
-            this.session.SetNewDataset(d);
+
+        //Subscribe
+        this.map.server.structures.OnContentUpdated.Subscribe("deltawebmap.tabs.map.addon.structures.onload", () => {
+            //New content
+            this.session.SetNewDataset(this.map.server.structures.content);
         });
-        this.session.SetNewDataset(this.map.server.db.structures.GetFilteredDataset());
+        this.session.SetNewDataset(this.map.server.structures.content);
     }
 
     async OnUnload(container) {

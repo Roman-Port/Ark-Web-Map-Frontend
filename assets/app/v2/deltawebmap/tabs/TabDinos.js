@@ -459,7 +459,7 @@ class TabDinos extends DeltaServerTab {
             this.ForEachRowType((info, index, globalIndex) => {
                 //Get row node
                 var e = node._rindexes[globalIndex];
-                var species = this.server.app.GetSpeciesByClassName(data.classname);
+                var species = this.server.GetEntrySpecies(data.classname);
                 info.render(e, data, this.sortMode, species, this.size_default, index);
             });
         });

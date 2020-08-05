@@ -216,7 +216,7 @@ statics.MAP_ICON_INTERACT_EVENTS = {
 
 statics.MAP_ICON_ADAPTERS = {
     "dinos": function (data, map) {
-        var s = map.server.app.GetSpeciesByClassName(data.classname);
+        var s = map.server.GetEntrySpecies(data.classname);
         var name = data.tamed_name;
         if (name == null || name.length == 0) {
             name = s.screen_name;

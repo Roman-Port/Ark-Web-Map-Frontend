@@ -79,7 +79,7 @@ class DeltaPopoutModal {
 
 	static async ShowDinoModal(app, data, pos, server) {
 		//Lookup entry
-		var entry = app.GetSpeciesByClassName(data.classname);
+		var entry = server.GetEntrySpecies(data.classname);
 
 		//Get name
 		var name = data.tamed_name;

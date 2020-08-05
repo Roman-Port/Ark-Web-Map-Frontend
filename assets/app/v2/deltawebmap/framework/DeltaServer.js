@@ -25,6 +25,7 @@ class DeltaServer extends DeltaTabView {
         this.bottomBanner = null;
         this.tribes = [];
         this.admin_mode = false;
+        this.primalInterface = null;
 
         //Create tabs
         this.tabs = [
@@ -39,9 +40,9 @@ class DeltaServer extends DeltaTabView {
         this.inventories = new ServerDataPackageInventories(this);
         this.structures = new ServerDataPackageStructures(this);
         this._packages = [
-            this.dinos,
             this.inventories,
-            this.structures
+            this.structures,
+            this.dinos
         ];
 
         //Set some content
@@ -380,11 +381,18 @@ class DeltaServer extends DeltaTabView {
         var filling = DeltaTools.CreateDom("div", "contentdownload_filling", bar);
 
         //Get the total count for all
-        var totalEntityCount = 0;
+        var totalEntityCount = this.primalInterface.GetTotalEntityCount();
         var totalEntitiesDownloaded = 0;
         for (var i = 0; i < this._packages.length; i += 1) {
             totalEntityCount += await this._packages[i].FetchCount();
         }
+
+        //Download mod content
+        await this.primalInterface.DownloadContent((count) => {
+            totalEntitiesDownloaded += count;
+            filling.style.width = ((totalEntitiesDownloaded / totalEntityCount) * 100).toString() + "%";
+            label.innerText = "Downloading mod content...";
+        });
 
         //Add UI update event to all
         var uiC = (e) => {
@@ -409,6 +417,14 @@ class DeltaServer extends DeltaTabView {
 
     async DownloadDataCritical() {
         //Downloads server data that we need to even begin loading. Returns the status
+
+        //Get primal data interface
+        try {
+            this.primalInterface = await this.app.primalPackageManager.RequestInterface(["0"]);
+        } catch (e) {
+            this.ForceAbort("Couldn't fetch mod data.");
+            return false;
+        }
 
         //Fetch tribes
         try {
@@ -817,5 +833,92 @@ class DeltaServer extends DeltaTabView {
 
     async UploadNewIcon(data) {
         await DeltaTools._BaseWebRequest(this.BuildServerRequestUrl("/admin/upload_icon"), "json", "POST", data, null, {});
+    }
+
+    GetEntrySpecies(classname, defaultToNull) {
+        //Try to get
+        var species = this.primalInterface.GetContentByClassName(classname, "SPECIES");
+        if (species != null) {
+            return species;
+        }
+
+        //Check if we should default to null. By default we don't
+        if (defaultToNull != null && defaultToNull == true) {
+            return null;
+        }
+
+        //This doesn't exist! Create a template so we don't cause errors
+        return {
+            "screen_name": classname,
+            "colorizationIntensity": 1,
+            "babyGestationSpeed": -1,
+            "extraBabyGestationSpeedMultiplier": -1,
+            "babyAgeSpeed": 0.000003,
+            "extraBabyAgeSpeedMultiplier": 0,
+            "useBabyGestation": false,
+            "extraBabyAgeMultiplier": 1.7,
+            "statusComponent": {
+                "baseFoodConsumptionRate": -0.001852,
+                "babyDinoConsumingFoodRateMultiplier": 25.5,
+                "extraBabyDinoConsumingFoodRateMultiplier": 20,
+                "foodConsumptionMultiplier": 1,
+                "tamedBaseHealthMultiplier": 1
+            },
+            "adultFoods": [],
+            "childFoods": [],
+            "classname": classname,
+            "icon": {
+                "image_url": "https://icon-assets.deltamap.net/unknown_dino.png",
+                "image_thumb_url": "https://icon-assets.deltamap.net/unknown_dino.png"
+            },
+            "baseLevel": [100, 100, 100, 100, 100, 100, 0, 0, 1, 1, 0, 1],
+            "increasePerWildLevel": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "increasePerTamedLevel": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "additiveTamingBonus": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "multiplicativeTamingBonus": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "statImprintMult": null
+        }
+    }
+
+    GetEntryItem(classname, defaultToNull) {
+        //Trim classname
+        if (classname.endsWith("_C")) {
+            classname = classname.substr(0, classname.length - 2);
+        }
+
+        //Try to get
+        var item = this.primalInterface.GetContentByClassName(classname, "ITEMS");
+        if (item != null) {
+            return item;
+        }
+
+        //Check if we should default to null. By default we don't
+        if (defaultToNull != null && defaultToNull == true) {
+            return null;
+        }
+
+        //This doesn't exist! Create a template so we don't cause errors
+        return {
+            "classname": classname,
+            "icon": {
+                "image_url": "https://icon-assets.deltamap.net/unknown_dino.png",
+                "image_thumb_url": "https://icon-assets.deltamap.net/unknown_dino.png"
+            },
+            "hideFromInventoryDisplay": false,
+            "useItemDurability": false,
+            "isTekItem": false,
+            "allowUseWhileRiding": false,
+            "name": classname,
+            "description": "Unknown item. It may be modded and is unsupported at this time.",
+            "spoilingTime": 0.0,
+            "baseItemWeight": 0.0,
+            "useCooldownTime": 0.0,
+            "baseCraftingXP": 1.0,
+            "baseRepairingXP": 0.0,
+            "maxItemQuantity": 0,
+            "addStatusValues": {
+
+            }
+        };
     }
 }

@@ -72,7 +72,7 @@ class TabItems extends DeltaServerTab {
 
     RefreshResults() {
         //Get items
-        var data = this.server.inventories.GetAllItemsFromInventoriesByName("");
+        var data = this.server.inventories.GetAllItemsFromInventories(null);
 
         //Sort
         data.sort((a, b) => {
@@ -103,7 +103,7 @@ class TabItems extends DeltaServerTab {
 
     AddItemBox(data) {
         //Fetch item entry
-        var entry = this.server.app.GetItemEntryByClassName(data.classname);
+        var entry = this.server.GetEntryItem(data.classname);
 
         //Total the amount of each item
         var total = data.total;
@@ -179,7 +179,7 @@ class TabItems extends DeltaServerTab {
             nameDiv.innerText = dino.tamed_name;
 
             //Get species
-            var species = this.server.app.GetSpeciesByClassName(dino.classname);
+            var species = this.server.GetEntrySpecies(dino.classname);
             if (species != null) {
                 iconDiv.style.backgroundImage = "url('" + species.icon.image_thumb_url + "')";
                 if (species.icon.image_thumb_url != "https://icon-assets.deltamap.net/unknown_dino.png") {

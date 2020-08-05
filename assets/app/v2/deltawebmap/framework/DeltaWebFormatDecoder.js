@@ -269,7 +269,7 @@ class DeltaWebFormatDecoder {
 
     _DecodeVariableFlagStringLength(flags) {
         //Decodes a string that uses a flag to decide if the length is 1 or 2 bytes
-        var strLen = this._DecodeVariableFlagLength();
+        var strLen = this._DecodeVariableFlagLength(flags);
         return this._ReadFixedString(strLen);
     }
 

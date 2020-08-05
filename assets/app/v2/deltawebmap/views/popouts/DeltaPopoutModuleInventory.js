@@ -37,7 +37,7 @@ class DeltaPopoutModuleInventory extends DeltaPopoutModuleCollapsable {
 
     CreateItem(ctx, data) {
         //Get item information
-        var info = ctx.app.GetItemEntryByClassName(data.classname);
+        var info = ctx.server.GetEntryItem(data.classname);
 
         //Create item div
         var d = DeltaTools.CreateDom("div", "popoutm2_inventory_item");

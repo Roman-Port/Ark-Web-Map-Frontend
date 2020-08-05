@@ -29,6 +29,7 @@ class DeltaApp {
         this.config = null;
         this.clusterItems = {};
         this.structureTool = null;
+        this.primalPackageManager = null;
     }
 
     async Init() {
@@ -39,6 +40,9 @@ class DeltaApp {
 
         //Load network resources
         await this.InitNetworkResources();
+
+        //Create package manager
+        this.primalPackageManager = new PrimalPackageManager();
 
         //Set up full DOM
         this.TriggerLoaderHide();
@@ -142,9 +146,6 @@ class DeltaApp {
                     this.TriggerLoaderFirstTime();
                 }
 
-                //Sync species
-                await this.db.Sync();
-
                 //Wait for structure setup to finish
                 await structureToolSetup;
 
@@ -164,17 +165,6 @@ class DeltaApp {
                 await DeltaTools.AsyncDelay(3000);
             }
         }
-    }
-
-    GetSpeciesByClassName(classname, defaultToNull) {
-        return this.db.species.GetSpeciesByClassName(classname, defaultToNull);
-    }
-
-    GetItemEntryByClassName(classname, defaultToNull) {
-        if (classname.endsWith("_C")) {
-            classname = classname.substr(0, classname.length - 2);
-        }
-        return this.db.items.GetItemEntryByClassName(classname, defaultToNull);
     }
 
     async GetItemEntryByStructureClassNameAsync(classname) {

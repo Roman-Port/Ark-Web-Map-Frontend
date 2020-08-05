@@ -8,7 +8,6 @@ class DeltaTools {
 
     static async _BaseWebRequest(url, type, method, body, token, args) {
         if (token === undefined || token == null) {
-            console.warn("WARNING: WebRequest launched without a DeltaCancellationToken!");
             token = new DeltaCancellationToken(null);
         }
         if (args == null) {

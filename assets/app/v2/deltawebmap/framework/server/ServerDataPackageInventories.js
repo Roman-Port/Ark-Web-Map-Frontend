@@ -41,6 +41,7 @@ class ServerDataPackageInventories extends ServerDataPackage {
 
         //First, find all items matching these classnames
         var items = this.GetByFilter((x) => {
+            if (classnames == null) { return true; }
             var cn = x.classname;
             if (cn.endsWith("_C")) {
                 cn = cn.substr(0, cn.length - 2);

@@ -44,7 +44,7 @@ class MapAddonOverview {
             return row;
         });
         this.recycler.SetRenderRowFunction((node, data) => {
-            var species = this.map.server.app.GetSpeciesByClassName(data.classname);
+            var species = this.map.server.GetEntrySpecies(data.classname);
             if (node._img.src != species.icon.image_thumb_url) {
                 node._img.style.display = "none";
                 node._img.src = species.icon.image_thumb_url;

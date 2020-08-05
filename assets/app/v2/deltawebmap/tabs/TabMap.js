@@ -99,6 +99,12 @@ class TabMap extends DeltaServerTab {
 
         //Add game map
         this.SwitchGameLayer(this.server.GetMapInfo().maps[0]);
+
+        //Set background
+        var bg = this.server.GetMapInfo().backgroundColor;
+        if (bg != null) {
+            this.mapContainer.style.backgroundColor = bg;
+        }
     }
 
     MapMovePushSavedPos() {

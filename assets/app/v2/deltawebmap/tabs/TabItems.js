@@ -227,7 +227,7 @@ class TabItems extends DeltaServerTab {
         var structure = await this.server.structures.GetById(id);
         if (structure != null) {
             //Get item data
-            var structureEntry = await this.server.app.GetItemEntryByStructureClassNameAsync(structure.classname);
+            var structureEntry = this.server.GetEntryItemByStructureClassName(structure.classname);
             if (structureEntry != null) {
                 sName = structureEntry.name;
                 sIcon = structureEntry.icon.image_thumb_url;

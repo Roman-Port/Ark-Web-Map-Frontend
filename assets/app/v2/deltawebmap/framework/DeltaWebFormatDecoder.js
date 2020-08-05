@@ -324,4 +324,12 @@ class DeltaWebFormatDecoder {
         return v;
     }
 
+    static ReadStringFromBuffer(buf, offset, len) {
+        var s = "";
+        for (var i = 0; i < len; i += 1) {
+            s += String.fromCharCode(buf.getUint8(offset + i));
+        }
+        return s;
+    }
+
 }

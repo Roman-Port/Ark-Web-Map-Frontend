@@ -921,4 +921,11 @@ class DeltaServer extends DeltaTabView {
             }
         };
     }
+
+    GetEntryItemByStructureClassName(classname) {
+        //Search for the item
+        return this.primalInterface.GetContentByFilter("ITEMS", (x) => {
+            return x.structure_classname == classname;
+        });
+    }
 }

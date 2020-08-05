@@ -23,8 +23,6 @@ class DeltaApp {
         this.structureMetadata = null;
         this.viewUserSettings = new DeltaUserSettingsTabView(this);
         this.maps = {};
-        this.db = null;
-        this.dbInitTask = null; //This should be awaited before be activate any tabs
         this.modal = null;
         this.config = null;
         this.clusterItems = {};
@@ -124,27 +122,18 @@ class DeltaApp {
                 //Get config
                 this.config = await DeltaTools.WebRequest(LAUNCH_CONFIG.CONFIG_API_ENDPOINT + "/prod/frontend/config.json", { "noauth": true }, null);
 
-                //Begin init of structure tool (this will take a bit)
-                this.structureTool = new DeltaStructureTool(this);
-                var structureToolSetup = this.structureTool.Init();
-
                 //Get structure metadata
                 this.structureMetadata = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
+
+                //Begin init of structure tool (this will take a bit)
+                this.structureTool = new DeltaStructureTool(this, this.structureMetadata.metadata);
+                var structureToolSetup = this.structureTool.Init();
 
                 //Set up the user
                 await this.user.RefreshData();
 
                 //Get map list
                 this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
-
-                //Init species db
-                this.db = new DeltaSystemDatabase();
-                await this.db.Init();
-
-                //If this is the first time, warn
-                if (await this.db.species.GetById("Argent_Character_BP") == null) {
-                    this.TriggerLoaderFirstTime();
-                }
 
                 //Wait for structure setup to finish
                 await structureToolSetup;
@@ -167,10 +156,6 @@ class DeltaApp {
         }
     }
 
-    async GetItemEntryByStructureClassNameAsync(classname) {
-        return await this.db.items.GetItemEntryByStructureClassNameAsync(classname);
-    }
-
     GetStructureEntryByClassName(name) {
         for (var i = 0; i < this.structureMetadata.metadata.length; i += 1) {
             if (this.structureMetadata.metadata[i].names.includes(name)) {
@@ -180,16 +165,8 @@ class DeltaApp {
         return null;
     }
 
-    SearchItemClassnamesByDisplayName(query) {
-        return this.db.items.SearchItemClassNamesByDisplayName(query.toLowerCase());
-    }
-
     TriggerLoaderError() {
         this.loaderScreen.classList.add("intro_slide_state_error");
-    }
-
-    TriggerLoaderFirstTime() {
-        this.loaderScreen.classList.add("intro_slide_first_error");
     }
 
     TriggerLoaderHide() {
@@ -425,16 +402,12 @@ class DeltaApp {
     async OpenDebugInfoPanel() {
         var modal = this.modal.AddModal(480, 590);
 
-        var countDinos = await app.db.species.GetDbCollection().count();
-        var countItems = await app.db.items.GetDbCollection().count();
-
         var builder = new DeltaModalBuilder();
         builder.AddContentTitle("Delta Debug Panel");
         builder.AddContentDescription("Use the information on this page for support during the beta period.");
         builder.AddLabledText("Account Info", "Delta ID: " + this.user.data.id + "\nSteam ID: " + this.user.data.steam_id + "\nName: " + this.user.data.screen_name);
         builder.AddLabledText("Account Settings", JSON.stringify(this.user.data.user_settings));
         builder.AddLabledText("App Version", SYSTEM_RELEASE_ENV + " at " + SYSTEM_VERSION_MAJOR.toString() + "." + SYSTEM_VERSION_MINOR.toString());
-        builder.AddLabledText("Charlie Content", "Species: " + countDinos + " at " + localStorage.getItem("PROD_SYSTEM_species~LAST_EPOCH") + "\nItems: " + countItems + " at " + localStorage.getItem("PROD_SYSTEM_items~LAST_EPOCH"));
 
         builder.AddAction("Close", "NEUTRAL", () => {
             modal.Close();

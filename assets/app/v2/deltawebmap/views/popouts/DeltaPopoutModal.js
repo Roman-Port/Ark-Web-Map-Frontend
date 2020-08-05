@@ -104,7 +104,7 @@ class DeltaPopoutModal {
 		var icon = "https://icon-assets.deltamap.net/unknown_dino.png";
 
 		//Lookup entry
-		var item = await app.GetItemEntryByStructureClassNameAsync(data.classname);
+		var item = server.GetEntryItemByStructureClassName(data.classname);
 		if (item != null) {
 			name = item.name;
 			icon = item.icon.image_url;

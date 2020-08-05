@@ -125,7 +125,7 @@ class ServerDataPackageInventories extends ServerDataPackage {
         var names = [];
         for (var i = 0; i < nameCount; i += 1) {
             var len = d.getUint8(offset);
-            names.push(DeltaServerSyncCollectionInventories.ReadStringFromBuffer(d, offset + 1, len));
+            names.push(DeltaWebFormatDecoder.ReadStringFromBuffer(d, offset + 1, len));
             offset += len + 1;
         }
 
@@ -157,7 +157,7 @@ class ServerDataPackageInventories extends ServerDataPackage {
                 for (var j = 0; j < customLength; j += 1) {
                     var tag = d.getUint16(offset + 0, true);
                     var tagLen = d.getUint16(offset + 2, true);
-                    var val = DeltaServerSyncCollectionInventories.ReadStringFromBuffer(d, offset + 4, tagLen);
+                    var val = DeltaWebFormatDecoder.ReadStringFromBuffer(d, offset + 4, tagLen);
                     custom[tag] = val;
                     offset += 4 + tagLen;
                 }

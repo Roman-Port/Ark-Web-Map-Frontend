@@ -2,21 +2,21 @@
 
 class DeltaStructureTool {
 
-    constructor(app) {
+    constructor(app, metadata) {
         this.app = app;
-        this.metadata = null;
         this.tiles = null;
         this.TO_RADIANS = Math.PI / 180;
+
+        //Convert metadata
+        this.metadata = {};
+        for (var i = 0; i < metadata.length; i += 1) {
+            for (var j = 0; j < metadata[i].names.length; j += 1) {
+                this.metadata[metadata[i].names[j]] = metadata[i];
+            }
+        }
     }
 
     async Init() {
-        var m = await DeltaTools.WebRequest(window.LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
-        this.metadata = {};
-        for (var i = 0; i < m.metadata.length; i += 1) {
-            for (var j = 0; j < m.metadata[i].names.length; j += 1) {
-                this.metadata[m.metadata[i].names[j]] = m.metadata[i];
-            }
-        }
         this.tiles = await new Promise((resolve, reject) => {
             let img = new Image();
             img.onload = function () {

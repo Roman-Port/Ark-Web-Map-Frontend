@@ -43,4 +43,23 @@ class PrimalPackageInterface {
         return null;
     }
 
+    GetContentByFilter(packageType, x) {
+        //Start looking for this, starting from the mod on top
+        for (var i = 0; i < this.packages.length; i += 1) {
+            //Check if the package type matches
+            if (this.packages[i].info.package_type != packageType) {
+                continue;
+            }
+
+            //Search by filter
+            var result = this.packages[i].GetByFilter(x);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        //Not found
+        return null;
+    }
+
 }

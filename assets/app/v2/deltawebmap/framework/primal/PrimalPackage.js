@@ -8,7 +8,7 @@ class PrimalPackage {
         this.downloaded = false;
         this.content = {}; //Content by classname
 
-        this.CHUNK_SIZE = 50;
+        this.CHUNK_SIZE = 300;
     }
 
     async DownloadContent(progress) {
@@ -46,6 +46,17 @@ class PrimalPackage {
 
     GetItemByClassName(classname) {
         return this.content[classname];
+    }
+
+    GetByFilter(x) {
+        //Searches via filter instead of index. This method is slow
+        var k = Object.keys(this.content);
+        for (var i = 0; i < k.length; i += 1) {
+            if (x(this.content[k[i]])) {
+                return this.content[k[i]];
+            }
+        }
+        return null;
     }
 
 }

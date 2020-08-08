@@ -14,6 +14,16 @@ class TabItems extends DeltaServerTab {
         return "items";
     }
 
+    GetIsSearchQueryEnabled() {
+        //Returns if we should enable the search query
+        return false;
+    }
+
+    GetQueryPlaceholder() {
+        //Returns the string to place in the query input box
+        return "Search Items";
+    }
+
     OnInit(mountpoint) {
         /* Called when this tab (and thus, the server) is initially created */
         super.OnInit(mountpoint);
@@ -38,14 +48,6 @@ class TabItems extends DeltaServerTab {
         this.holder.parentNode.addEventListener("scroll", () => {
             this.RefreshVisibleData();
         });
-
-        //Create sidebar
-        var sidebar = DeltaTools.CreateDom("div", "itemsearch_sidebar", this.mountpoint);
-
-        //Create query box
-        var query = DeltaTools.CreateDom("input", "itemsearch_query", sidebar);
-        query.type = "text";
-        query.placeholder = "Search Items";
     }
 
     async OnFirstOpen() {

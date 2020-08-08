@@ -6,6 +6,7 @@ class ServerDataPackageStructures extends ServerDataPackage {
         super("Structures", server);
         this.HEADER_SIZE = 32;
         this.STRUCT_SIZE = 24;
+        this.CHUNK_SIZE *= 15;
     }
 
     async FetchCount() {
@@ -105,6 +106,10 @@ class ServerDataPackageStructures extends ServerDataPackage {
             output.push(result);
         }
         return output;
+    }
+
+    EntityMatchesFilter(e) {
+        return this.server.filter.CheckEntityStructure(e);
     }
 
 }

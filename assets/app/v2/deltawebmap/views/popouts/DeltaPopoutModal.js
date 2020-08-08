@@ -24,7 +24,9 @@ class DeltaPopoutModal {
 
 		//Add each module and build them
 		for (var i = 0; i < this.modules.length; i += 1) {
-			b.appendChild(this.modules[i].Build(this, b));
+			if (this.modules[i].ShouldDisplay()) {
+				b.appendChild(this.modules[i].Build(this, b));
+			}
 		}
 
 		//Await an animation frame so we can measure the height
@@ -91,7 +93,9 @@ class DeltaPopoutModal {
 		var modules = [
 			new DeltaPopoutModuleTitle(entry.icon.image_url, name, entry.screen_name, data.dino_id),
 			new DeltaPopoutModuleStatus(data),
+			new DeltaPopoutModuleAdmin(data, server),
 			new DeltaPopoutModuleStatBars(data),
+			new DeltaPopoutModuleTribeColorTag(data, server),
 			new DeltaPopoutModuleInventory(0, data.dino_id, 2)
 		];
 		var modal = new DeltaPopoutModal(app, pos, modules, server);
@@ -113,6 +117,7 @@ class DeltaPopoutModal {
 		//Add modules
 		var modules = [
 			new DeltaPopoutModuleTitle(icon, name, "Structure", data.structure_id.toString()),
+			new DeltaPopoutModuleAdmin(data, server),
 			new DeltaPopoutModuleInventory(1, data.structure_id, 4)
 		];
 		var modal = new DeltaPopoutModal(app, pos, modules, server);

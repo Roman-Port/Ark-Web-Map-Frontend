@@ -29,4 +29,8 @@ class DeltaPopoutModuleStatus {
         return e;
     }
 
+    ShouldDisplay() {
+        return true;
+    }
+
 }

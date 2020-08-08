@@ -18,4 +18,8 @@ class DeltaPopoutModuleTitle {
         return d;
     }
 
+    ShouldDisplay() {
+        return true;
+    }
+
 }

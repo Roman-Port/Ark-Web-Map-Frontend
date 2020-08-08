@@ -24,8 +24,9 @@ class DeltaServer extends DeltaTabView {
         this.ready = false; //Set to true when all data has been synced
         this.bottomBanner = null;
         this.tribes = [];
-        this.admin_mode = false;
         this.primalInterface = null;
+        this.filter = new DeltaFilter();
+        this.adminEnabled = false;
 
         //Create tabs
         this.tabs = [
@@ -307,6 +308,11 @@ class DeltaServer extends DeltaTabView {
             this.OnSwitchedToFirst();
             this.first = false;
         }
+
+        //Run open callback on the current tab
+        if (this.activeTab != -1) {
+            this.tabs[this.activeTab].OnOpen();
+        }
     }
 
     UpdateSystemBar() {
@@ -330,7 +336,9 @@ class DeltaServer extends DeltaTabView {
             this.app.SetActiveHeaderSearch(false, null, null, null);
         } else {
             var t = this.tabs[this.activeTab];
-            this.app.SetActiveHeaderSearch(t.GetIsSearchQueryEnabled(), t.GetQueryPlaceholder(), t.lastQuery, t.OnQueryChanged);
+            this.app.SetActiveHeaderSearch(t.GetIsSearchQueryEnabled(), t.GetQueryPlaceholder(), t.lastQuery, (q) => {
+                this.tabs[this.activeTab].OnQueryChanged(q);
+            });
         }
 
         //Set menu creation
@@ -346,15 +354,19 @@ class DeltaServer extends DeltaTabView {
         items.push({
             "type": "BTN",
             "text": "Filter...",
-            "callback": () => { },
+            "callback": () => {
+                this.OpenFilterDialog();
+            },
             "icon": "/assets/app/icons/system_menu/filter.svg"
         });
         items.push({
             "type": "SWITCH",
             "text": "Admin Mode",
-            "callback": () => { },
+            "callback": () => {
+                this.SetAdminMode(!this.adminEnabled);
+            },
             "icon": "/assets/app/icons/system_menu/manage.svg",
-            "checked": this.admin_mode
+            "checked": this.adminEnabled
         });
         items.push({
             "type": "BTN",
@@ -362,11 +374,22 @@ class DeltaServer extends DeltaTabView {
             "callback": () => {
                 this.PromptLeaveServer();
             },
-            "icon": "/assets/app/icons/system_menu/close.svg"
+            "icon": "/assets/app/icons/system_menu/close.svg",
+            "modifier": "negative"
         });
 
         //Break
-        items.push({"type": "HR"});
+        items.push({ "type": "HR" });
+
+        //Add server create button
+        items.push({
+            "type": "BTN",
+            "text": "Add Your Server",
+            "callback": () => {
+                new DeltaGuildCreator(this.app, null);
+            },
+            "icon": "/assets/app/icons/system_menu/add.svg",
+        });
 
         //Add other servers
         var k = Object.keys(this.app.servers);
@@ -376,8 +399,12 @@ class DeltaServer extends DeltaTabView {
                 items.push({
                     "type": "SERVER",
                     "text": s.info.display_name,
-                    "callback": () => { },
-                    "icon": s.info.image_url
+                    "callback": (e) => {
+                        var id = e.currentTarget._context;
+                        this.app.SwitchServer(this.app.servers[id]);
+                    },
+                    "icon": s.info.image_url,
+                    "context": s.id
                 });
             }
         }
@@ -398,6 +425,14 @@ class DeltaServer extends DeltaTabView {
                 this.HideServer();
             }
         }, () => { }, "NEGATIVE", "NEUTRAL");
+    }
+
+    SetAdminMode(status) {
+        //Set
+        this.adminEnabled = status;
+
+        //Clear filter
+        this.ApplyNewFilter({});
     }
 
     async OnSwitchedToFirst() {
@@ -485,22 +520,21 @@ class DeltaServer extends DeltaTabView {
         return this.prefs;
     }
 
-    CheckFilterDino(dino) {
-        /* Checks if a dino fits the criteria for the active filter */
-        return true;
+    async PushDinoPrefs(dino) {
+        /* Pushes user prefs for this server */
+        var p = await DeltaTools.WebPOSTJson(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/put_dino_prefs", {
+            "dino_id": dino.dino_id,
+            "prefs": dino.tribe_prefs
+        }, this.token);
+        return p;
     }
 
-    CheckFilterStructure(structure) {
-        /* Checks if a structure fits the criteria for the active filter */
-        return true;
-    }
-
-    async OpenSortDialog() {
+    OpenFilterDialog() {
         var builder = new DeltaModalBuilder();
         var modal = this.app.modal.AddModal(670, 380);
 
         //Fetch dinos and get their name and ID
-        var species = await app.db.species.GetAllItems();
+        var species = this.primalInterface.GetAllContentOfType("SPECIES");
         species.sort((a, b) => {
             return a.screen_name.localeCompare(b.screen_name);
         });
@@ -512,19 +546,40 @@ class DeltaServer extends DeltaTabView {
         }
 
         var commonGridBuilder = new DeltaModalBuilder(false, "sort_menu_grid", "sort_menu_grid_item");
-        commonGridBuilder.AddContentInputSelect("Status", ["Alive", "(Wanted) Dead or Alive", "Dead"], ["alive", "any", "dead"], "alive");
-        commonGridBuilder.AddContentInputSelect("Cryo Status", ["Any", "In World", "In Cryo"], ["any", "world", "cryo"], "any");
-        commonGridBuilder.AddContentInputSelect("Species", speciesTitles, speciesIds, "*");
-        commonGridBuilder.AddContentInputSelect("Sex", ["Any", "Male", "Female"], ["any", "male", "female"], "any");
+        //commonGridBuilder.AddContentInputSelect("Status", ["Alive", "(Wanted) Dead or Alive", "Dead"], ["alive", "any", "dead"], "alive");
+        //commonGridBuilder.AddContentInputSelect("Cryo Status", ["Any", "In World", "In Cryo"], ["any", "world", "cryo"], "any");
+        var selectSpecies = commonGridBuilder.AddContentInputSelect("Species", speciesTitles, speciesIds, "*");
+        var selectSex = commonGridBuilder.AddContentInputSelect("Sex", ["Any", "Male", "Female"], ["any", "male", "female"], "any");
         builder.AddContentBuilder(commonGridBuilder);
 
         builder.AddAction("Apply", "POSITIVE", () => {
+            //Build filters
+            var filters = {};
+            if (selectSpecies.value != "*")
+                filters["SPECIES"] = selectSpecies.value;
+            if (selectSex.value != "any")
+                filters["SEX"] = selectSex.value;
+
+            //Apply filter
+            this.ApplyNewFilter(filters);
+
+            //Close
             modal.Close();
         });
         builder.AddAction("Clear", "NEUTRAL", () => {
             modal.Close();
         });
         modal.AddPage(builder.Build());
+    }
+
+    ApplyNewFilter(filters) {
+        //Set
+        this.filter.SetNewFilters(filters);
+
+        //Refresh items
+        for (var i = 0; i < this._packages.length; i += 1) {
+            this._packages[i].FilterUpdated();
+        }
     }
 
     BuildServerRequestUrl(extra) {
@@ -536,8 +591,6 @@ class DeltaServer extends DeltaTabView {
             "secure": status
         }, this.token);
     }
-
-    
 
     IsAdmin() {
         return this.info.is_admin;

@@ -29,4 +29,8 @@ class ServerDataPackageDinos extends ServerDataPackage {
         }
     }
 
+    EntityMatchesFilter(e) {
+        return this.server.filter.CheckEntityDino(e);
+    }
+
 }

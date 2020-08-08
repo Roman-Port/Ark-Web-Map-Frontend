@@ -11,7 +11,6 @@ class AdminTabServerDelete extends AdminSubTabMenuTabModule {
         this.mountpoint = DeltaTools.CreateDom("div", null);
         this._AddTitle(this.name);
         this._AddText("Deleting a server will remove all of it's content from Delta Web Map. Deleting a server from Delta Web Map will not impact the game server. ");
-        this._AddWarning("You cannot undo this action, even by contacting support.");
         this._AddRedBtn("Delete Server", () => {
             var modal = this.server.app.modal.AddModal(480, 290);
             var builder = new DeltaModalBuilder();

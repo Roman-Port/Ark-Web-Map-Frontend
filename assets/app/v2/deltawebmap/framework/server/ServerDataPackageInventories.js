@@ -182,4 +182,8 @@ class ServerDataPackageInventories extends ServerDataPackage {
         return output;
     }
 
+    EntityMatchesFilter(e) {
+        return this.server.filter.CheckEntityItem(e);
+    }
+
 }

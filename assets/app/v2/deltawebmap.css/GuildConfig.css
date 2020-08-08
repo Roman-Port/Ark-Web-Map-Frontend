@@ -63,6 +63,11 @@
     font-size: 15px;
 }
 
+.gs_widebtn_nomargin {
+    margin-left:0;
+    margin-right:0;
+}
+
 .gs_widebtn_title {
     font-weight: bold;
     color: white;

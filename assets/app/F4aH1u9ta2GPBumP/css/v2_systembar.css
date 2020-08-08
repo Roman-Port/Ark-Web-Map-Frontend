@@ -29,6 +29,13 @@
     background-repeat: no-repeat;
 }
 
+.sysbar_server_top {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 15px;
+}
+
 .sysbar_server_icon {
     height: 26px;
     width: 26px;
@@ -45,8 +52,9 @@
     top: 0;
     bottom: 0;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
     font-size: 15px;
+    right: 360px;
 }
 
 .sysbar_nav div {
@@ -134,6 +142,10 @@
 
 .system_dropdown_item_btn:hover {
     background-color: #3882dc;
+}
+
+.system_dropdown_item_btn_negative:hover {
+    background-color: #f04747;
 }
 
 .system_dropdown_item_btn_icon {

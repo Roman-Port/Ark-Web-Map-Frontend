@@ -33,6 +33,11 @@ class TabAdmin extends SubTabMenuTab {
         return "admin";
     }
 
+    GetIsSearchQueryEnabled() {
+        //Returns if we should enable the search query
+        return false;
+    }
+
     CreateMenuItem(container) {
         var btn = super.CreateMenuItem(container);
         this.switch = DeltaTools.CreateDom("div", "admin_tab_toggle", btn);
@@ -180,7 +185,7 @@ class AdminSubTabMenuTabModule extends SubTabMenuTabModule {
         c._lastItem = null;
         c._callback = callback;
         for (var i = 0; i < options.length; i += 1) {
-            var d = DeltaTools.CreateDom("div", "gs_widebtn admin_piano_key", c);
+            var d = DeltaTools.CreateDom("div", "gs_widebtn admin_piano_key gs_widebtn_nomargin", c);
             DeltaTools.CreateDom("div", "gs_widebtn_title", d, options[i].name);
             DeltaTools.CreateDom("div", null, d, options[i].description);
             d._data = options[i];

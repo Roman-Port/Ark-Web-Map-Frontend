@@ -26,6 +26,11 @@ class TabMap extends DeltaServerTab {
         ];
     }
 
+    OnQueryChanged(query) {
+        //Send to overview addon
+        this.addons[2].OnNewSearchQuery(query);
+    }
+
     GetDisplayName() {
         return "Overview";
     }

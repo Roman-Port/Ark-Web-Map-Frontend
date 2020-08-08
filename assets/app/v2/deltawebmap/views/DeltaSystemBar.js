@@ -12,8 +12,9 @@ class DeltaSystemBar {
         //Create
         this.sysBar = DeltaTools.CreateDom("div", "sysbar", this.mountpoint);
         var server = DeltaTools.CreateDom("div", "sysbar_server", this.sysBar);
-        this.serverIcon = DeltaTools.CreateDom("img", "sysbar_server_icon", server);
-        this.serverName = DeltaTools.CreateDom("span", null, server);
+        var serverTop = DeltaTools.CreateDom("div", "sysbar_server_top", server);
+        this.serverIcon = DeltaTools.CreateDom("img", "sysbar_server_icon", serverTop);
+        this.serverName = DeltaTools.CreateDom("span", null, serverTop);
         this.optionContainer = DeltaTools.CreateDom("div", "sysbar_nav", this.sysBar);
         this.options = [];
         this.menu = DeltaTools.CreateDom("div", "sysbar_dropdown", server);
@@ -74,7 +75,7 @@ class DeltaSystemBar {
             this.input.value = value;
             this.input._callback = callback;
             this.input.addEventListener("input", (e) => {
-                e.target._callback(e.target.input);
+                e.target._callback(e.target.value);
             });
         }
     }
@@ -117,6 +118,10 @@ class DeltaSystemBar {
                 var b = DeltaTools.CreateDom("div", "system_dropdown_item_btn", outputMenu);
                 DeltaTools.CreateDom("img", "system_dropdown_item_btn_icon", b).src = pack.icon;
                 DeltaTools.CreateDom("span", null, b).innerText = pack.text;
+                if (pack.modifier == "negative") {
+                    b.classList.add("system_dropdown_item_btn_negative");
+                }
+                b._context = pack.context;
                 b.addEventListener("click", pack.callback);
             } else if (pack.type == "SWITCH") {
                 //Switch
@@ -125,7 +130,7 @@ class DeltaSystemBar {
                 DeltaTools.CreateDom("span", null, b).innerText = pack.text;
                 b._switch = DeltaTools.CreateDom("div", "system_dropdown_item_switch", b);
                 if (pack.checked) {
-                    b._switch.classList.add("system_dropdown_item_switch");
+                    b._switch.classList.add("system_dropdown_item_switch_active");
                 }
                 b.addEventListener("click", pack.callback);
             } else if (pack.type == "HR") {
@@ -139,6 +144,7 @@ class DeltaSystemBar {
                     DeltaTools.CreateDom("div", "sysmenu_dropdown_notify", b).innerText = pack.sub;
                 }
                 DeltaTools.CreateDom("span", null, b).innerText = pack.text;
+                b._context = pack.context;
                 b.addEventListener("click", pack.callback);
             } else {
                 throw "Unsupported menu type '" + pack.type + "'!";

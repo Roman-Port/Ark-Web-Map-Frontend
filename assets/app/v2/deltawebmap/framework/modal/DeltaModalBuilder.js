@@ -70,7 +70,8 @@ class DeltaModalBuilder {
             DeltaTools.CreateDom("option", null, s, optionTexts[i]).value = optionIds[i];
         }
         s.value = defaultValue;
-        return this.AddLabeledContent(label, s);
+        this.AddLabeledContent(label, s);
+        return s;
     }
 
     AddContentBuilder(b) {

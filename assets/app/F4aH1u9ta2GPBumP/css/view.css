@@ -2918,7 +2918,7 @@ a {
     top: 0;
     bottom: 0;
     left: 0;
-    right: 366px;
+    right: 0;
     position: absolute;
 }
 
@@ -3155,14 +3155,13 @@ a {
 
 .popoutm2_statbars_bar_left {
     position: absolute;
-    top: 0;
+    top: 5px;
     bottom: 0;
-    line-height: 30px;
-    color: white;
     left: 5px;
     text-align: left;
     font-size: 13px;
     z-index: 5;
+    height: 20px;
 }
 
 .popoutm2_statbars_bar_right {
@@ -3280,6 +3279,52 @@ a {
     margin: 3px 0;
 }
 
+.popoutm2_colortag_holder {
+    display: flex;
+    margin: 0px 4px;
+}
+
+.popoutm2_colortag_tag {
+    width: 43px;
+    height: 28px;
+    border-radius: 5px;
+    flex-grow: 1;
+    margin: 0px 2px;
+    border: 1px solid #252629;
+    cursor: pointer;
+}
+
+.popoutm2_colortag_tag_clear {
+    background-color: rgb(37, 38, 41);
+    background-image: url(/assets/app/icons/system_menu/close.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.popoutm2_colortag_tag_selected {
+    border-color: white;
+}
+
+.popoutm2_admin {
+    color: white;
+    font-size: 15px;
+    margin: 0 5px;
+}
+
+.popoutm2_admin_keyvalue {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.popoutm2_admin_key {
+    text-transform: uppercase;
+    width: 130px;
+    display: inline-block;
+    color: #d2d2d2;
+    text-decoration: underline;
+}
+
 .subtab_nav {
     position: absolute;
     top: 0;
@@ -3300,6 +3345,10 @@ a {
     margin-top: 30px;
 }
 
+.subtab_nav_label:first-child {
+    margin-top: 5px;
+}
+
 .subtab_nav_btn {
     margin: 2px 0;
     padding: 5px 8px;
@@ -3309,9 +3358,9 @@ a {
     cursor: pointer;
 }
 
-    .subtab_nav_btn:hover {
-        background-color: rgba(69, 72, 77, 0.58);
-    }
+.subtab_nav_btn:hover {
+    background-color: rgba(69, 72, 77, 0.58);
+}
 
 .subtab_nav_btn_active {
     background-color: #45484d !important;
@@ -3321,7 +3370,7 @@ a {
     position: absolute;
     top: 0;
     bottom: 0;
-    padding: 60px 0;
+    padding: 30px 0;
     left: 210px;
     right: 0;
     overflow-y: auto;

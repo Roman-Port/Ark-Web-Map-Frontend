@@ -30,13 +30,14 @@
 }
 
 .admin_btn_red {
-    padding: 10px 15px;
+    padding: 14px 15px;
     color: white;
-    background-color: #f04747;
+    background-color: #f16060;
     border-radius: 5px;
     font-size: 15px;
-    display: inline-block;
     cursor: pointer;
+    text-align: center;
+    border: 1px solid #222325;
 }
 
 .admin_piano_key {

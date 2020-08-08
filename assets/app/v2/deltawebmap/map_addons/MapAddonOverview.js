@@ -44,7 +44,15 @@ class MapAddonOverview {
             } else {
                 node._title.innerText = species.screen_name;
             }
-            node._sub.innerText = species.screen_name + " - Lvl "+data.level.toString();
+            node._title.style.color = data.tribe_prefs.color_tag;
+            if (this.map.server.adminEnabled) {
+                //Admin mode is on; Show the tribe name
+                node._sub.innerText = this.map.server.GetTribeByIdSafe(data.tribe_id).tribe_name + " (" + data.tribe_id + ")";
+            } else {
+                //Standard text
+                node._sub.innerText = species.screen_name + " - Lvl " + data.level.toString();
+            }
+            node.style.borderRightColor = statics.STATUS_STATES[data.status].color;
         });
         this.recycler.SetSortFunction((a, b) => {
             return b.level - a.level;
@@ -54,7 +62,7 @@ class MapAddonOverview {
         });
         this.recycler.SetNewSearchQuery((a) => {
             if (this.query == "") { return true; }
-            return a.tamed_name.toLowerCase().includes(this.query) || this.map.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
+            return a.tamed_name.toLowerCase().includes(this.query) || this.map.server.GetEntrySpecies(a.classname).screen_name.toLowerCase().includes(this.query);
         });
         this.recycler.AddEventListener("click", (data, originalEvent, originalDom) => {
             //Show the dino modal
@@ -79,7 +87,7 @@ class MapAddonOverview {
     }
 
     OnNewSearchQuery(query) {
-        this.query = query.value.toLowerCase();
+        this.query = query.toLowerCase();
         this.recycler.RefreshSearch();
     }
 

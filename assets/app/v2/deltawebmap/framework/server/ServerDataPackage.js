@@ -117,6 +117,35 @@ class ServerDataPackage {
         return output;
     }
 
+    FilterUpdated() {
+        //Filters the content again and fires off events
+
+        //Remove all
+        this.OnContentAddRemoved.Fire({
+            "adds": [],
+            "removes": this.filteredContent
+        });
+
+        //Filter
+        this.filteredContent = [];
+        for (var i = 0; i < this.content.length; i += 1) {
+            if (this.EntityMatchesFilter(this.content[i])) {
+                this.filteredContent.push(this.content[i]);
+            }
+        }
+
+        //Push updated
+        this.OnContentUpdated.Fire({
+            "filtered_content": this.filteredContent
+        });
+
+        //Push added event
+        this.OnContentAddRemoved.Fire({
+            "adds": this.filteredContent,
+            "removes": []
+        });
+    }
+
     //Other
 
     _ContentUpdated() {

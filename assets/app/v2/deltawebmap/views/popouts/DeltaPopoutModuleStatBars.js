@@ -19,7 +19,7 @@ class DeltaPopoutModuleStatBars extends DeltaPopoutModuleCollapsable {
 	CreateBar(stat, currentValues, maxValues) {
 		var b = DeltaTools.CreateDom("div", "popoutm2_statbars_bar");
 		DeltaTools.CreateDom("div", "popoutm2_statbars_bar_progress", b).style.width = ((currentValues[stat] / maxValues[stat]) * 100).toString() + "%";
-		DeltaTools.CreateDom("div", "popoutm2_statbars_bar_left", b, statics.STATUS_ENTRIES[stat].name);
+		DeltaTools.CreateDom("img", "popoutm2_statbars_bar_left", b).src = statics.STATUS_ENTRIES[stat].icon;
 		DeltaTools.CreateDom("div", "popoutm2_statbars_bar_right", b, statics.STATUS_ENTRIES[stat].formatString(currentValues[stat]) + " / " + statics.STATUS_ENTRIES[stat].formatString(maxValues[stat]));
 		return b;
 	}

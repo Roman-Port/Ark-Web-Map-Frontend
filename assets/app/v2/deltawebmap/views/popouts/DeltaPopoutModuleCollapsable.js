@@ -30,4 +30,8 @@ class DeltaPopoutModuleCollapsable {
         throw "You must overwrite this.";
     }
 
+    ShouldDisplay() {
+        return true;
+    }
+
 }

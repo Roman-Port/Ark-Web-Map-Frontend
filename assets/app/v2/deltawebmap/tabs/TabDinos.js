@@ -147,9 +147,7 @@ class TabDinos extends DeltaServerTab {
                 "name": "Tag",
                 "render": function (e, data, sortIndex, species) {
                     var s = e.x_tag;
-                    /*if (data.prefs.color_tag) {
-                        s.style.backgroundColor = data.prefs.color_tag;
-                    }*/
+                    s.style.backgroundColor = data.tribe_prefs.color_tag;
                 },
                 "create": function (e) {
                     e.x_tag = DeltaTools.CreateDom("div", "v2tab_dinos_row_item_sex v2tab_dinos_row_item_sex_unknown", e);

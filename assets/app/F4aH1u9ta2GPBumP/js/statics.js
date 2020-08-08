@@ -8,7 +8,7 @@ statics.STATUS_STATES = {
         "modal_color":"#5AE000"
     },
     "NEUTRAL":{
-        "color":"#000000",
+        "color":"#33363c",
         "text":"Neutral",
         "modal_color":"#FFFFFF"
     },
@@ -36,7 +36,8 @@ statics.COLOR_TAGS = [
     "#F7F123",
     "#34F820",
     "#3B8AF5",
-    "#932DF9"
+    "#932DF9",
+    "#f92dc4"
 ];
 
 //Tabs on the side of each server

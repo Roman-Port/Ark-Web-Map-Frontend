@@ -60,11 +60,6 @@ class DeltaApp {
             this.BootServer(info);
         }
 
-        //Add "add server" button
-        DeltaTools.CreateDom("div", "v3_nav_server_add", this.serverListHolder, "Add Server").addEventListener("click", () => {
-            new DeltaGuildCreator(this);
-        });
-
         //Swtich to the default server
         this.SwitchServer(this.GetDefaultServer());
 
@@ -78,35 +73,9 @@ class DeltaApp {
     }
 
     BootServer(info) {
-        //Get a cluster to place this in
-        var clusterTarget;
-        if (info.cluster_id == null) {
-            clusterTarget = "_UNCLUSTERED";
-        } else {
-            clusterTarget = info.cluster_id;
-        }
-        var cluster;
-        /*if (this.clusterItems[clusterTarget] == null) {
-            //We must create it
-            if (info.cluster_id == null) {
-                cluster = this.CreateServerListClusterLabel(this.serverListHolder, "UNCATEGORIZED");
-            } else {
-                cluster = this.CreateServerListClusterLabel(this.serverListHolder, "UNCATEGORIZED");
-            }
-            this.clusterItems[clusterTarget] = cluster;
-        } else {
-            //Already exists
-            cluster = this.clusterItems[clusterTarget];
-        }*/
-        cluster = this.serverListHolder;
-
         //Create server and it's menu
         var server = new DeltaServer(this, info);
         this.servers[info.id] = server;
-
-        //Create menu
-        cluster.appendChild(server.CreateMenuItem());
-        server.SetUserInterfaceSecureStatus(info.secure_mode);
 
         //Create mountpoint and init
         var m = DeltaTools.CreateDom("div", "server_mountpoint", this.mainHolder);
@@ -184,7 +153,6 @@ class DeltaApp {
         var introContent = DeltaTools.CreateDom("div", "intro_slide_content", intro);
         var introBody = DeltaTools.CreateDom("div", "", introContent);
         DeltaTools.CreateDom("div", "intro_slide_body_title", introBody, "DeltaWebMap");
-        DeltaTools.CreateDom("div", "loading_spinner", DeltaTools.CreateDom("div", "intro_slide_body_loader", introBody));
         var introWarning = DeltaTools.CreateDom("div", "intro_slide_warning intro_slide_warning_base", intro);
         DeltaTools.CreateDom("div", "intro_slide_warning_box", introWarning, "Hang tight! We're having troubles connecting.");
         var introSpecies = DeltaTools.CreateDom("div", "intro_slide_first intro_slide_warning_base", intro);
@@ -196,38 +164,26 @@ class DeltaApp {
     }
 
     LayoutMainView(parent) {
-        //Create top banner
-        var banner = DeltaTools.CreateDom("div", "error_box_generic error_box_fixed_top_banner", parent);
-
         var mount = DeltaTools.CreateDom("div", "main_view", parent);
         this.mainHolder = mount;
 
-        var leftSidebar = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open v3_nav_area", mount);
-        this.serverListHolder = DeltaTools.CreateDom("div", "v3_nav_server_area", leftSidebar);
-        var bottom = DeltaTools.CreateDom("div", "v3_nav_bottom", leftSidebar);
-
-        var top = DeltaTools.CreateDom("div", "top_nav", leftSidebar); //Top strip. Pretty much has no use except to show a darker color at this point, though
-        DeltaTools.CreateDom("span", "delta_nav_badge_beta", DeltaTools.CreateDom("div", "delta_nav_badge", top, "DeltaWebMap"), "BETA").addEventListener("click", () => {
-            this.OpenDebugInfoPanel();
-        });
-
-        //Add bottom options
-        this._AddBottomButton(bottom, "v3_nav_bottom_btn_settings", () => {
-
-        });
-        this._AddBottomButton(bottom, "v3_nav_bottom_btn_flag", () => {
-
-        });
+        //Create top menu
+        this.topNav = new DeltaSystemBar(mount);
 
         //Add context menu listener
         DeltaContextMenu.AddContextListener(parent, this);
     }
 
-    _AddBottomButton(mount, icon, callback) {
-        var b = DeltaTools.CreateDom("div", "v3_nav_bottom_btn", mount);
-        b.classList.add(icon);
-        b.addEventListener("click", callback);
-        return b;
+    SetActiveHeaderInfo(title, icon, actions, selectedActionIndex) {
+        this.topNav.SetActiveHeaderInfo(title, icon, actions, selectedActionIndex);
+    }
+
+    SetActiveHeaderSearch(enabled, placeholder, value, callback) {
+        this.topNav.SetActiveHeaderSearch(enabled, placeholder, value, callback);
+    }
+
+    SetActiveHeaderMenuCreateCallback(c) {
+        this.topNav.SetMenuCreateCallback(c);
     }
 
     CreateServerListClusterLabel(container, name) {
@@ -307,12 +263,7 @@ class DeltaApp {
                 //This is a server ID. Try to see if this server exists
                 server = this.servers[id];
                 if (server != null) {
-                    status = server.CheckStatus();
-                    if (status == null) {
-                        return server;
-                    } else {
-                        return this.msgViewServerRequestedNotOk;
-                    }
+                    return server;
                 } else {
                     return this.msgViewServerNotFound;
                 }
@@ -342,10 +293,7 @@ class DeltaApp {
         //If we have a server, use it
         for (var i = 0; i < this.user.data.servers.length; i += 1) {
             server = this.servers[this.user.data.servers[i].id];
-            status = server.CheckStatus();
-            if (status == null) {
-                return server;
-            }
+            return server;
         }
 
         //No default to load!

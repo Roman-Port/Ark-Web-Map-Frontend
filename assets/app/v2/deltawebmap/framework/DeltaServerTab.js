@@ -10,6 +10,7 @@ class DeltaServerTab {
         this.menu = null;
         this.token = new DeltaCancellationToken(server.token);
         this.top = null;
+        this.lastQuery = "";
     }
 
     GetDisplayName() {
@@ -58,6 +59,20 @@ class DeltaServerTab {
     async OnDeinit() {
         /* Called when this tab (and thus, the server) is closed */
         
+    }
+
+    GetIsSearchQueryEnabled() {
+        //Returns if we should enable the search query
+        return true;
+    }
+
+    GetQueryPlaceholder() {
+        //Returns the string to place in the query input box
+        return "Search Tribe";
+    }
+
+    OnQueryChanged(value) {
+        //When the current query changes
     }
 
 }

@@ -414,19 +414,12 @@ class TabDinos extends DeltaServerTab {
         this.RefreshView();
     }
 
+    OnQueryChanged(query) {
+        this._OnSearchChanged(query);
+    }
+
     LayoutDom(mountpoint) {
         this.mountpoint = mountpoint;
-
-        this.top = DeltaTools.CreateDom("div", "v2tab_top", this.mountpoint);
-        this.topCounts = DeltaTools.CreateDom("div", "v2tab_top_counts_container", this.top);
-        this.countTotal = this._CreateCount("TOTAL");
-        this.countFound = this._CreateCount("FOUND");
-        //this.countCryo = this._CreateCount("CRYO");
-
-        var search = DeltaTools.CreateDom("input", "v2tab_top_search", this.top);
-        search.type = "text";
-        search.placeholder = "Search Dinos";
-        search.addEventListener("input", (search) => this._OnSearchChanged(search.target.value));
 
         this.dataContainer = DeltaTools.CreateDom("div", "dino_stats_container", this.mountpoint);
         this.dataInner = DeltaTools.CreateDom("div", "", this.dataContainer);
@@ -437,7 +430,7 @@ class TabDinos extends DeltaServerTab {
             this.header.style.left = (-this.dataContainer.scrollLeft).toString() + "px";
         });
 
-        this.recycler = new DeltaRecyclerView(this.dataInner, this.dataContainer, 50, 30);
+        this.recycler = new DeltaRecyclerView(this.dataInner, this.dataContainer, 10, 30);
         this.recycler.SetCreateRowFunction(() => {
             //Create row
             var row = DeltaTools.CreateDom("div", "v2tab_dinos_row v2tab_dinos_row_standard");
@@ -471,7 +464,7 @@ class TabDinos extends DeltaServerTab {
         });
         this.recycler.SetNewSearchQuery((a) => {
             if (this.query == "") { return true; }
-            return a.tamed_name.toLowerCase().includes(this.query) || this.server.app.GetSpeciesByClassName(a.classname).screen_name.toLowerCase().includes(this.query);
+            return a.tamed_name.toLowerCase().includes(this.query) || this.server.GetEntrySpecies(a.classname).screen_name.toLowerCase().includes(this.query);
         });
         this.recycler.OnPostDatasetUpdated.Subscribe("deltawebmap.tab.dinos.counts", () => {
             this._RefreshCounts();
@@ -770,8 +763,7 @@ class TabDinos extends DeltaServerTab {
     }
 
     _RefreshCounts() {
-        this.countTotal.innerText = this.recycler._GetTotalUnsearchedDataLength();
-        this.countFound.innerText = this.recycler._GetDataLength();
+        
     }
 
 }

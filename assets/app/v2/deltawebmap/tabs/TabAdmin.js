@@ -26,7 +26,7 @@ class TabAdmin extends SubTabMenuTab {
     }
 
     GetDisplayName() {
-        return "Admin";
+        return "Manage";
     }
 
     GetId() {

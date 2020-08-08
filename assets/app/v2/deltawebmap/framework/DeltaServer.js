@@ -68,108 +68,11 @@ class DeltaServer extends DeltaTabView {
         }
     }
 
-    CreateMenuItem() {
-        //Get server info
-        var info = this.info;
-
-        //Create the server on the sidebar
-        var menu = DeltaTools.CreateDom("div", "v3_nav_server");
-        this.menu = menu;
-        var top = DeltaTools.CreateDom("div", "v3_nav_server_top", menu);
-
-        this.menu_icon = DeltaTools.CreateDom("img", "v3_nav_server_top_icon", top);
-        this.menu_icon.src = info.image_url;
-
-        var alertBadge = DeltaTools.CreateDom("div", "sidebar_server_error_badge", top, "!");
-        menu.alertBadge = alertBadge;
-        var loaderBadge = DeltaTools.CreateDom("div", "loading_spinner server_loader", top, "");
-        menu.loaderBadge = loaderBadge;
-
-        this.menu_name = DeltaTools.CreateDom("span", "", top);
-        this.menu_name.innerText = info.display_name;
-
-        var bottom = DeltaTools.CreateDom("div", "v3_nav_server_bottom", menu);
-
-        //Add padlock
-        DeltaTools.CreateDom("div", "v3_nav_server_bottom_secure", bottom).addEventListener("click", () => {
-            //Show dialog about secure mode
-            var modal = this.modal.AddModal(480, 290);
-            var e = new DeltaModalBuilder();
-            e.AddContentTitle("Server Using Secure Mode");
-            e.AddContentDescription("The owner of this server has opted to enable secure mode. This prevents any other user, including server admins, from viewing or accessing your tribe information without being in your tribe.");
-            e.AddContentDescription("Your server owner can opt out of this at any time, but you will be notified. This feature is built to make admin abuse using this app impossible.");
-            e.AddAction("Close", "NEUTRAL", () => {
-                modal.Close();
-            });
-            e.Build();
-            modal.AddPage(e.Build());
-        });
-
-        //Finish creating menu
-        for (var j = 0; j < this.tabs.length; j += 1) {
-            var btn = this.tabs[j].CreateMenuItem(bottom);
-            btn.x_index = j;
-            btn.x_server = this;
-            this.tabs[j].menu = btn;
-            btn.addEventListener("click", function () {
-                this.x_server.OnSwitchTab(this.x_index);
-            });
-        }
-
-        //Add context menu
-        DeltaContextMenu.AddContextMenu(menu, this, [
-            [
-                {
-                    "name": "Hide Server",
-                    "style": "red",
-                    "callback": (app, server) => {
-                        if (server.IsOwner()) {
-                            return;
-                        }
-                        app.OpenPromptModal("Hide " + server.info.display_name, "Are you sure you want to hide " + server.info.display_name + "? Hiding a server will make it disappear from Delta Web Map until you rejoin the server in-game.", "Hide", "Cancel", () => {
-                            if (server.IsAdmin()) {
-                                //Warn about losing admin
-                                app.OpenPromptModal("Give Up Admin", "Hiding " + server.info.display_name + " will give up your admin access on this server. Are you sure you want to hide it?", "Accept", "Cancel", () => {
-                                    //Leave now
-                                    server.HideServer();
-                                }, () => { }, "NEGATIVE", "NEUTRAL");
-                            } else {
-                                //Leave now
-                                server.HideServer();
-                            }
-                        }, () => { }, "NEGATIVE", "NEUTRAL");
-                    },
-                    "enabled": !this.IsOwner()
-                }
-            ],
-            [
-                {
-                    "name": "Copy ID",
-                    "callback": (app, server) => {
-                        DeltaTools.CopyToClipboard(server.info.id);
-                    }
-                }
-            ]
-        ]);
-
-        //Add event
-        top.x_id = info.id;
-        top.x_app = this.app;
-        top.addEventListener("click", function () {
-            this.x_app.SwitchServer(this.x_app.servers[this.x_id]);
-        });
-
-        return menu;
-    }
-
     RemoveServer() {
         //If we're currently viewing this server, switch
         if (this.app.lastServer.id == this.id) {
             this.app.SwitchServer(this.app.msgViewServerRemoved);
         }
-
-        //Remove menu
-        this.menu.remove();
 
         //Remove our mountpoint. This might cause errors but the user won't see them
         this.mountpoint.remove();
@@ -205,14 +108,6 @@ class DeltaServer extends DeltaTabView {
         app.rpc.UnsubscribeServer(this.info.id, tag);
     }
 
-    SetLoaderStatus(shown) {
-        if (shown) {
-            this.menu.loaderBadge.classList.add("server_loader_active");
-        } else {
-            this.menu.loaderBadge.classList.remove("server_loader_active");
-        }
-    }
-
     GetMapInfo() {
         var m = this.app.maps.maps[this.info.map_id];
         if (m == null) {
@@ -223,29 +118,6 @@ class DeltaServer extends DeltaTabView {
 
     GetIsMapSupported() {
         return this.app.maps.maps[this.info.map_id] != null;
-    }
-
-    ForceAbort(error) {
-        /* Aborts a server and triggers the error badge */
-
-        //Set state
-        this.error = error;
-        this.menu.alertBadge.classList.add("sidebar_server_error_badge_active");
-        this.SetLoaderStatus(false);
-
-        //If we are the active server, boot the user out
-        if (this.app.lastServer == this) {
-            console.log("Kicking the user out of the active server due to an error.");
-            this.app.SwitchServer(this.app.msgViewActiveServerErr);
-        }
-    }
-
-    CancelTokens() {
-        this.token.Cancel();
-        this.token = new DeltaCancellationToken(null);
-        for (var i = 0; i < this.tabs.length; i += 1) {
-            this.tabs[i].token = new DeltaCancellationToken(this.token);
-        }
     }
 
     Init(mountpoint) {
@@ -333,12 +205,6 @@ class DeltaServer extends DeltaTabView {
         }
     }
 
-    CheckStatus() {
-        /* Returns null if all is OK to change to this server, else returns a string */
-
-        return this.error;
-    }
-
     async Deinit() {
         //Cancel
         this.token.Cancel();
@@ -380,6 +246,15 @@ class DeltaServer extends DeltaTabView {
         var bar = DeltaTools.CreateDom("div", "contentdownload_bar", dialog);
         var filling = DeltaTools.CreateDom("div", "contentdownload_filling", bar);
 
+        //Get primal data interface
+        label.innerText = "Fetching mod content list...";
+        this.primalInterface = await this.app.primalPackageManager.RequestInterface(["0"]);
+
+        //Get tribe list
+        label.innerText = "Fetching tribe list...";
+        var tribeListing = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/tribes", {}, this.token);
+        this.tribes = tribeListing.tribes;
+
         //Get the total count for all
         var totalEntityCount = this.primalInterface.GetTotalEntityCount();
         var totalEntitiesDownloaded = 0;
@@ -415,39 +290,17 @@ class DeltaServer extends DeltaTabView {
         dialog.remove();
     }
 
-    async DownloadDataCritical() {
-        //Downloads server data that we need to even begin loading. Returns the status
-
-        //Get primal data interface
-        try {
-            this.primalInterface = await this.app.primalPackageManager.RequestInterface(["0"]);
-        } catch (e) {
-            this.ForceAbort("Couldn't fetch mod data.");
-            return false;
-        }
-
-        //Fetch tribes
-        try {
-            var tribeListing = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/tribes", {}, this.token);
-            this.tribes = tribeListing.tribes;
-        } catch (e) {
-            this.ForceAbort("Couldn't fetch tribe listing.");
-            return false;
-        }
-
-        return true;
-    }
-
-    async DownloadDataBackground() {
-        //Downloads server data in the background while the tabs are shown
-
-        //Download data
-        await this.SyncContent();
+    //Called when our access to the API is changed (we're granted admin access, secure mode changed, etc)
+    async OnApiPermissionsChanged() {
+        //TODO
     }
 
     OnSwitchedTo() {
         /* Called when this server is switched to */
         super.OnSwitchedTo();
+
+        //Update bar
+        this.UpdateSystemBar();
 
         //If this hasn't been used yet, init the first tab
         if (this.first) {
@@ -456,30 +309,105 @@ class DeltaServer extends DeltaTabView {
         }
     }
 
+    UpdateSystemBar() {
+        //Create tabs
+        var items = [];
+        for (var i = 0; i < this.tabs.length; i += 1) {
+            items.push({
+                "title": this.tabs[i].GetDisplayName(),
+                "context": i,
+                "callback": (e) => {
+                    this.OnSwitchTab(e);
+                }
+            });
+        }
+        
+        //Set header
+        this.app.SetActiveHeaderInfo(this.info.display_name, this.info.image_url, items, this.activeTab);
+
+        //Set menu bar input
+        if (this.activeTab == -1) {
+            this.app.SetActiveHeaderSearch(false, null, null, null);
+        } else {
+            var t = this.tabs[this.activeTab];
+            this.app.SetActiveHeaderSearch(t.GetIsSearchQueryEnabled(), t.GetQueryPlaceholder(), t.lastQuery, t.OnQueryChanged);
+        }
+
+        //Set menu creation
+        this.app.SetActiveHeaderMenuCreateCallback(() => {
+            return this.CreateSystemMenu();
+        });
+    }
+
+    CreateSystemMenu() {
+        var items = [];
+
+        //Add server actions
+        items.push({
+            "type": "BTN",
+            "text": "Filter...",
+            "callback": () => { },
+            "icon": "/assets/app/icons/system_menu/filter.svg"
+        });
+        items.push({
+            "type": "SWITCH",
+            "text": "Admin Mode",
+            "callback": () => { },
+            "icon": "/assets/app/icons/system_menu/manage.svg",
+            "checked": this.admin_mode
+        });
+        items.push({
+            "type": "BTN",
+            "text": "Hide Server",
+            "callback": () => {
+                this.PromptLeaveServer();
+            },
+            "icon": "/assets/app/icons/system_menu/close.svg"
+        });
+
+        //Break
+        items.push({"type": "HR"});
+
+        //Add other servers
+        var k = Object.keys(this.app.servers);
+        for (var i = 0; i < k.length; i += 1) {
+            var s = this.app.servers[k[i]];
+            if (s != this) {
+                items.push({
+                    "type": "SERVER",
+                    "text": s.info.display_name,
+                    "callback": () => { },
+                    "icon": s.info.image_url
+                });
+            }
+        }
+
+        return items;
+    }
+
+    PromptLeaveServer() {
+        this.app.OpenPromptModal("Hide " + this.info.display_name, "Are you sure you want to hide " + this.info.display_name + "? Hiding a server will make it disappear from Delta Web Map until you rejoin the server in-game.", "Hide", "Cancel", () => {
+            if (this.IsAdmin()) {
+                //Warn about losing admin
+                this.app.OpenPromptModal("Give Up Admin", "Hiding " + this.info.display_name + " will give up your admin access on this server. Are you sure you want to hide it?", "Accept", "Cancel", () => {
+                    //Leave now
+                    this.HideServer();
+                }, () => { }, "NEGATIVE", "NEUTRAL");
+            } else {
+                //Leave now
+                this.HideServer();
+            }
+        }, () => { }, "NEGATIVE", "NEUTRAL");
+    }
+
     async OnSwitchedToFirst() {
-        //Called when this server is first switched to and we need to begin downloading
-        this.SetLoaderStatus(true);
-
-        //Set admin mode if we can
-        if (!this.info.has_tribe && this.IsAdmin() && !this.info.secure_mode) {
-            this.SetAdminMode(true);
-        }
-
-        //Download critical data first
-        if (!await this.DownloadDataCritical()) {
-            this.SetLoaderStatus(false);
-            this.ready = true;
-            return;
-        }
-
         //Switch to the first tab
         this.OnSwitchTab(0);
 
         //Begin background loading
-        await this.DownloadDataBackground();
+        await this.SyncContent();
 
         //Finish
-        this.SetLoaderStatus(false);
         this.ready = true;
     }
 
@@ -500,42 +428,32 @@ class DeltaServer extends DeltaTabView {
         //Close the old tab
         if (this.activeTab != -1 && this.activeTab != index) {
             //Hide
-            this.tabs[index].mountpoint.classList.remove("main_tab_active");
-
-            //Hide on the menu
-            this.tabs[index].menu.classList.remove("v3_nav_server_bottom_item_selected");
+            this.tabs[this.activeTab].mountpoint.classList.remove("main_tab_active");
 
             //Deactivate
             this.tabs[this.activeTab].OnClose();
         }
 
-        //Remove active tabs and menu tabs
-        DeltaTools.RemoveClassFromClassNames(this.mountpoint, "main_tab_active", "main_tab_active");
-        DeltaTools.RemoveClassFromClassNames(this.menu, "v3_nav_server_bottom_item_selected", "v3_nav_server_bottom_item_selected");
-
-        //Go to this tab
-        if (this.activeTab != index) {
-            //Run first open on this tab, if needed
-            if (this.tabs[index].openCount == 0) {
-                await this.tabs[index].OnFirstOpen();
-            }
-
-            //Show
-            this.tabs[index].mountpoint.classList.add("main_tab_active");
-
-            //Show on the menu
-            this.tabs[index].menu.classList.add("v3_nav_server_bottom_item_selected");
-
-            //Open the new tab
-            await this.tabs[index].OnOpen();
-
-            //Set vars
-            this.tabs[index].openCount += 1;
-            this.activeTab = index;
+        //Run first open on this tab, if needed
+        if (this.tabs[index].openCount == 0) {
+            await this.tabs[index].OnFirstOpen();
         }
+
+        //Show
+        this.tabs[index].mountpoint.classList.add("main_tab_active");
+
+        //Open the new tab
+        await this.tabs[index].OnOpen();
+
+        //Set vars
+        this.tabs[index].openCount += 1;
+        this.activeTab = index;
 
         //Update
         this.app.RefreshBrowserMetadata();
+
+        //Update bar
+        this.UpdateSystemBar();
     }
 
     SubscribeEvent(sourceTag, eventTag, callback) {
@@ -609,14 +527,6 @@ class DeltaServer extends DeltaTabView {
         modal.AddPage(builder.Build());
     }
 
-    SetUserInterfaceSecureStatus(status) {
-        if (status) {
-            this.menu.classList.add("v3_nav_server_flag_secure");
-        } else {
-            this.menu.classList.remove("v3_nav_server_flag_secure");
-        }
-    }
-
     BuildServerRequestUrl(extra) {
         return LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + extra;
     }
@@ -627,37 +537,7 @@ class DeltaServer extends DeltaTabView {
         }, this.token);
     }
 
-    //Sets if we're using admin mode
-    SetAdminMode(admin) {
-        var adminTab = this.tabs[3];
-
-        //If we aren't changing anything, abort
-        if (this.admin_mode == admin) {
-            return false;
-        }
-
-        //Set loader and switch
-        this.admin_mode = admin;
-        adminTab.SetLoadingSymbol(true);
-        adminTab.SetActiveStatus(admin);
-
-        //Set loader
-        adminTab.SetLoadingSymbol(false);
-
-        return true;
-    }
-
-    //Called when our access to the API is changed (we're granted admin access, secure mode changed, etc)
-    async OnApiPermissionsChanged() {
-        //Set loader
-        this.SetLoaderStatus(true);
-
-        //Sync
-        await this.SyncContent();
-
-        //Set loader
-        this.SetLoaderStatus(false);
-    }
+    
 
     IsAdmin() {
         return this.info.is_admin;

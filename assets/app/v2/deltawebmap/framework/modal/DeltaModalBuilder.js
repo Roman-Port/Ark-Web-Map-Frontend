@@ -28,6 +28,20 @@ class DeltaModalBuilder {
         this.AddContentCustomText("modal_preset_warning", text);
     }
 
+    AddContentBigNav(btns) {
+        //Btns in format: {"title", "callback", "is_big"}
+        var holder = DeltaTools.CreateDom("div", "modal_preset_bignav_container");
+        for (var i = 0; i < btns.length; i += 1) {
+            var b = DeltaTools.CreateDom("div", "modal_preset_bignav", holder);
+            b.innerText = btns[i].title;
+            b.addEventListener("click", btns[i].callback);
+            if (btns[i].is_big) {
+                b.classList.add("modal_preset_bignav_big");
+            }
+        }
+        this._AddContent(holder);
+    }
+
     AddContentCustomText(textClass, text) {
         var t = DeltaTools.CreateDom("div", textClass, null);
         DeltaModalBuilder.ParseMarkdown(t, text);

@@ -22,11 +22,23 @@ class DeltaSystemBar {
         server.addEventListener("click", () => {
             this.ToggleDropdown()
         });
+        this.SetVisiblity(false);
+    }
+
+    SetVisiblity(v) {
+        if (v == true) {
+            this.sysBar.style.display = "block";
+        } else {
+            this.sysBar.style.display = "none";
+        }
     }
 
     //Sets up the top nav bar
     //Actions is array of {"title", "callback", "context"}
     SetActiveHeaderInfo(title, icon, actions, selectedActionIndex) {
+        //Show
+        this.SetVisiblity(true);
+
         //Set server info
         this.serverName.innerText = title;
         this.serverIcon.src = icon;

@@ -37,11 +37,8 @@ class DeltaRPC {
     }
 
     OpenConnection() {
-        //Get access token
-        var token = localStorage.getItem("access_token");
-
         //Create a URL to use.
-        var url = "wss://rpc-prod.deltamap.net/rpc/v1" + "?access_token=" + encodeURIComponent(token);
+        var url = "wss://rpc-prod.deltamap.net/rpc/v1";
 
         //Create connection
         this.sock = new WebSocket(url);
@@ -49,11 +46,11 @@ class DeltaRPC {
 
         //Add events
         this.sock.addEventListener('open', () => this.OnRPCOpen());
-        this.sock.addEventListener('message', (m) => this.OnRPCMsg(m));
+        this.sock.addEventListener('message', (m) => this.OnCommand(m));
         this.sock.addEventListener('close', () => this.OnRPCClose());
 
         //Add timeout
-        this.connectTimeout = window.setTimeout( () => this.OnRPCTimeout(), 3000);
+        this.connectTimeout = window.setTimeout( () => this.OnRPCTimeout(), 6000);
     }
 
     OnRPCTimeout() {
@@ -63,18 +60,51 @@ class DeltaRPC {
     }
 
     OnRPCOpen() {
-        this.Log("CONNECT", "RPC connected.");
-        this.app.topBanner.RemoveType("TAG_RPC_DISCONNECT");
-        this.fails = 0;
-        if (this.connectTimeout != null) {
-            clearTimeout(this.connectTimeout);
+        //We've connected, but we aren't done yet. We need to authenticate
+        //Log
+        this.Log("CONNECT", "RPC connected. Now authenticating...");
+
+        //Send authentication
+        this.SendRPCData("LOGIN", {
+            "ACCESS_TOKEN": localStorage.getItem("access_token")
+        });
+    }
+
+    OnCommand(evt) {
+        //Decode command
+        var d = JSON.parse(evt.data);
+
+        //Log
+        this.Log("COMMAND", "Got command of type " + d.command + ".");
+        if (d.command == "LOGIN_COMPLETED") {
+            this.OnCommandLogin(d.payload);
+        } else if (d.command == "GROUPS_UPDATED") {
+
+        } else if (d.command == "RPC_MESSAGE") {
+            this.OnCommandRPC(d.payload);
+        } else {
+            this.Log("COMMAND", "Unknown command. Disconnecting...");
+            this.sock.close();
         }
     }
 
-    OnRPCMsg(evt) {
-        //Decode RPC message
-        var d = JSON.parse(evt.data);
+    OnCommandLogin(p) {
+        if (p.success) {
+            //Stop timeout
+            this.fails = 0;
+            if (this.connectTimeout != null) {
+                clearTimeout(this.connectTimeout);
+            }
 
+            //Log
+            this.Log("LOGIN", "Authenticated with RPC. Using user \"" + p.user.name + "\" (" + p.user.id + ")!");
+        } else {
+            //Close
+            this.sock.close();
+        }
+    }
+
+    OnCommandRPC(d) {
         //Log
         this.Log("MSG", "Got RPC message with opcode " + d.opcode + ".");
 
@@ -85,6 +115,11 @@ class DeltaRPC {
     OnRPCClose() {
         this.fails += 1;
         this.Log("CLOSE", "RPC closed. Fail #" + this.fails);
+
+        //Stop timeout
+        if (this.connectTimeout != null) {
+            clearTimeout(this.connectTimeout);
+        }
 
         //Calculate the amount of time to wait to reconnect. If this is one of the first fails, we'll wait a short amount of time. If we haven't been able to connect for a while, wait longer
         var time = 2000;
@@ -98,10 +133,7 @@ class DeltaRPC {
             time = 20000;
         }
         if (this.fails > 8) {
-            time = 60000;
-        }
-        if (this.fails > 12) {
-            time = 120000;
+            time = 40000;
         }
 
         //Set reconnect timer
@@ -111,6 +143,17 @@ class DeltaRPC {
 
     Log(topic, msg) {
         console.log("[RPC] " + topic + " -> " + msg);
+    }
+
+    SendRPCData(opcode, data) {
+        //Create payload
+        var p = {
+            "command": opcode,
+            "payload": data
+        };
+
+        //Send
+        this.sock.send(JSON.stringify(p));
     }
 
 }

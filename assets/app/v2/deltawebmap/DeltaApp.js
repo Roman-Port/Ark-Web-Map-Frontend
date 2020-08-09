@@ -60,9 +60,6 @@ class DeltaApp {
             this.BootServer(info);
         }
 
-        //Swtich to the default server
-        this.SwitchServer(this.GetDefaultServer());
-
         //Bind to RPC events
         this.rpc.SubscribeGlobal("app-server-joined", 30001, (m) => {
             //We've just joined a server. Add it to the server list
@@ -70,6 +67,27 @@ class DeltaApp {
             var server = this.BootServer(m.guild);
             this.SwitchServer(server);
         });
+
+        //Show the out of box experience
+        DeltaOOBE.ShowOOBEPrompt(this);
+    }
+
+    OnOOBEFinished() {
+        //Swtich to the default server
+        this.OpenDefaultServer();
+    }
+
+    OpenDefaultServer() {
+        //Check if we have one
+        var s = this.GetDefaultServer();
+        if (s != null) {
+            //Go
+            this.SwitchServer(s);
+        } else {
+            //Show no servers prompt
+            this.topNav.SetVisiblity(false);
+            DeltaOOBE.ShowNoServersPrompt(this);
+        }
     }
 
     BootServer(info) {
@@ -297,7 +315,7 @@ class DeltaApp {
         }
 
         //No default to load!
-        return this.msgViewNoServers;
+        return null;
     }
 
     RefreshBrowserMetadata() {

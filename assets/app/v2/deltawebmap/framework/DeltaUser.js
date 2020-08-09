@@ -15,4 +15,9 @@ class DeltaUser {
         this.data = await DeltaTools.WebRequest(window.LAUNCH_CONFIG.API_ENDPOINT + "/users/@me", {}, null);
     }
 
+    LogOut() {
+        localStorage.setItem("access_token", "");
+        window.location = "/login/";
+    }
+
 }

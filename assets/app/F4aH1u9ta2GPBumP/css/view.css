@@ -2912,6 +2912,34 @@ a {
     font-size: 13px;
 }
 
+.modal_preset_bignav_container {
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:90px;
+}
+
+.modal_preset_bignav {
+    margin: 10px 20px;
+    padding: 15px;
+    background-color: #42454a;
+    border: 1px solid #171718;
+    border-radius: 5px;
+    color: #e8e8e8;
+    font-weight: 800;
+    text-transform: uppercase;
+    background-image: url(/assets/app/icons/OOBE/nav_right.svg);
+    background-repeat: no-repeat;
+    background-position-y: center;
+    background-position-x: right;
+    background-size: 24px;
+    cursor: pointer;
+}
+
+.modal_preset_bignav_big {
+    padding: 30px 15px;
+}
+
 .itemlist_container {
     overflow-y: scroll;
     overflow-x: auto;

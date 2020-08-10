@@ -3,10 +3,11 @@
 //Serves as a container for server types. Must be extended
 class ServerDataPackage {
 
-    constructor(name, server) {
+    constructor(name, server, rpcType) {
         //Create
         this.name = name; //Just used as a label
         this.server = server;
+        this.rpcType = rpcType;
         this.CHUNK_SIZE = 800;
 
         //Make events
@@ -29,6 +30,11 @@ class ServerDataPackage {
 
     async FetchContent(offset, limit) {
         //Returns an array of content after fetching with the offset and limit
+        throw "Must be extended.";
+    }
+
+    GetContentUniqueKey(e) {
+        //Returns a unique key, as a string, to identify content
         throw "Must be extended.";
     }
 
@@ -70,6 +76,10 @@ class ServerDataPackage {
             //Add to content
             var newFilteredContent = [];
             for (var i = 0; i < chunk.length; i += 1) {
+                //Get unique key
+                var unique = this.GetContentUniqueKey(chunk[i]);
+                chunk[i]._deltaPackageIndexedKey = unique;
+
                 //Add main
                 this.content.push(chunk[i]);
 
@@ -89,6 +99,9 @@ class ServerDataPackage {
                 "removes": []
             });
         }
+
+        //Subscribe to RPC events
+        this._SubscribeRPCEvents();
     }
 
     EntityMatchesFilter(e) {
@@ -147,6 +160,77 @@ class ServerDataPackage {
     }
 
     //Other
+
+    _SubscribeRPCEvents() {
+        //Subscribe to content updated events
+        this.server.SubscribeRPCEvent("deltawebmap.framework.server.ServerDataPackage." + this.name, 20001, (p) => {
+            //Make sure the RPC type matches
+            if (p.type != this.rpcType) { return; }
+
+            //Loop through content
+            var adds = [];
+            var removes = [];
+            for (var i = 0; i < p.content.length; i += 1) {
+                var c = p.content[i];
+
+                //Get the unique key
+                var unique = this.GetContentUniqueKey(c);
+                c._deltaPackageIndexedKey = unique;
+
+                //Find if this already exists in the content. If it does, replace it
+                for (var j = 0; j < this.content.length; j += 1) {
+                    if (this.content[j]._deltaPackageIndexedKey == unique) {
+                        this._UpdateItem(this.content[j], c);
+                    }
+                }
+
+                //Check if we fit the filter
+                var filtered = this.EntityMatchesFilter(c);
+
+                //Find if this already exists in the filtered content. If it does, replace it or remove it
+                for (var j = 0; j < this.filteredContent.length; j += 1) {
+                    if (this.filteredContent[j]._deltaPackageIndexedKey == unique) {
+                        if (filtered) {
+                            //Matched! Replace it
+                            this._UpdateItem(this.filteredContent[j], c);
+                        } else {
+                            //Matched! But it no longer fits the filter. Remove it
+                            this.filteredContent.splice(j, 1);
+                            j--;
+                        }
+                    }
+                }
+
+                //Queue for events
+                if (filtered) {
+                    adds.push(c);
+                } else {
+                    removes.push(c);
+                }
+            }
+
+            //Send add/remove events
+            this.OnContentAddRemoved.Fire({
+                "adds": adds,
+                "removes": removes
+            });
+
+            //Send updated events
+            this.OnContentUpdated.Fire({
+                "filtered_content": this.filteredContent
+            });
+        });
+    }
+
+    _UpdateItem(target, replacement) {
+        //This will update each key individually so that missing ones aren't required
+        var k = Object.keys(replacement);
+        for (var i = 0; i < k.length; i += 1) {
+            if (replacement[k[i]] != null) {
+                target[k[i]] = replacement[k[i]];
+            }
+        }
+    }
 
     _ContentUpdated() {
         //Filters the content again and fires off events

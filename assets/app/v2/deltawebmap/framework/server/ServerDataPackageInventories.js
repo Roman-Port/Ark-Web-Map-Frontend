@@ -3,7 +3,7 @@
 class ServerDataPackageInventories extends ServerDataPackage {
 
     constructor(server) {
-        super("Inventories", server);
+        super("Inventories", server, 2);
     }
 
     async FetchCount() {
@@ -18,6 +18,9 @@ class ServerDataPackageInventories extends ServerDataPackage {
         return this.DecodePayload(r);
     }
 
+    GetContentUniqueKey(e) {
+        return e.holder_type + "@" + e.holder_type;
+    }
 
     //Public API
 

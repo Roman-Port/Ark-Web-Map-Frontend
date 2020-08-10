@@ -3,7 +3,7 @@
 class ServerDataPackageDinos extends ServerDataPackage {
 
     constructor(server) {
-        super("Dinos", server);
+        super("Dinos", server, 0);
     }
 
     async FetchCount() {
@@ -31,6 +31,10 @@ class ServerDataPackageDinos extends ServerDataPackage {
 
     EntityMatchesFilter(e) {
         return this.server.filter.CheckEntityDino(e);
+    }
+
+    GetContentUniqueKey(e) {
+        return e.dino_id;
     }
 
 }

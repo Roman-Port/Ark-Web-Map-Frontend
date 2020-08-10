@@ -3,7 +3,7 @@
 class ServerDataPackageStructures extends ServerDataPackage {
 
     constructor(server) {
-        super("Structures", server);
+        super("Structures", server, 3);
         this.HEADER_SIZE = 32;
         this.STRUCT_SIZE = 24;
         this.CHUNK_SIZE *= 15;
@@ -19,6 +19,10 @@ class ServerDataPackageStructures extends ServerDataPackage {
         var url = this.server.GetEchoEndpointUrl("/structures") + "?format=binary&limit=" + limit + "&skip=" + offset;
         var r = await DeltaTools.WebRequestBinary(url, null, {});
         return this.DecodePayload(r);
+    }
+
+    GetContentUniqueKey(e) {
+        return e.structure_id;
     }
 
     GetById(id) {

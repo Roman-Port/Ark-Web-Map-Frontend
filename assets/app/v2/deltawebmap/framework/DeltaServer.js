@@ -683,6 +683,10 @@ class DeltaServer extends DeltaTabView {
         }, this.token);
     }
 
+    async FetchAdminStats() {
+        return await DeltaTools.WebRequest(this.BuildServerRequestUrl("/admin/stats"), {}, this.token);
+    }
+
     FlyToLocation(location) {
         this.tabs[0].FlyToLocation(location);
         this.OnSwitchTab(0);

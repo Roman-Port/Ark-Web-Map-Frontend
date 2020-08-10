@@ -42,8 +42,19 @@ class DeltaApp {
         //Create package manager
         this.primalPackageManager = new PrimalPackageManager();
 
+        //Add events to RPC
+        this.rpc.OnConnectedEvent.Subscribe("deltawebmap.app", () => {
+            this.TriggerLoaderHide();
+        });
+        this.rpc.OnDisconnectedEvent.Subscribe("deltawebmap.app", () => {
+            this.TriggerLoaderShow();
+            this.TriggerLoaderError("Lost connection to Delta Web Map. Reconnecting...");
+        });
+
+        //Begin RPC connecting
+        this.rpc.OpenConnection();
+
         //Set up full DOM
-        this.TriggerLoaderHide();
         this.LayoutMainView(this.settings.mountpoint);
 
         //Create message views
@@ -133,7 +144,7 @@ class DeltaApp {
 
                 //Set error state
                 if (tries > 0) {
-                    this.TriggerLoaderError();
+                    this.TriggerLoaderError("Hang tight! We're having troubles connecting.");
                 }
                 tries++;
 
@@ -152,12 +163,18 @@ class DeltaApp {
         return null;
     }
 
-    TriggerLoaderError() {
+    TriggerLoaderError(text) {
+        this.loaderScreenError.innerText = text;
         this.loaderScreen.classList.add("intro_slide_state_error");
     }
 
     TriggerLoaderHide() {
         this.loaderScreen.classList.add("intro_slide_hide");
+        this.loaderScreen.classList.remove("intro_slide_state_error");
+    }
+
+    TriggerLoaderShow() {
+        this.loaderScreen.classList.remove("intro_slide_hide");
     }
 
     LayoutLoginScreen(mount) {
@@ -171,8 +188,9 @@ class DeltaApp {
         var introContent = DeltaTools.CreateDom("div", "intro_slide_content", intro);
         var introBody = DeltaTools.CreateDom("div", "", introContent);
         DeltaTools.CreateDom("div", "intro_slide_body_title", introBody, "DeltaWebMap");
+        DeltaTools.CreateDom("div", "loading_spinner", DeltaTools.CreateDom("div", "intro_slide_body_loader", introBody));
         var introWarning = DeltaTools.CreateDom("div", "intro_slide_warning intro_slide_warning_base", intro);
-        DeltaTools.CreateDom("div", "intro_slide_warning_box", introWarning, "Hang tight! We're having troubles connecting.");
+        this.loaderScreenError = DeltaTools.CreateDom("div", "intro_slide_warning_box", introWarning);
         var introSpecies = DeltaTools.CreateDom("div", "intro_slide_first intro_slide_warning_base", intro);
         DeltaTools.CreateDom("div", "intro_slide_warning_box intro_slide_warning_box_blue", introSpecies, "Hang tight! We're downloading first time information. This may take a moment, but will only happen once.");
         this.loaderScreen = intro;

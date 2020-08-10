@@ -2597,6 +2597,10 @@ a {
     transition: background 300ms ease-in-out, opacity 200ms ease-in-out;
 }
 
+.intro_slide .loading_spinner {
+    display: none;
+}
+
 .intro_slide_hide {
     pointer-events: none;
     opacity: 0;
@@ -2665,9 +2669,13 @@ a {
     background-color: #e85a5a;
 }
 
-    .intro_slide_state_error .intro_slide_warning {
-        bottom: 60px;
-    }
+.intro_slide_state_error .intro_slide_warning {
+    bottom: 60px;
+}
+
+.intro_slide_state_error .loading_spinner {
+    display: block;
+}
 
 .intro_slide_first_error .intro_slide_first {
     bottom: 60px;

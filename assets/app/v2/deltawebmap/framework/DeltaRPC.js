@@ -8,7 +8,8 @@ class DeltaRPC {
         this.fails = 0;
         this.connectTimeout = null;
         this.dispatcher = new DeltaEventDispatcher();
-        this.OpenConnection();
+        this.OnConnectedEvent = new DeltaBasicEventDispatcher();
+        this.OnDisconnectedEvent = new DeltaBasicEventDispatcher();
     }
 
     FireSubscription(msg) {
@@ -38,7 +39,7 @@ class DeltaRPC {
 
     OpenConnection() {
         //Create a URL to use.
-        var url = "wss://rpc-prod.deltamap.net/rpc/v1";
+        var url = LAUNCH_CONFIG.RPC_HOST + "/rpc/v1";
 
         //Create connection
         this.sock = new WebSocket(url);
@@ -98,6 +99,9 @@ class DeltaRPC {
 
             //Log
             this.Log("LOGIN", "Authenticated with RPC. Using user \"" + p.user.name + "\" (" + p.user.id + ")!");
+
+            //Send event
+            this.OnConnectedEvent.Fire({});
         } else {
             //Close
             this.sock.close();
@@ -139,6 +143,9 @@ class DeltaRPC {
         //Set reconnect timer
         this.Log("CLOSE", "Attempting to reconnect in " + time + "ms.");
         window.setTimeout(() => this.OpenConnection(), time);
+
+        //Send event
+        this.OnDisconnectedEvent.Fire({});
     }
 
     Log(topic, msg) {

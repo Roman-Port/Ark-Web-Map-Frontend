@@ -123,15 +123,18 @@ class DeltaApp {
                 //Get structure metadata
                 this.structureMetadata = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/structure_metadata.json", {}, null);
 
+                //Get map list
+                this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
+
+                //Get guild setup config
+                this.guildSetupConfig = await DeltaTools.WebRequest(LAUNCH_CONFIG.CONFIG_API_ENDPOINT + "/prod/frontend/guild_setup.json", { "noauth": true }, null);
+
                 //Begin init of structure tool (this will take a bit)
                 this.structureTool = new DeltaStructureTool(this, this.structureMetadata.metadata);
                 var structureToolSetup = this.structureTool.Init();
 
                 //Set up the user
                 await this.user.RefreshData();
-
-                //Get map list
-                this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
 
                 //Wait for structure setup to finish
                 await structureToolSetup;

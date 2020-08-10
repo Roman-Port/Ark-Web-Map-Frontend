@@ -248,20 +248,27 @@ class DeltaServer extends DeltaTabView {
         var filling = DeltaTools.CreateDom("div", "contentdownload_filling", bar);
 
         //Get primal data interface
-        label.innerText = "Fetching mod content list...";
+        label.innerText = "Downloading mod content list...";
         this.primalInterface = await this.app.primalPackageManager.RequestInterface(["0"]);
 
         //Get tribe list
-        label.innerText = "Fetching tribe list...";
+        label.innerText = "Downloading tribe list...";
         var tribeListing = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/tribes", {}, this.token);
         this.tribes = tribeListing.tribes;
 
-        //Get the total count for all
+        //Get the total count for content
+        label.innerText = "Downloading server content list...";
         var totalEntityCount = this.primalInterface.GetTotalEntityCount();
         var totalEntitiesDownloaded = 0;
+        var countsFetchTasks = [];
         for (var i = 0; i < this._packages.length; i += 1) {
-            totalEntityCount += await this._packages[i].FetchCount();
+            var task = this._packages[i].FetchCount();
+            task.then((v) => {
+                totalEntityCount += v;
+            });
+            countsFetchTasks.push(task);
         }
+        await Promise.all(countsFetchTasks);
 
         //Download mod content
         await this.primalInterface.DownloadContent((count) => {
@@ -274,7 +281,6 @@ class DeltaServer extends DeltaTabView {
         var uiC = (e) => {
             totalEntitiesDownloaded += e.delta;
             filling.style.width = ((totalEntitiesDownloaded / totalEntityCount) * 100).toString() + "%";
-            label.innerText = "Downloading " + e.source.name.toLowerCase() + "...";
         };
         for (var i = 0; i < this._packages.length; i += 1) {
             this._packages[i].OnContentChunkReceived.Subscribe("deltawebmap.server.synccontent.ui", uiC);
@@ -283,6 +289,7 @@ class DeltaServer extends DeltaTabView {
         //Download content for all packages
         for (var i = 0; i < this._packages.length; i += 1) {
             console.log("[DeltaServer-SyncContent] Beginning download of package \"" + this._packages[i].name + "\"...");
+            label.innerText = "Downloading " + this._packages[i].name.toLowerCase() + "...";
             await this._packages[i].LoadContent();
             console.log("[DeltaServer-SyncContent] Download of package \"" + this._packages[i].name + "\" completed successfully.");
         }

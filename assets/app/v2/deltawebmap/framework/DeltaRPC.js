@@ -110,7 +110,7 @@ class DeltaRPC {
 
     OnCommandRPC(d) {
         //Log
-        this.Log("MSG", "Got RPC message with opcode " + d.opcode + ".");
+        this.Log("MSG", "Got RPC message with opcode " + d.opcode + ". Server: " + d.target_server);
 
         //Fire event
         this.FireSubscription(d);

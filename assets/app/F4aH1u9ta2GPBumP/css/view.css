@@ -2799,10 +2799,9 @@ a {
 .modal_view_builder {
     font-family: 'Roboto', sans-serif;
     background-color: #33363c;
-    padding-bottom: 95px;
     overflow-y: auto;
     overflow-x: hidden;
-    min-height: calc(100% - 95px);
+    height: calc(100% - 79px);
 }
 
 .modal_view_nav {
@@ -3415,7 +3414,7 @@ a {
 
 .subtab_content {
     margin-right: 20px;
-    max-width: 600px;
+    max-width: 800px;
     font-family: 'Roboto', sans-serif;
     display: none;
 }

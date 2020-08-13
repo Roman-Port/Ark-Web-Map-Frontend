@@ -27,6 +27,8 @@ class DeltaServer extends DeltaTabView {
         this.primalInterface = null;
         this.filter = new DeltaFilter();
         this.adminEnabled = false;
+        this.onlinePlayers = [];
+        this.onlinePlayerCount = -1;
 
         //Create tabs
         this.tabs = [
@@ -55,6 +57,12 @@ class DeltaServer extends DeltaTabView {
             this.tribe = '*';
             this.nativeTribe = '*';
         }
+
+        //Subscribe to events
+        this.app.rpc.SubscribeServer(this.id, "DeltaWebMap.DeltaServer.PlayerList", 20011, (m) => {
+            this.onlinePlayerCount = m.player_count;
+            this.onlinePlayers = m.players;
+        });
     }
 
     GetDisplayName() {
@@ -358,6 +366,16 @@ class DeltaServer extends DeltaTabView {
         var items = [];
 
         //Add server actions
+        if (this.onlinePlayerCount != -1) {
+            items.push({
+                "type": "BTN",
+                "text": this.onlinePlayerCount + " Online",
+                "callback": () => {
+                    this.OpenPlayerList();
+                },
+                "icon": "/assets/app/icons/system_menu/players.svg"
+            });
+        }
         items.push({
             "type": "BTN",
             "text": "Filter...",
@@ -534,6 +552,35 @@ class DeltaServer extends DeltaTabView {
             "prefs": dino.tribe_prefs
         }, this.token);
         return p;
+    }
+
+    OpenPlayerList() {
+        var builder = new DeltaModalBuilder();
+        var modal = this.app.modal.AddModal(470, 680);
+
+        builder.AddContentTitle("Players Online");
+        builder._AddContent(DeltaTools.CreateDom("div", "playerlist_header"));
+
+        //Add each player
+        for (var i = 0; i < this.onlinePlayers.length; i += 1) {
+            //Get tribe
+            var tribe = this.GetTribeByIdSafe(this.onlinePlayers[i].tribe_id);
+
+            //Create
+            var d = DeltaTools.CreateDom("div", "playerlist_holder");
+            DeltaTools.CreateDom("img", "playerlist_icon", d).src = this.onlinePlayers[i].steam_icon;
+            DeltaTools.CreateDom("div", "playerlist_name", d, this.onlinePlayers[i].steam_name);
+            DeltaTools.CreateDom("div", "playerlist_tribe", d, tribe.tribe_name);
+
+            //Add
+            builder._AddContent(d);
+        }
+
+
+        builder.AddAction("Close", "NEUTRAL", () => {
+            modal.Close();
+        });
+        modal.AddPage(builder.Build());
     }
 
     OpenFilterDialog() {

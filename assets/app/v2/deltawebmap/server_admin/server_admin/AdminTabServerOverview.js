@@ -26,6 +26,7 @@ class AdminTabServerOverview extends AdminSubTabMenuTabModule {
     WriteContent(adminStatus) {
         var d = DeltaTools.CreateDom("div", null, this.mountpoint);
         d.appendChild(this.CreateOnlineBox(adminStatus));
+        this.CreateGraph(adminStatus);
     }
 
     CreateOnlineBox(status) {
@@ -62,4 +63,55 @@ class AdminTabServerOverview extends AdminSubTabMenuTabModule {
         return b;
     }
 
+    CreateGraph(status) {
+        //Convert
+        var avgPings = [];
+        var labels = [];
+        for (var i = 0; i < status.pings.length; i += 1) {
+            if (i % 10 != 0) { continue;}
+            avgPings.push(Math.round(status.pings[i].tick_avg * 10000) / 10);
+            labels.push(new moment(status.pings[i].time).format("MM/DD h:mm A"));
+        }
+
+        //Create
+        var holder = DeltaTools.CreateDom("div", "admin_content_box", this.mountpoint);
+        var ctx = DeltaTools.CreateDom("canvas", null, holder).getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Average Time per Tick',
+                        data: avgPings,
+                        backgroundColor: "#3882dc",
+                        borderColor: "#3882dc",
+                        borderWidth: 1,
+                        fill: false,
+                    },
+                ]
+            },
+            options: {
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        display: false,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Milliseconds per Tick'
+                        }
+                    }]
+                }
+            }
+        });
+    }
 }

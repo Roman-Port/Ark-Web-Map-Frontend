@@ -80,7 +80,11 @@ class DeltaApp {
         });
 
         //Show the out of box experience
-        DeltaOOBE.ShowOOBEPrompt(this);
+        if (this.user.settings.oobe_status == 0) {
+            DeltaOOBE.ShowOOBEPrompt(this);
+        } else {
+            this.OnOOBEFinished();
+        }
     }
 
     OnOOBEFinished() {

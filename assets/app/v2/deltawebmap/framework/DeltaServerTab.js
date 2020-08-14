@@ -23,6 +23,10 @@ class DeltaServerTab {
         
     }
 
+    IsEnabled() {
+        return true;
+    }
+
     CreateMenuItem(container) {
         var btn = DeltaTools.CreateDom("div", "v3_nav_server_bottom_item", container);
         btn.innerText = this.GetDisplayName();

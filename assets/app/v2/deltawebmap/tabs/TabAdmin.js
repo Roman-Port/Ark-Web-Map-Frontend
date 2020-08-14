@@ -33,6 +33,10 @@ class TabAdmin extends SubTabMenuTab {
         return "admin";
     }
 
+    IsEnabled() {
+        return this.server.IsAdmin();
+    }
+
     GetIsSearchQueryEnabled() {
         //Returns if we should enable the search query
         return false;

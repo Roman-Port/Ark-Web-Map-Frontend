@@ -334,13 +334,15 @@ class DeltaServer extends DeltaTabView {
         //Create tabs
         var items = [];
         for (var i = 0; i < this.tabs.length; i += 1) {
-            items.push({
-                "title": this.tabs[i].GetDisplayName(),
-                "context": i,
-                "callback": (e) => {
-                    this.OnSwitchTab(e);
-                }
-            });
+            if (this.tabs[i].IsEnabled()) {
+                items.push({
+                    "title": this.tabs[i].GetDisplayName(),
+                    "context": i,
+                    "callback": (e) => {
+                        this.OnSwitchTab(e);
+                    }
+                });
+            }
         }
         
         //Set header
@@ -376,23 +378,25 @@ class DeltaServer extends DeltaTabView {
                 "icon": "/assets/app/icons/system_menu/players.svg"
             });
         }
-        items.push({
+        /*items.push({
             "type": "BTN",
             "text": "Filter...",
             "callback": () => {
                 this.OpenFilterDialog();
             },
             "icon": "/assets/app/icons/system_menu/filter.svg"
-        });
-        items.push({
-            "type": "SWITCH",
-            "text": "Admin Mode",
-            "callback": () => {
-                this.SetAdminMode(!this.adminEnabled);
-            },
-            "icon": "/assets/app/icons/system_menu/manage.svg",
-            "checked": this.adminEnabled
-        });
+        });*/
+        if (this.IsAdmin()) {
+            items.push({
+                "type": "SWITCH",
+                "text": "Admin Mode",
+                "callback": () => {
+                    this.SetAdminMode(!this.adminEnabled);
+                },
+                "icon": "/assets/app/icons/system_menu/manage.svg",
+                "checked": this.adminEnabled
+            });
+        }
         items.push({
             "type": "BTN",
             "text": "Hide Server",
@@ -469,6 +473,12 @@ class DeltaServer extends DeltaTabView {
 
         //Finish
         this.ready = true;
+
+        //Set OOBE flag
+        if (this.app.user.settings.oobe_status == 0) {
+            this.app.user.settings.oobe_status = 1;
+            this.app.user.PushUserSettings();
+        }
     }
 
     OnSwitchedAway() {

@@ -29,6 +29,7 @@ class DeltaServer extends DeltaTabView {
         this.adminEnabled = false;
         this.onlinePlayers = [];
         this.onlinePlayerCount = -1;
+        this.worldPlayers = [];
 
         //Create tabs
         this.tabs = [
@@ -263,6 +264,11 @@ class DeltaServer extends DeltaTabView {
         label.innerText = "Downloading tribe list...";
         var tribeListing = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/servers/" + this.id + "/tribes", {}, this.token);
         this.tribes = tribeListing.tribes;
+
+        //Get player list
+        label.innerText = "Downloading player list...";
+        var playerListing = await DeltaTools.WebRequest(LAUNCH_CONFIG.ECHO_API_ENDPOINT + "/v1/" + this.id + "/players", {}, this.token);
+        this.worldPlayers = playerListing.profiles;
 
         //Get the total count for content
         label.innerText = "Downloading server content list...";
@@ -749,6 +755,12 @@ class DeltaServer extends DeltaTabView {
 
     async FetchAdminStats() {
         return await DeltaTools.WebRequest(this.BuildServerRequestUrl("/admin/stats"), {}, this.token);
+    }
+
+    ForceUpdateDino(dinoId) {
+        DeltaTools.WebPOSTJson(this.BuildServerRequestUrl("/remote_refresh"), {
+            "dino_id": dinoId
+        }, this.token);
     }
 
     FlyToLocation(location) {

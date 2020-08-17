@@ -97,7 +97,7 @@ class DeltaSystemBar {
     }
 
     ToggleDropdown() {
-        if (this.menu.classList.contains("system_dropdown_shown")) {
+        if (this.sysBar.classList.contains("system_dropdown_shown")) {
             this.HideDropdown();
         } else {
             this.ShowDropdown();
@@ -105,16 +105,16 @@ class DeltaSystemBar {
     }
 
     HideDropdown() {
-        if (!this.menu.classList.contains("system_dropdown_shown")) {
+        if (!this.sysBar.classList.contains("system_dropdown_shown")) {
             return; //Already inactive
         }
 
         //Hide
-        this.menu.classList.remove("system_dropdown_shown");
+        this.sysBar.classList.remove("system_dropdown_shown");
     }
 
     ShowDropdown() {
-        if (this.menu.classList.contains("system_dropdown_shown")) {
+        if (this.sysBar.classList.contains("system_dropdown_shown")) {
             return; //Already active
         }
 
@@ -170,7 +170,7 @@ class DeltaSystemBar {
         this.menuContent.appendChild(outputMenu);
 
         //Show
-        this.menu.classList.add("system_dropdown_shown");
+        this.sysBar.classList.add("system_dropdown_shown");
     }
 
 }

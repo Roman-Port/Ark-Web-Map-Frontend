@@ -12,33 +12,36 @@ class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
         this.mountpoint = DeltaTools.CreateDom("div", null);
         this._AddTitle("Players");
         this._AddText("Only players that have joined since you added Delta Web Map to your server will be shown.");
-        return this.mountpoint;
-    }
+        this.table = new DeltaSimpleTableView(this.mountpoint, null, "steam_id", [
+            "",
+            "Name",
+            "Tribe ID",
+            "Tribe Name",
+            "Last Seen",
+            ""
+        ], (item) => {
+                //Create icon
+                var icon = DeltaTools.CreateDom("img", "admintab_players_icon");
+                icon.src = item.icon;
 
-    OnFirstOpened() {
-        this.FetchPlayers();
-    }
+                //Create flags
+                var flags = DeltaTools.CreateDom("div", null);
+                if (item.delta_account) {
+                    DeltaTools.CreateDom("div", "admintab_players_user_dwm", flags, "DWM");
+                }
 
-    async FetchPlayers() {
-        //Load
-        var results = await DeltaTools.WebRequest(this.server.BuildServerRequestUrl("/admin/players?page=" + this.page), {}, this.server.token);
-
-        //Add players
-        for (var i = 0; i < results.players.length; i += 1) {
-            this.mountpoint.appendChild(this.CreatePlayerDom(results.players[i]));
-        }
-    }
-
-    CreatePlayerDom(data) {
-        var d = DeltaTools.CreateDom("div", "admintab_players_user");
-        DeltaTools.CreateDom("img", "admintab_players_user_icon", d).src = data.icon;
-        if (data.delta_account) {
-            DeltaTools.CreateDom("div", "admintab_players_user_dwm", d, "DWM");
-        }
-        DeltaTools.CreateDom("div", "admintab_players_user_name", d, data.name);
-        DeltaTools.CreateDom("div", "admintab_players_user_tribe", d, data.tribe_id.toString() + " / " + this.server.GetTribeByIdSafe(data.tribe_id).tribe_name);
-        DeltaTools.CreateDom("div", "admintab_players_user_time", d, new moment(data.last_seen).format('MMMM Do, YYYY - h:mm A '));
-        DeltaContextMenu.AddContextMenu(d, data, [
+                return [
+                    icon,
+                    item.ark_name,
+                    item.tribe_id.toString(),
+                    this.server.GetTribeByIdSafe(item.tribe_id).tribe_name,
+                    new moment(item.last_seen).format('MM/DD/YYYY h:mm A '),
+                    flags
+                ];
+        });
+        this.table.SetCustomColumnClassName(0, "admintab_players_icon_holder");
+        this.table.SetCustomColumnClassName(5, "admintab_players_flags");
+        this.table.SetCustomContextMenu([
             [
                 {
                     "name": "Open Steam Profile",
@@ -61,7 +64,7 @@ class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
             ],
             [
                 {
-                    "name": "Ban " + data.name,
+                    "name": "Ban Player",
                     "style": "red",
                     "callback": (app, dd) => {
                         //Check if this is an admin
@@ -81,7 +84,17 @@ class AdminTabServerPlayers extends AdminSubTabMenuTabModule {
                 }
             ]
         ]);
-        return d;
+        return this.mountpoint;
+    }
+
+    OnFirstOpened() {
+        this.FetchPlayers();
+    }
+
+    async FetchPlayers() {
+        //Load
+        var results = await DeltaTools.WebRequest(this.server.BuildServerRequestUrl("/admin/players?page=" + this.page), {}, this.server.token);
+        this.table.AddContent(results.players);
     }
 
 }

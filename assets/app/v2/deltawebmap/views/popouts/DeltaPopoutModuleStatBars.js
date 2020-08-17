@@ -8,12 +8,14 @@ class DeltaPopoutModuleStatBars extends DeltaPopoutModuleCollapsable {
 	}
 
 	BuildCollapseArea(ctx, rootHolder) {
-		var b = DeltaTools.CreateDom("div", "popoutm2_statbars");
-		b.appendChild(this.CreateBar(0, this.dino.current_stats, this.dino.max_stats));
-		b.appendChild(this.CreateBar(1, this.dino.current_stats, this.dino.max_stats));
-		b.appendChild(this.CreateBar(4, this.dino.current_stats, this.dino.max_stats));
-		b.appendChild(this.CreateBar(7, this.dino.current_stats, this.dino.max_stats));
-		return b;
+		var c = DeltaTools.CreateDom("div", null);
+		var b1 = DeltaTools.CreateDom("div", "popoutm2_statbars", c);
+		var b2 = DeltaTools.CreateDom("div", "popoutm2_statbars", c);
+		b1.appendChild(this.CreateBar(0, this.dino.current_stats, this.dino.max_stats));
+		b1.appendChild(this.CreateBar(1, this.dino.current_stats, this.dino.max_stats));
+		b2.appendChild(this.CreateBar(4, this.dino.current_stats, this.dino.max_stats));
+		b2.appendChild(this.CreateBar(7, this.dino.current_stats, this.dino.max_stats));
+		return c;
 	}
 
 	CreateBar(stat, currentValues, maxValues) {

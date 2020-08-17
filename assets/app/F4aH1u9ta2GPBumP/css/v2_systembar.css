@@ -15,10 +15,10 @@
     top: 10px;
     left: 10px;
     bottom: 10px;
-    width: 200px;
+    width: 210px;
     border-radius: 5px;
     background-color: #33363c;
-    padding: 6px 10px;
+    padding: 6px;
     line-height: 26px;
     font-weight: 800;
     border: 1px solid #45484d;
@@ -27,6 +27,11 @@
     background-position-x: right;
     background-position-y: center;
     background-repeat: no-repeat;
+}
+
+.system_dropdown_shown .sysbar_server {
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
 }
 
 .sysbar_server_top {
@@ -41,7 +46,7 @@
     width: 26px;
     border-radius: 5px;
     vertical-align: middle;
-    margin-right: 10px;
+    margin-right: 8px;
     float: left;
 }
 
@@ -112,7 +117,7 @@
     overflow: hidden;
 }
 
-.system_dropdown_shown {
+.system_dropdown_shown .sysbar_dropdown {
     pointer-events: all;
     opacity: 1;
     top: 35px;

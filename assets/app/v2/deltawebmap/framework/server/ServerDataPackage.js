@@ -181,6 +181,7 @@ class ServerDataPackage {
                 for (var j = 0; j < this.content.length; j += 1) {
                     if (this.content[j]._deltaPackageIndexedKey == unique) {
                         this._UpdateItem(this.content[j], c);
+                        c = this.content[j];
                     }
                 }
 

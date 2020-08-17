@@ -1989,6 +1989,10 @@ a {
     background-size: 30px;
 }
 
+.map_icon_player {
+    background-size: cover;
+}
+
 .mini_modal {
     position: absolute;
     top: -10px;
@@ -3134,21 +3138,15 @@ a {
 .popoutm2_collapse {
     font-family: 'Roboto', sans-serif;
     background-color: #33363c;
+    padding-bottom: 5px;
 }
 
 .popoutm2_collapse_top {
-    padding: 5px 5px;
+    padding: 5px 10px;
     font-weight: 800;
     color: #d2d2d2;
     text-transform: uppercase;
-    cursor: pointer;
     font-size: 13px;
-    background-image: url(/assets/app/icons/modal_popout/expandable_less.svg);
-    background-position-y: center;
-    background-position-x: 5px;
-    background-repeat: no-repeat;
-    padding-left: 34px;
-    background-size: 24px;
     user-select: none;
 }
 
@@ -3158,16 +3156,17 @@ a {
 }
 
 .popoutm2_statbars {
-    padding: 4px;
     display: flex;
     flex-wrap: wrap;
-    padding: 0px 3px;
-    padding-bottom: 3px;
+    padding: 0px 7px;
+}
+
+.popoutm2_statbars:last-child {
+    margin-top:4px;
 }
 
 .popoutm2_statbars_bar {
     height: 30px;
-    margin: 2px;
     margin-top: 0;
     background-color: #252629;
     border-radius: 5px;
@@ -3175,6 +3174,7 @@ a {
     position: relative;
     flex-grow: 2;
     flex-basis: 40%;
+    margin: 0px 2px;
 }
 
 .popoutm2_statbars_bar_progress {
@@ -3316,7 +3316,7 @@ a {
 
 .popoutm2_colortag_holder {
     display: flex;
-    margin: 0px 4px;
+    margin: 0px 7px;
 }
 
 .popoutm2_colortag_tag {
@@ -3350,14 +3350,72 @@ a {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    margin: 2px 5px;
+    margin-top: 0;
 }
 
 .popoutm2_admin_key {
-    text-transform: uppercase;
-    width: 130px;
+    width: 120px;
     display: inline-block;
-    color: #d2d2d2;
     text-decoration: underline;
+}
+
+.popoutm2_admin_btn_area {
+    display: flex;
+    margin: 0px 2px;
+}
+
+.popoutm2_admin_btn_area_top {
+    margin-top: 5px;
+}
+
+.popoutm2_admin_btn {
+    background-color: #3882dc;
+    padding: 8px;
+    border-radius: 5px;
+    font-weight: 800;
+    font-size: 15px;
+    text-transform: uppercase;
+    width: 100%;
+    margin: 2px;
+    line-height: 18px;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.popoutm2_admin_btn img {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+    vertical-align: top;
+}
+
+.popoutm2_updated {
+    color: #b9b9b9;
+    font-size: 15px;
+    padding: 5px;
+    text-transform: uppercase;
+    line-height: 26px;
+    padding-left: 10px;
+}
+
+.popoutm2_updated_btn {
+    background-image: url(/assets/app/icons/modal_popout/refresh.svg);
+    height: 24px;
+    width: 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #33363c;
+    border-radius: 5px;
+    border: 1px solid black;
+    float: right;
+    cursor: pointer;
+}
+
+.popoutm2_updated_loader {
+    float: right;
+    margin: 4px;
 }
 
 .subtab_nav {
@@ -3569,4 +3627,25 @@ a {
     bottom: 0;
     background-color: #3882dc;
     transition: width 80ms ease-in-out;
+}
+
+.tableview_table {
+    color: white;
+    text-align: left;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableview_table td {
+    padding: 3px 8px;
+}
+
+.tableview_table th {
+    padding: 5px 8px;
+    text-transform: uppercase;
+}
+
+.tableview_table_element:hover {
+    background-color: #222325b8;
+    border-radius: 5px;
 }

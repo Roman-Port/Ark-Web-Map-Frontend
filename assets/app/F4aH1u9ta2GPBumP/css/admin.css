@@ -46,24 +46,19 @@
 
 /* Players tab */
 
-.admintab_players_user {
-    position: relative;
-    height: 40px;
-    margin-bottom: 10px;
-    border-radius:5px;
+.admintab_players_icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    margin-top: 4px;
 }
 
-.admintab_players_user:hover {
-    background-color: #252629;
+.admintab_players_icon_holder {
+    width: 30px;
 }
 
-.admintab_players_user_icon {
-    position:absolute;
-    left:0;
-    top:0;
-    width:40px;
-    height:40px;
-    border-radius:5px;
+.admintab_players_flags {
+    width: 40px;
 }
 
 .admintab_players_user_dwm {
@@ -71,8 +66,6 @@
     height: 20px;
     font-size: 13px;
     line-height: 20px;
-    right: 10px;
-    position: absolute;
     background-color: #3882dc;
     border: none;
     border-radius: 5px;
@@ -80,58 +73,6 @@
     font-weight: 700;
     text-align: center;
     top: 10px;
-}
-
-.admintab_players_user_name {
-    left: 50px;
-    top: 2px;
-    font-size: 15px;
-    color: white;
-    right: 0;
-    position: absolute;
-    right: 250px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.admintab_players_user_tribe {
-    left: 50px;
-    bottom: 2px;
-    font-size: 15px;
-    color: #adadad;
-    right: 0;
-    position: absolute;
-    right: 250px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.admintab_players_user_time_label {
-    top: 2px;
-    font-size: 15px;
-    color: white;
-    right: 0;
-    position: absolute;
-    right: 60px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.admintab_players_user_time {
-    bottom: 0;
-    top:0;
-    line-height:40px;
-    font-size: 15px;
-    color: #adadad;
-    right: 0;
-    position: absolute;
-    right: 60px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
 }
 
 /* Permissions tab */

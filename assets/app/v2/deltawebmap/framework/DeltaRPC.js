@@ -149,7 +149,7 @@ class DeltaRPC {
     }
 
     Log(topic, msg) {
-        console.log("[RPC] " + topic + " -> " + msg);
+        //console.log("[RPC] " + topic + " -> " + msg);
     }
 
     SendRPCData(opcode, data) {

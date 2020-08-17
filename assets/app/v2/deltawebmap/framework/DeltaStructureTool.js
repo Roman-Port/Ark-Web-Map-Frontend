@@ -194,7 +194,7 @@ class DeltaStructureSession {
                 (async () => {
                     var menu = [];
                     for (var i = 0; i < hits.length; i += 1) {
-                        var d = await this.server.app.GetItemEntryByStructureClassNameAsync(hits[i].classname);
+                        var d = this.server.GetEntryItemByStructureClassName(hits[i].classname);
                         var name = hits[i].classname;
                         if (d != null) {
                             name = d.name;

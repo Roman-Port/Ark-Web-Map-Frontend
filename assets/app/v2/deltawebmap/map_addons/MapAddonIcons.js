@@ -49,17 +49,13 @@ class MapAddonIcons extends TabMapAddon {
             //Check if we have a pin for this
             var key = adds[i].dino_id;
             var pin = this.pins[key];
-            if (pin == null) {
-                //Add
-                this.AddPin(adds[i]);
-            } else {
-                //Update pos
-                var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, adds[i].location.x, adds[i].location.y);
-                pin.marker.setLatLng(pos);
-
-                //Finish updating
-                pin.marker.x_last_data = adds[i];
+            if (pin != null) {
+                //Remove
+                this.RemovePin("", adds[i].dino_id);
             }
+
+            //Add
+            this.AddPin(adds[i]);
         }
     }
 
@@ -126,10 +122,10 @@ class MapAddonIcons extends TabMapAddon {
         marker.style.backgroundImage = "url(" + species.icon.image_thumb_url + ")";
 
         //Add color tag to content, if any
-        if (data.tribe_prefs.tag_color != null) {
-            DeltaTools.CreateDom("div", "map_icon_tag", content).style.backgroundColor = data.tag_color;
-        } else {
-            DeltaTools.CreateDom("div", "map_icon_tag", content).style.display = "none";
+        var colorTag = null;
+        if (data.tribe_prefs.color_tag != null) {
+            colorTag = DeltaTools.CreateDom("div", "map_icon_tag", content);
+            colorTag.style.backgroundColor = data.tribe_prefs.color_tag;
         }
 
         //Create icon
@@ -146,6 +142,8 @@ class MapAddonIcons extends TabMapAddon {
             x_delta_data: data
         });
         marker.x_last_data = data;
+        marker._content = content;
+        marker._colorTag = colorTag;
 
         //Add to map
         var icon_data = this.markers.addLayer(marker);
@@ -180,7 +178,7 @@ class MapAddonIcons extends TabMapAddon {
     /* Accepts DATA in THIS.PINS */
         var data = this.pins[id];
         if (data != null) {
-            data.icon.remove();
+            data.marker.remove();
             delete this.pins[id];
         }
     }

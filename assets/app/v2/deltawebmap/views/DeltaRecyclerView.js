@@ -2,384 +2,229 @@
 
 class DeltaRecyclerView {
 
-    constructor(mount, scrollProxy, scrollOffset, rowHeight) {
+    constructor(mount, options) {
+        //Set vars
         this.mount = mount;
-        this.scrollProxy = scrollProxy; //The actual element that scrolls
-        this.scrollOffset = scrollOffset; //The offset to apply to scrolling from the proxy
-        this.rowHeight = rowHeight;
-        this.fCreateRow = null; //Creates an empty DOM node
-        this.fRenderRow = null; //Renders data to DOM
-        this.fSortFunction = null; //Sorts a,b
-        this.fGetUniqueKey = null; //Given data, returns a unique ID for it
-        this.fSearch = (a) => {
-            return true;
-        };
-        this.nodes = []; //The DOM nodes to be recycled
-        this.usedIndexes = []; //Indexes where there is already a drawn row
-        this.data = []; //The data that will be rendered
-        this.dataMap = []; //Maps indexes to the data. Used for searching
-        this.lastScroll = 0;
+        this.rowHeight = options.rowHeight;
+        this.createView = options.createView; //()
+        this.setViewContent = options.setViewContent; //(row, data)
+        this.getDataPrimaryKey = options.getDataPrimaryKey; //(data)
+        this.extraContainerClass = options.extraContainerClass; //not required
+        this.onClickElementEvent = options.onClickElementEvent; //not required; (data, row)
+        this.doSort = options.doSort;
+        this.doFilter = options.doFilter;
+        this.dataset = [];
+        this.filteredDataset = [];
+        this.lastHeight = 0;
 
-        this.events = [];
+        //Make sure required options are set
+        if (this.rowHeight == null || this.createView == null || this.setViewContent == null || this.getDataPrimaryKey == null || this.doSort == null || this.doFilter == null) {
+            throw "Required options are missing.";
+        }
 
-        this.addCollateTimeout = null;
-        this.addCollateQueue = [];
-        this.removeCollateTimeout = null;
-        this.removeCollateQueue = [];
+        //Create views
+        this.container = DeltaTools.CreateDom("div", this.extraContainerClass, this.mount);
+        this.container.style.height = "100%";
+        this.container.style.overflowY = "scroll";
+        this.content = DeltaTools.CreateDom("div", null, this.container);
+        this.content.style.position = "relative";
 
-        this.OnPostDatasetUpdated = new DeltaBasicEventDispatcher();
+        //Create
+        this.CreateRows();
+        this.OnDatasetUpdated();
 
-        this.scrollProxy.addEventListener("scroll", () => this._OnScroll());
+        //Add events
+        this.container.addEventListener("scroll", () => this.OnScroll());
+    }
 
-        this._OnDatasetUpdated();
+    //Forces a refresh of all entries
+    ReloadAll() {
+        //Sort
+        this.SortDataset();
 
-        /*window.requestAnimationFrame(() => {
-            this._AddTemplateDOMs();
-        });*/
-        window.addEventListener("resize", () => {
-            this._AddTemplateDOMs();
+        //Refresh
+        this.OnDatasetUpdated();
+    }
+
+    //Adds entries and updates
+    AddEntries(entries) {
+        //Add each
+        for (var i = 0; i < entries.length; i += 1) {
+            this.UpsertDatasetItem(entries[i]);
+        }
+
+        //Sort
+        this.SortDataset();
+
+        //Update
+        this.OnDatasetUpdated();
+    }
+
+    //Called when we update the dataset
+    OnDatasetUpdated() {
+        //Set height
+        this.content.style.height = (this.GetDatasetLength() * this.rowHeight).toString() + "px";
+
+        //Update
+        this.OnScroll();
+    }
+
+    //Called when the area is scrolled
+    OnScroll() {
+        //Create rows in case something got updated
+        this.CreateRows();
+
+        //Get elements
+        var topElement = Math.floor(this.container.scrollTop / this.rowHeight);
+        var bottomElement = Math.ceil((this.container.scrollTop + this.container.clientHeight) / this.rowHeight);
+
+        //Update
+        for (var i = topElement; i < bottomElement; i += 1) {
+            this.UpdateRow(i, topElement, bottomElement);
+        }
+    }
+
+    //Resorts the database
+    SortDataset() {
+        //Sort
+        this.dataset.sort((a, b) => {
+            return this.doSort(a, b);
         });
+
+        //Refilter
+        this.filteredDataset = [];
+        for (var i = 0; i < this.dataset.length; i += 1) {
+            if (this.doFilter(this.dataset[i])) {
+                this.filteredDataset.push(this.dataset[i]);
+            }
+        }
     }
 
-    AddEventListener(type, callback) {
-        this.events.push({
-            "type": type,
-            "callback": callback
-        });
+    //Returns the length of the dataset
+    GetDatasetLength() {
+        return this.filteredDataset.length;
     }
 
-    AddFixedElement(d) {
-        this.mount.appendChild(d);
+    //Returns the item by the index
+    GetDatasetItem(index) {
+        return this.filteredDataset[index];
     }
 
-    SetCreateRowFunction(f) {
-        this.fCreateRow = f;
-        /* f() RETURNS row DOM */
+    //Adds an item to the dataset if it's new, else updates an existing one. Does NOT fire events
+    UpsertDatasetItem(item) {
+        //Get key
+        var key = this.getDataPrimaryKey(item);
+
+        //Set
+        item.__recyclerKey = key;
+        item.__recyclerVersion = Math.round(Math.random() * 10000);
+
+        //Search to see if this already exists
+        for (var i = 0; i < this.dataset.length; i += 1) {
+            if (this.dataset[i].__recyclerKey == key) {
+                this.dataset[i] = item;
+                return;
+            }
+        }
+
+        //Add
+        this.dataset.push(item);
     }
 
-    SetRenderRowFunction(f) {
-        this.fRenderRow = f;
-        /* f(node, data) */
+    //Updates a row. The index is the index from the top of the view
+    UpdateRow(index, topElementIndex, bottomElementIndex) {
+        //Find an unused row to use
+        var row = null;
+
+        //Look to see if we already have an element at the correct location
+        for (var i = 0; i < this.content.children.length; i += 1) {
+            if (this.content.children[i]._recyclerIndex == index) {
+                row = this.content.children[i];
+                break;
+            }
+        }
+
+        //We'll need to get an unused row
+        if (row == null) {
+            row = this.FindUnusedRow(topElementIndex, bottomElementIndex);
+        }
+
+        //Check if we somehow still haven't found a row to use
+        if (row == null) {
+            throw "Could not find a row to use!";
+        }
+
+        //Update internal data
+        row.style.top = (index * this.rowHeight).toString() + "px";
+        row._recyclerIndex = index;
+
+        //Update if this is valid
+        if (index < this.GetDatasetLength()) {
+            //Valid
+            row.style.display = null;
+
+            //Get data
+            var data = this.GetDatasetItem(index);
+
+            //Check if the data is the same
+            var update = true;
+            if (data == row._recyclerData) {
+                //This is the same data. However, check if it has been modified since
+                //When it's modified this version is changed
+                update = row._recyclerVersion != data.__recyclerVersion;
+            }
+            if (update) {
+                row._recyclerData = data;
+                this.setViewContent(row, data);
+                row._recyclerVersion = data.__recyclerVersion;
+            }
+        } else {
+            //Invalid
+            row.style.display = "none";
+        }
     }
 
-    SetSortFunction(f) {
-        this.fSortFunction = f;
-        this._OnDatasetUpdated();
-        /* f(a, b) */
-    }
-
-    SetGetUniqueKeyFunction(f) {
-        this.fGetUniqueKey = f;
-        /* f(a) */
-    }
-
-    _GetCurrentScroll() {
-        return this.scrollProxy.scrollTop - this.scrollOffset;
-    }
-
-    _GetContainerHeight() {
-        return this.scrollProxy.offsetHeight;
-    }
-
-    _ScrollToTop() {
-        this.scrollProxy.scrollTop = 0;
-    }
-
-    _GetRowOffsetPixels(index) {
-        return (index * this.rowHeight) + this.scrollOffset;
-    }
-
-    _GetTotalUnsearchedDataLength() {
-        return this.data.length;
-    }
-
-    _GetDataLength() {
-        return this.dataMap.length;
-    }
-    
-    _GetDataElement(i) {
-        return this.data[this.dataMap[i]];
-    }
-
-    _SortDataElementIndexes(i1, i2) {
-        return this.fSortFunction(this._GetDataElement(i1), this._GetDataElement(i2));
-    }
-
-    _SortElements(a, b) {
-        return this.fSortFunction(a, b);
-    }
-
-    _GetDataKey(a) {
-        return this.fGetUniqueKey(a);
-    }
-
-    _GetDataIndexByKey(key) {
-        //Searches for an item by it's ID and returns it's index
-        for (var i = 0; i < this.data.length; i += 1) {
-            if (this._GetDataKey(this.data[i]) == key) {
-                return i;
+    //Returns a row that we can use freely
+    FindUnusedRow(topElementIndex, bottomElementIndex) {
+        //Loop through rows and find one outside of this range
+        for (var i = 0; i < this.content.children.length; i += 1) {
+            if (this.content.children[i]._recyclerIndex > bottomElementIndex || this.content.children[i]._recyclerIndex < topElementIndex) {
+                return this.content.children[i];
             }
         }
         return null;
     }
 
-    _OnDatasetUpdated() {
-        //Sort elements
-        if (this.fSortFunction != null) {
-            this.data.sort((a, b) => {
-                return this._SortElements(a, b);
-            });
-        }
-
-        //Remap elements
-        this._Remap();
-
-        //Make sure the height of the DOM matches
-        this.mount.style.height = ((this._GetDataLength() * this.rowHeight) + this.scrollOffset).toString() + "px";
-
-        //Update all
-        this.RefreshAllItemsInView();
-
-        //Call events
-        this.OnPostDatasetUpdated.Fire(null);
+    //Returns the number of rows needed in view
+    GetRowsInViewCount() {
+        return Math.ceil(this.container.clientHeight / this.rowHeight) + 2;
     }
 
-    _CallEvent(type, evt) {
-        var target = evt.currentTarget;
-        var data = this.data[target._rindex];
-        for (var i = 0; i < this.events.length; i += 1) {
-            var e = this.events[i];
-            if (e.type == type) {
-                e.callback(data, evt, target);
-            }
-        }
-    }
+    //Creates all of the required rows, but does not set their content
+    CreateRows() {
+        //Determine the number of rows required
+        var required = this.GetRowsInViewCount();
 
-    _CreateTemplateDOMs() {
-        this._AddTemplateDOMs();
-    }
+        //Create rows
+        for (var i = this.content.children.length; i < required; i += 1) {
+            //Make
+            var d = this.createView();
 
-    _AddTemplateDOMs() {
-        //Get number of DOMs needed
-        var needed = Math.max((Math.ceil((this._GetContainerHeight()) / this.rowHeight) + 20) - this.nodes.length, 0);
-
-        //Generate and position these many
-        for (var i = 0; i < needed; i += 1) {
-            var d = this.fCreateRow();
-            d.style.position = "absolute";
-
+            //Set data
+            d._recyclerIndex = i;
+            d.style.top = (i * this.rowHeight).toString() + "px";
             d.style.display = "none";
-            d._rindex = i;
-            d._startindex = i;
 
-            d.addEventListener("click", (evt) => {
-                this._CallEvent("click", evt);
-            });
-
-            this.mount.appendChild(d);
-            this.nodes.push(d);
-            this._RenderRow(d, i);
-        }
-    }
-
-    _RenderRow(node, index) {
-        //Move row
-        node.style.top = this._GetRowOffsetPixels(index) + "px";
-        node._rindex = index;
-
-        //Check if index is in bounds
-        if (index < 0 || index >= this._GetDataLength()) {
-            node.style.display = "none";
-            return;
-        } else {
-            node.style.display = "";
-            this.fRenderRow(node, this._GetDataElement(index));
-        }
-    }
-
-    _Remap() {
-        //Remaps the data according to the search function
-        this.dataMap = [];
-        for (var i = 0; i < this.data.length; i += 1) {
-            if (this.fSearch(this.data[i])) {
-                this.dataMap.push(i);
+            //Add event
+            if (this.onClickElementEvent != null) {
+                d.addEventListener("click", (evt) => {
+                    this.onClickElementEvent(evt.currentTarget._recyclerData, evt.currentTarget);
+                });
             }
+
+            //Add
+            this.content.appendChild(d);
         }
     }
 
-    SetData(d) {
-        this.data = d;
-        this._OnDatasetUpdated();
-    }
-
-    _OnScroll() {
-        //Get the index of the topmost element
-        var top = this._GetTopElementIndex();
-        var bottom = this._GetBottomElementIndex();
-        var count = bottom - top;
-
-        //Find elements that have not been moved to a location on-screen. Start off by finding what we need to update
-        var elements = {};
-        for (var i = 0; i < this.nodes.length; i += 1) {
-            elements[this.nodes[i]._rindex - top] = this.nodes[i];
-        }
-        for (var i = 0; i < count; i += 1) {
-            if (elements[i] == null || elements[i] == undefined) {
-                //Move an element to here
-                var node = this._GetNextElementOutOfBounds(top, bottom);
-                this._RenderRow(node, i + top);
-            }
-        }
-    }
-
-    _GetNextElementOutOfBounds(top, bottom) {
-        //Gets the first element we can find that is out of bounds of the index
-        for (var i = 0; i < this.nodes.length; i += 1) {
-            if (this.nodes[i]._rindex < bottom && this.nodes[i]._rindex > top) {
-                continue;
-            }
-            return this.nodes[i];
-        }
-    }
-
-    RefreshAllItemsInView() {
-        //Loop through these and update
-        for (var i = 0; i < this.nodes.length; i += 1) {
-            this._RenderRow(this.nodes[i], this.nodes[i]._rindex);
-        }
-    }
-
-    _GetTopElementIndex() {
-        return Math.floor(this._GetCurrentScroll() / this.rowHeight) - 1; //Smaller, top end
-    }
-
-    _GetBottomElementIndex() {
-        return Math.ceil((this._GetCurrentScroll() + this._GetContainerHeight()) / this.rowHeight); //Larger, bottom end
-    }
-
-    _TryQuickModifyElementData(data) {
-        //ATTEMPTS to quickly modify the element data. Returns true if it was OK, returns false if a slow refresh is needed
-        var index = this._GetDataIndexByKey(this._GetDataKey(data));
-        if (index == null) {
-            //We don't have this, it must be added!
-            return false;
-        }
-
-        //Check to see if the sorting has changed
-        if (index > 0) {
-            if (this._SortElements(this._GetDataElement(index - 1), data) > 0) {
-                return false; //Sort would have been changed!
-            }
-        }
-        if (index < this._GetDataLength() - 1) {
-            if (this._SortElements(data, this._GetDataElement(index + 1)) > 0) {
-                return false; //Sort would have been changed!
-            }
-        }
-
-        //Update data
-        this.data[index] = data;
-
-        //Update onscreen
-        for (var i = 0; i < this.nodes.length; i += 1) {
-            if (this.nodes[i]._rindex == index) {
-                this._RenderRow(this.nodes[i], this.nodes[i]._rindex);
-            }
-        }
-
-        return true;
-    }
-
-    Reset() {
-        //Clears all items
-        this.data = [];
-
-        //Refresh
-        this._OnDatasetUpdated();
-    }
-
-    _PushAdds(updates) {
-        //First, try to update all of these using a quick modify
-        /*for (var i = 0; i < updates.length; i += 1) {
-            if (this._TryQuickModifyElementData(updates[i])) {
-                //Quick update OK!
-                i--;
-                updates.splice(i, 1);
-            }
-        }
-
-        //Check if quick updates were enough
-        if (updates.length == 0) {
-            return 0;
-        }*/
-
-        //Add or modify all of these
-        for (var i = 0; i < updates.length; i += 1) {
-            var index = this._GetDataIndexByKey(this._GetDataKey(updates[i]));
-            if (index != null) {
-                this.data[index] = updates[i];
-            } else {
-                this.data.push(updates[i]);
-            }
-        }
-
-        //Trigger updates
-        this._OnDatasetUpdated();
-        return 1;
-    }
-
-    _PushRemoves(updates) {
-        //Removes all of the elements specified
-        for (var i = 0; i < updates.length; i += 1) {
-            var index = this._GetDataIndexByKey(updates[i]);
-            if (index != null) {
-                this.data.splice(index, 1);
-            }
-        }
-
-        //Trigger updates
-        this._OnDatasetUpdated();
-    }
-
-    AddItem(item) {
-        this.addCollateQueue.push(item);
-        if (this.addCollateTimeout == null) {
-            this.addCollateTimeout = window.setTimeout(() => {
-                this.addCollateTimeout = null;
-                this._PushAdds(this.addCollateQueue);
-                this.addCollateQueue = [];
-            }, 500);
-        }
-    }
-
-    RemoveItem(item) {
-        this.removeCollateQueue.push(item);
-        if (this.removeCollateTimeout == null) {
-            this.removeCollateTimeout = window.setTimeout(() => {
-                this.removeCollateTimeout = null;
-                this._PushRemoves(this.removeCollateQueue);
-                this.removeCollateQueue = [];
-            }, 500);
-        }
-    }
-
-    BulkAddItems(items) {
-        this._PushAdds(items);
-    }
-
-    BulkRemoveItems(items) {
-        this._PushRemoves(items);
-    }
-
-    SetNewSearchQuery(f) {
-        this.fSearch = f;
-        this.RefreshSearch();
-    }
-
-    RefreshSearch() {
-        this._Remap();
-        this.RefreshAllItemsInView();
-        this.mount.style.height = ((this._GetDataLength() * this.rowHeight) + this.scrollOffset).toString() + "px";
-        this._ScrollToTop();
-    }
 }

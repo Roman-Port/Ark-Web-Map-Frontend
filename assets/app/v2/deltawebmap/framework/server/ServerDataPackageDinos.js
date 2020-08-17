@@ -4,6 +4,13 @@ class ServerDataPackageDinos extends ServerDataPackage {
 
     constructor(server) {
         super("Dinos", server, 0);
+        this.BLACKLISTED_CLASSNAMES = [
+            "Raft_BP",
+            "MotorRaft_BP",
+            "ExtendedRaft_BP", //modded
+            "BigRaft_BP", //modded
+            "Barge_BP", //modded
+        ]; //most of these are rafts
     }
 
     async FetchCount() {
@@ -30,7 +37,7 @@ class ServerDataPackageDinos extends ServerDataPackage {
     }
 
     EntityMatchesFilter(e) {
-        return this.server.filter.CheckEntityDino(e);
+        return this.server.filter.CheckEntityDino(e) && !this.BLACKLISTED_CLASSNAMES.includes(e.classname);
     }
 
     GetContentUniqueKey(e) {

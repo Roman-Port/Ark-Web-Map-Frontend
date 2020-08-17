@@ -40,55 +40,6 @@ statics.COLOR_TAGS = [
     "#f92dc4"
 ];
 
-//Tabs on the side of each server
-statics.SERVER_NAV_OPTIONS = [
-    {
-        "name":"Overview",
-        "tab_element":document.getElementById('tab_map'),
-        "open_function":function() {
-            if(map.map != null) {
-                map.map._sizeChanged = true; //Fix for map resizing bug
-            }
-        },
-        "init": function () {
-
-        },
-        "deinit": function () {
-
-        }
-    },
-    {
-        "name":"Dinos",
-        "tab_element":document.getElementById('tab_dinos'),
-        "open_function":function() {
-            //Download the data if needed
-            if (!dino_stats.loading && dino_stats.dinos.length == 0) {
-                dino_stats.load(ark.getEndpoint("tribes_dino_stats"), dino_stats.container);
-            }
-        },
-        "init": function () {
-            dino_stats.init();
-        },
-        "deinit": function () {
-            dino_stats.loading = false;
-            dino_stats.dinos = [];
-        }
-    },
-    {
-        "name":"Nursery",
-        "tab_element":document.getElementById('tab_nursery'),
-        "open_function":function() {
-
-        },
-        "init": function () {
-
-        },
-        "deinit": function () {
-
-        }
-    },
-];
-
 statics.CLOSE_REASONS = {
     32: "The ARK map this server is using is currently unsupported.",
     33: "This server is temporarily unavailable. It will return soon.",
@@ -189,54 +140,5 @@ statics.ERROR_BANNER_PACKS = {
         "id": 0,
         "priority": 10,
         "actions":[]
-    }
-}
-
-statics.MAP_ICON_RENDER_PROFILE = {
-    "dinos": function (data, icon, all) {
-        
-    },
-    "players": function (data, icon, all) {
-        icon.style.backgroundSize = "cover";
-    }
-}
-
-statics.MAP_ICON_INTERACT_EVENTS = {
-    "dinos": {
-        "click": function (data, marker) {
-            var pos = marker.getBoundingClientRect();
-            var x = pos.left-14;
-            var y = pos.top-11;
-            DeltaPopoutModal.ShowDinoModal(data.extras._map.map.server.app, data._original, { "x": x, "y": y }, data.extras._map.map.server);
-        }
-    },
-    "players": {
-
-    }
-}
-
-statics.MAP_ICON_ADAPTERS = {
-    "dinos": function (data, map) {
-        var s = map.server.GetEntrySpecies(data.classname);
-        var name = data.tamed_name;
-        if (name == null || name.length == 0) {
-            name = s.screen_name;
-        }
-        return {
-            "location": data.location,
-            "img": s.icon.image_thumb_url,
-            "type": "dinos",
-            "id": data.dino_id,
-            "outline_color": "#000000",
-            "tag_color": null,
-            "dialog": {
-                "title": name,
-                "subtitle": s.screen_name + " - Lvl " + data.level
-            },
-            "extras": {
-                
-            },
-            "_original": data
-        };
     }
 }

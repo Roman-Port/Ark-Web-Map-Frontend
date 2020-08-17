@@ -33,8 +33,8 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "Name",
                 "render": function (e, data, sortIndex, species) {
-                    e.innerText = data./*dino.*/tamed_name;
-                    if (data./*dino.*/tamed_name.length == 0) {
+                    e.innerText = data.tamed_name;
+                    if (data.tamed_name.length == 0) {
                         e.innerText = species.screen_name;
                     }
                 },
@@ -43,10 +43,10 @@ class TabDinos extends DeltaServerTab {
                 },
                 "sort_modes": [
                     function (a, b) {
-                        return a./*dino.*/tamed_name.localeCompare(b./*dino.*/tamed_name);
+                        return a.tamed_name.localeCompare(b.tamed_name);
                     },
                     function (a, b) {
-                        return b./*dino.*/tamed_name.localeCompare(a./*dino.*/tamed_name);
+                        return b.tamed_name.localeCompare(a.tamed_name);
                     }
                 ],
                 "size_min": 90,
@@ -65,10 +65,10 @@ class TabDinos extends DeltaServerTab {
                 },
                 "sort_modes": [
                     function (a, b) {
-                        return a./*dino.*/classname.localeCompare(b./*dino.*/classname);
+                        return a.classname.localeCompare(b.classname);
                     },
                     function (a, b) {
-                        return b./*dino.*/classname.localeCompare(a./*dino.*/classname);
+                        return b.classname.localeCompare(a.classname);
                     }
                 ],
                 "size_min": 90,
@@ -105,12 +105,12 @@ class TabDinos extends DeltaServerTab {
                 "name": "Sex",
                 "render": function (e, data, sortIndex, species) {
                     var s = e.x_sex;
-                    if (data./*dino.*/is_female) {
-                        s.classList.add("v2tab_dinos_row_item_sex_female");
+                    if (data.is_female) {
+                        s.style.backgroundColor = "#d45bd7";
                         s.innerHTML = "&#9792;";
                     } else {
                         s.innerHTML = "&#9794;";
-                        s.classList.remove("v2tab_dinos_row_item_sex_female");
+                        s.style.backgroundColor = "#4793ff";
                     }
                 },
                 "create": function (e) {
@@ -119,19 +119,19 @@ class TabDinos extends DeltaServerTab {
                 },
                 "sort_modes": [
                     function (a, b) {
-                        if (a./*dino.*/is_female && !b./*dino.*/is_female) {
+                        if (a.is_female && !b.is_female) {
                             return 1;
                         }
-                        if (b./*dino.*/is_female && !a./*dino.*/is_female) {
+                        if (b.is_female && !a.is_female) {
                             return -1;
                         }
                         return 0;
                     },
                     function (a, b) {
-                        if (a./*dino.*/is_female && !b./*dino.*/is_female) {
+                        if (a.is_female && !b.is_female) {
                             return -1;
                         }
-                        if (b./*dino.*/is_female && !a./*dino.*/is_female) {
+                        if (b.is_female && !a.is_female) {
                             return 1;
                         }
                         return 0;
@@ -150,7 +150,7 @@ class TabDinos extends DeltaServerTab {
                     s.style.backgroundColor = data.tribe_prefs.color_tag;
                 },
                 "create": function (e) {
-                    e.x_tag = DeltaTools.CreateDom("div", "v2tab_dinos_row_item_sex v2tab_dinos_row_item_sex_unknown", e);
+                    e.x_tag = DeltaTools.CreateDom("div", "v2tab_dinos_row_item_sex", e);
                 },
                 "sort_modes": [],
                 "size_min": 35,
@@ -162,26 +162,26 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "Lvl.",
                 "render": function (e, data, sortIndex, species) {
-                    e.innerText = data./*dino.*/level;
+                    e.innerText = data.level;
                 },
                 "create": function (e) {
                     
                 },
                 "sort_modes": [
                     function (a, b) {
-                        if (a./*dino.*/level > b./*dino.*/level) {
+                        if (a.level > b.level) {
                             return 1;
                         }
-                        if (b./*dino.*/level > a./*dino.*/level) {
+                        if (b.level > a.level) {
                             return -1;
                         }
                         return 0;
                     },
                     function (a, b) {
-                        if (a./*dino.*/level > b./*dino.*/level) {
+                        if (a.level > b.level) {
                             return -1;
                         }
-                        if (b./*dino.*/level > a./*dino.*/level) {
+                        if (b.level > a.level) {
                             return 1;
                         }
                         return 0;
@@ -196,26 +196,26 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "B. Lvl.",
                 "render": function (e, data, sortIndex, species) {
-                    e.innerText = data./*dino.*/base_level;
+                    e.innerText = data.base_level;
                 },
                 "create": function (e) {
 
                 },
                 "sort_modes": [
                     function (a, b) {
-                        if (a./*dino.*/base_level > b./*dino.*/base_level) {
+                        if (a.base_level > b.base_level) {
                             return 1;
                         }
-                        if (b./*dino.*/base_level > a./*dino.*/base_level) {
+                        if (b.base_level > a.base_level) {
                             return -1;
                         }
                         return 0;
                     },
                     function (a, b) {
-                        if (a./*dino.*/base_level > b./*dino.*/base_level) {
+                        if (a.base_level > b.base_level) {
                             return -1;
                         }
-                        if (b./*dino.*/base_level > a./*dino.*/base_level) {
+                        if (b.base_level > a.base_level) {
                             return 1;
                         }
                         return 0;
@@ -230,11 +230,11 @@ class TabDinos extends DeltaServerTab {
             {
                 "name": "Distance",
                 "render": (e, data, sortIndex, species) => {
-                    if (data./*dino.*/is_cryo) {
+                    if (data.is_cryo) {
                         e.innerText = "--";
                         return;
                     }
-                    var p = this.server.GetDistanceFromMe(data./*dino.*/location.x, data./*dino.*/location.y);
+                    var p = this.server.GetDistanceFromMe(data.location.x, data.location.y);
                     if (p == null) {
                         e.innerText = "--";
                     } else {
@@ -247,12 +247,12 @@ class TabDinos extends DeltaServerTab {
                 "sort_modes": [
                     (a, b) => {
                         var aa = null
-                        if (!a./*dino.*/is_cryo) {
-                            aa = this.server.GetDistanceFromMe(a./*dino.*/location.x, a./*dino.*/location.y);
+                        if (!a.is_cryo) {
+                            aa = this.server.GetDistanceFromMe(a.location.x, a.location.y);
                         }
                         var bb = null;
-                        if (!b./*dino.*/is_cryo) {
-                            bb = this.server.GetDistanceFromMe(b./*dino.*/location.x, b./*dino.*/location.y);
+                        if (!b.is_cryo) {
+                            bb = this.server.GetDistanceFromMe(b.location.x, b.location.y);
                         }
                         if (aa == null && bb == null) { return 0; }
                         if (aa != null && bb == null) { return -1; }
@@ -261,12 +261,12 @@ class TabDinos extends DeltaServerTab {
                     },
                     (a, b) => {
                         var aa = null
-                        if (!a./*dino.*/is_cryo) {
-                            aa = this.server.GetDistanceFromMe(a./*dino.*/location.x, a./*dino.*/location.y);
+                        if (!a.is_cryo) {
+                            aa = this.server.GetDistanceFromMe(a.location.x, a.location.y);
                         }
                         var bb = null;
-                        if (!b./*dino.*/is_cryo) {
-                            bb = this.server.GetDistanceFromMe(b./*dino.*/location.x, b./*dino.*/location.y);
+                        if (!b.is_cryo) {
+                            bb = this.server.GetDistanceFromMe(b.location.x, b.location.y);
                         }
                         if (aa == null && bb == null) { return 0; }
                         if (aa != null && bb == null) { return -1; }
@@ -280,13 +280,13 @@ class TabDinos extends DeltaServerTab {
                 "has_handle": true,
                 "array_size": 1
             },
-            {
+            /*{
                 "name": "Colors",
                 "render": function (e, data, sortIndex, species, width) {
                     for (var i = 0; i < 6; i += 1) {
                         var c = e.children[i];
-                        if (data./*dino.*/colors.length > i) {
-                            c.style.backgroundColor = "#" + data./*dino.*/colors[i];
+                        if (data.colors.length > i) {
+                            c.style.backgroundColor = "#" + data.colors[i];
                             c.style.display = "";
                         } else {
                             c.style.display = "none";
@@ -305,7 +305,7 @@ class TabDinos extends DeltaServerTab {
                 "size_max": 90,
                 "has_handle": true,
                 "array_size": 1
-            },
+            },*/
             {
                 "name": "Status",
                 "render": function (e, data, sortIndex, species, width) {
@@ -320,10 +320,10 @@ class TabDinos extends DeltaServerTab {
                 },
                 "sort_modes": [
                     function (a, b) {
-                        return a./*dino.*/status.localeCompare(b.status);
+                        return a.status.localeCompare(b.status);
                     },
                     function (a, b) {
-                        return b./*dino.*/status.localeCompare(a.status);
+                        return b.status.localeCompare(a.status);
                     }
                 ],
                 "size_min": 110,
@@ -340,8 +340,8 @@ class TabDinos extends DeltaServerTab {
                 },
                 "render": function (e, data, sortIndex, species, width, arrayIndex) {
                     var index = TabDinos.ConvertColumnStatIndexToArkIndex(arrayIndex);//statics.ARK_DINO_STAT.Health;
-                    e.x_stat_a.innerText = data./*dino.*/base_levelups_applied[index];
-                    e.x_stat_b.innerText = data./*dino.*/tamed_levelups_applied[index];
+                    e.x_stat_a.innerText = data.base_levelups_applied[index];
+                    e.x_stat_b.innerText = data.tamed_levelups_applied[index];
                 },
                 "create": function (e) {
                     e.x_stat_a = DeltaTools.CreateDom("div", "v2tab_dinos_row_item_stat_box", e);
@@ -405,83 +405,70 @@ class TabDinos extends DeltaServerTab {
         /* Called when this tab (and thus, the server) is initially created */
         super.OnInit(mountpoint);
         this.LayoutDom(mountpoint);
-
-        this.server.SubscribeRPCEvent("tab.dinos", 1, (m) => this.OnDinoFullRefreshed(m));
-        this.server.SubscribeEvent("tab.dinos", R.server_events.EVT_SERVER_MY_LOCATION_UPDATE, (d) => this.RefreshView());
-
-        this.RefreshView();
     }
 
     OnQueryChanged(query) {
-        this._OnSearchChanged(query);
+        this.query = query.toLowerCase();
+        this.recycler.ReloadAll();
     }
 
     LayoutDom(mountpoint) {
         this.mountpoint = mountpoint;
 
-        this.dataContainer = DeltaTools.CreateDom("div", "dino_stats_container", this.mountpoint);
-        this.dataInner = DeltaTools.CreateDom("div", "", this.dataContainer);
-
         this.header = this.CreateHeader();
         mountpoint.appendChild(this.header);
-        this.dataContainer.addEventListener("scroll", () => {
+        /*this.dataContainer.addEventListener("scroll", () => {
             this.header.style.left = (-this.dataContainer.scrollLeft).toString() + "px";
-        });
+        });*/
 
-        this.recycler = new DeltaRecyclerView(this.dataInner, this.dataContainer, 10, 30);
-        this.recycler.SetCreateRowFunction(() => {
-            //Create row
-            var row = DeltaTools.CreateDom("div", "v2tab_dinos_row v2tab_dinos_row_standard");
+        var recyclerOptions = {
+            "rowHeight": 30,
+            "extraContainerClass": "dino_stats_container",
+            "onClickElementEvent": (data, row) => {
+                var pos = row.getBoundingClientRect();
+                var x = pos.left + 10;
+                var y = pos.top + 35;
+                DeltaPopoutModal.ShowDinoModal(this.server.app, data, { "x": x, "y": y }, this.server);
+            },
+            "createView": () => {
+                //Create row
+                var row = DeltaTools.CreateDom("div", "v2tab_dinos_row v2tab_dinos_row_standard");
 
-            //Add each
-            var indexes = [];
-            this.ForEachRowType((info, index, globalIndex) => {
-                var e = DeltaTools.CreateDom("div", "v2tab_dinos_row_item v2tab_dinos_row_item_standard", row);
-                e.style.width = info.size_default.toString() + "px";
-                info.create(e);
-                indexes.push(e);
-            });
+                //Add each
+                var indexes = [];
+                this.ForEachRowType((info, index, globalIndex) => {
+                    var e = DeltaTools.CreateDom("div", "v2tab_dinos_row_item v2tab_dinos_row_item_standard", row);
+                    e.style.width = info.size_default.toString() + "px";
+                    info.create(e);
+                    indexes.push(e);
+                });
 
-            //Set data
-            row._rindexes = indexes;
-            return row;
-        });
-        this.recycler.SetRenderRowFunction((node, data) => {
-            this.ForEachRowType((info, index, globalIndex) => {
-                //Get row node
-                var e = node._rindexes[globalIndex];
+                //Set data
+                row._rindexes = indexes;
+                return row;
+            },
+            "setViewContent": (node, data) => {
                 var species = this.server.GetEntrySpecies(data.classname);
-                info.render(e, data, this.sortMode, species, this.size_default, index);
-            });
-        });
-        this.recycler.SetSortFunction((a, b) => {
-            return b.level - a.level;
-        });
-        this.recycler.SetGetUniqueKeyFunction((a) => {
-            return a.dino_id;
-        });
-        this.recycler.SetNewSearchQuery((a) => {
-            if (this.query == "") { return true; }
-            return a.tamed_name.toLowerCase().includes(this.query) || this.server.GetEntrySpecies(a.classname).screen_name.toLowerCase().includes(this.query);
-        });
-        this.recycler.OnPostDatasetUpdated.Subscribe("deltawebmap.tab.dinos.counts", () => {
-            this._RefreshCounts();
-        });
+                this.ForEachRowType((info, index, globalIndex) => {
+                    //Get row node
+                    var e = node._rindexes[globalIndex];
+                    info.render(e, data, this.sortMode, species, this.size_default, index);
+                });
+            },
+            "getDataPrimaryKey": (data) => {
+                return data.dino_id;
+            },
+            "doSort": (a, b) => {
+                return b.level - a.level;
+            },
+            "doFilter": (a) => {
+                return a.tamed_name.toLowerCase().includes(this.query) || this.server.GetEntrySpecies(a.classname).screen_name.toLowerCase().includes(this.query);
+            }
+        }
+        this.recycler = new DeltaRecyclerView(this.mountpoint, recyclerOptions);
 
-        this.recycler.AddEventListener("click", (data, originalEvent, originalDom) => {
-            //Show the dino modal
-            var pos = originalDom.getBoundingClientRect();
-            var x = pos.left + 10;
-            var y = pos.top + 35;
-            DeltaPopoutModal.ShowDinoModal(this.server.app, data, { "x": x, "y": y }, this.server);
-        });
-    }
-
-    _CreateCount(label) {
-        var c = DeltaTools.CreateDom("div", "v2tab_top_count", this.topCounts);
-        var n = DeltaTools.CreateDom("div", "v2tab_top_count_number", c, "0");
-        DeltaTools.CreateDom("div", "v2tab_top_count_label", c, label);
-        return n;
+        //Subscribe
+        this.server.dinos.SubscribeRecycler("deltawebmap.tabs.dinos.recycler", this.recycler);
     }
 
     CreateHeader() {
@@ -545,90 +532,21 @@ class TabDinos extends DeltaServerTab {
         }
     }
 
-    ShowDefaultLoader() {
-        this.dataContainer.innerHTML = "";
-        var spinnerContainer = DeltaTools.CreateDom("div", "dinos_loader_holder", this.dataContainer);
-        DeltaTools.CreateDom("div", "loading_spinner", spinnerContainer);
-        this.loadInfo = DeltaTools.CreateDom("div", "dinos_loader_subtext", this.dataContainer, "");
-    }
-
     async OnFirstOpen() {
         /* Called when this tab is opened for the first time */
-
-        window.requestAnimationFrame(() => {
-            //Set up recycler
-            this.recycler._CreateTemplateDOMs();
-
-            //Set dataset
-            this.server.dinos.SubscribeRecycler("deltawebmap.tabs.dinos.recycler", this.recycler);
-        });
     }
 
     async OnOpen() {
         /* Called when this tab is switched to */
-
-        //Check if we need to load dinos
-        /*if (this.dinoLoadTask == null) {
-            this.dinoLoadTask = this.LoadDinos();
-        }*/
+        this.recycler.OnScroll(); //Fixes a bug where sizes aren't calculated when this tab isn't shown
     }
 
     async OnClose() {
         /* Called when this tab is switched away from */
-        
     }
 
     async OnDeinit() {
         /* Called when this tab (and thus, the server) is closed */
-        this.server.UnsubscribeRPCEvent("tab.dinos");
-        this.server.UnsubscribeEvent("tab.dinos");
-    }
-
-    async LoadDinos() {
-        /* Load dinos until we reach a blank page */
-        this.dinosLoaded = false;
-        var url = this.server.GetTribesEndpointUrl("/dino_stats?limit=10000");
-        var loaded = 0;
-        var queuedSpecies = [];
-        while (url != null) {
-            //Fetch
-            var r = await DeltaTools.WebRequest(url, {}, this.token);
-
-            //Check end behavior
-            if (r.dinos.length == 0) {
-                url = null;
-            } else {
-                url = r.next;
-            }
-
-            //Write
-            for (var i = 0; i < r.dinos.length; i += 1) {
-                this.UpdateOrReplaceDino(r.dinos[i]);
-                loaded++;
-            }
-            var keys = Object.keys(r.dino_entries);
-            for (var i = 0; i < keys.length; i += 1) {
-                this.species[keys[i]] = r.dino_entries[keys[i]];
-            }
-
-            //Update
-            if (this.loadInfo != null) {
-                var percent = Math.round((loaded / r.total) * 100);
-                this.loadInfo.innerText = loaded.toString() + "/" + r.total.toString() + " (" + percent.toString() + "%)";
-            }
-        }
-
-        //Get all species
-        for (var i = 0; i < queuedSpecies.length; i += 1) {
-
-        }
-
-        //Finish
-        this.loaded = true;
-        this.dinosLoaded = true;
-        this.RefreshView();
-        this.recycler.SetData(this.dinos);
-        this._RefreshCounts();
     }
 
     static StaticOnHeaderSortBtnClicked() {
@@ -645,13 +563,6 @@ class TabDinos extends DeltaServerTab {
             t.sortModeIndex = 0;
             t.sortMode = index;
         }
-        t.RefreshView();
-    }
-
-    RefreshView() {
-        this._RefreshCounts();
-        return;
-        
     }
 
     ForEachRowType(run) {
@@ -705,63 +616,6 @@ class TabDinos extends DeltaServerTab {
                 }, "v2tab_dinos_row_standard", "v2tab_dinos_row_item_standard", d.dino_id);
             }
         }
-    }
-
-    OnDinoFullRefreshed(m) {
-        //Add all
-        for (var i = 0; i < m.dinos.length; i += 1) {
-            this.UpdateFullDino(m.dinos[i]);
-        }
-
-        //Refresh
-        this.RefreshView();
-
-        this._RefreshCounts();
-    }
-
-    UpdateFullDino(m) {
-        //Set the updated species
-        this.species[m.species.classname] = m.species;
-
-        //Create replacement data
-        var replacement = {
-            "dino": m.dino,
-            "prefs": m.prefs,
-            "dino_id": m.dino_id
-        };
-
-        //Update
-        this.UpdateOrReplaceDino(replacement);
-
-        this._RefreshCounts();
-    }
-
-    UpdateOrReplaceDino(replacement) {
-        //Find and replace (or add) this dino
-        var exists = false;
-        for (var i = 0; i < this.dinos.length; i += 1) {
-            if (this.dinos[i].dino_id == replacement.dino_id) {
-                exists = true;
-                this.dinos[i] = replacement;
-            }
-        }
-
-        //Add it if needed
-        if (!exists) {
-            this.dinos.push(replacement);
-        }
-
-        this._RefreshCounts();
-    }
-
-    _OnSearchChanged(query) {
-        this.query = query.toLowerCase();
-        this.recycler.RefreshSearch();
-        this._RefreshCounts();
-    }
-
-    _RefreshCounts() {
-        
     }
 
 }

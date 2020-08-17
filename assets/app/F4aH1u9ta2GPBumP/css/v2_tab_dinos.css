@@ -1,13 +1,5 @@
 .dino_stats_container {
-    overflow-y: scroll;
-    overflow-x:auto;
-    position: absolute;
-    top: 40px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding-right: 3px;
-    padding: 0;
+    margin-top:45px;
 }
 
 .dino_stats_container {
@@ -114,20 +106,12 @@
 }
 
 .v2tab_dinos_row_item_sex {
-    background-color: #4793ff;
+    background-color: #555862;
     width: inherit;
     border-radius: 5px;
     height: 20px;
-    margin-right:3px;
-    text-align:center;
-}
-
-.v2tab_dinos_row_item_sex_female {
-    background-color: #d45bd7;
-}
-
-.v2tab_dinos_row_item_sex_unknown {
-    background-color: #555862;
+    margin-right: 3px;
+    text-align: center;
 }
 
 .v2tab_header {

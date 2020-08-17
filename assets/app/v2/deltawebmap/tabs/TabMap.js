@@ -66,8 +66,7 @@ class TabMap extends DeltaServerTab {
         this.mapContainer = DeltaTools.CreateDom("div", "map_part smooth_anim", this.mountpoint);
         var mapCanvas = DeltaTools.CreateDom("div", "map_part_canvas", this.mapContainer);
 
-        this.sidebarContainer = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
-        this.sidebarContent = DeltaTools.CreateDom("div", "dino_sidebar_helper smooth_anim", this.sidebarContainer);
+        this.sidebar = DeltaTools.CreateDom("div", "dino_sidebar smooth_anim dino_sidebar_open", this.mountpoint);
     }
 
     async OnFirstOpen() {

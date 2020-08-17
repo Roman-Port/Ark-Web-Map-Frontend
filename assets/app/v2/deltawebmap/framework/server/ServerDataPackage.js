@@ -111,12 +111,12 @@ class ServerDataPackage {
 
     SubscribeRecycler(tagName, recycle) {
         //Subscribe
-        this.OnContentUpdated.Subscribe(tagName, () => {
-            recycle.SetData(this.filteredContent);
+        this.OnContentAddRemoved.Subscribe(tagName, (d) => {
+            recycle.AddEntries(d.adds);
         });
 
         //Send filtered data now
-        recycle.SetData(this.filteredContent);
+        recycle.AddEntries(this.filteredContent);
     }
 
     GetByFilter(x) {

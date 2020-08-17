@@ -12,7 +12,6 @@ class MapAddonIcons extends TabMapAddon {
 
     BindEvents(container) {
         /* Used when we bind events to the map container */
-        //container.on("moveend", () => this.RefreshPins());
     }
 
     async OnLoad(container) {
@@ -28,9 +27,7 @@ class MapAddonIcons extends TabMapAddon {
         this.map.map.addLayer(this.markers);
 
         //Set up
-        this.markers.on("click", (evt) => this.OnMapMarkerInteractionEvent(evt));
-        this.markers.on("mouseover", (evt) => this.OnMapMarkerInteractionEvent(evt));
-        this.markers.on("scroll", (evt) => this.OnMapMarkerInteractionEvent(evt));
+        this.markers.on("click", (evt) => this.OnMapMarkerClickEvent(evt));
         this.markers.on("mouseover", (evt) => this.OnMapMarkerHover(evt));
 
         //Add DB events
@@ -50,105 +47,71 @@ class MapAddonIcons extends TabMapAddon {
         //Use adds
         for (var i = 0; i < adds.length; i += 1) {
             //Check if we have a pin for this
-            var key = "dinos@" + adds[i].dino_id;
+            var key = adds[i].dino_id;
             var pin = this.pins[key];
-            var cd = statics.MAP_ICON_ADAPTERS["dinos"](adds[i], this.map);
             if (pin == null) {
                 //Add
-                this.AddPin(cd);
+                this.AddPin(adds[i]);
             } else {
                 //Update pos
-                var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, cd.location.x, cd.location.y);
+                var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, adds[i].location.x, adds[i].location.y);
                 pin.marker.setLatLng(pos);
 
                 //Finish updating
-                pin.marker.x_last_data = cd;
+                pin.marker.x_last_data = adds[i];
             }
         }
     }
 
-    OnMapMarkerInteractionEvent(evt) {
+    OnMapMarkerClickEvent(evt) {
         //Get the data of this icon
-        var data = evt.layer.options.x_delta_data;
-        var type = evt.type;
+        var dino = evt.layer.options.x_delta_data;
+        var species = this.map.server.GetEntrySpecies(dino.classname);
         var marker = evt.layer._icon;
 
-        //Check if this has any events that need to be handled
-        var outEvt = statics.MAP_ICON_INTERACT_EVENTS[data.type][type];
-        if (outEvt != null) {
-            outEvt(data, marker);
-            evt.originalEvent.stopPropagation();
-        }
+        //Execute
+        var pos = marker.getBoundingClientRect();
+        var x = pos.left - 14;
+        var y = pos.top - 11;
+        DeltaPopoutModal.ShowDinoModal(this.map.server.app,dino, { "x": x, "y": y }, this.map.server);
+
+        //Stop propigation
+        evt.originalEvent.stopPropagation();
     }
 
     OnMapMarkerHover(evt) {
         /* This is called when we hover over something. We'll check if we need to spawn the dialog */
-        var data = evt.layer.options.x_delta_data;
+        var dino = evt.layer.options.x_delta_data;
+        var species = this.map.server.GetEntrySpecies(dino.classname);
         var marker = evt.layer._icon;
 
         //Check if it exists
-        if (marker.x_delta_dialog == null && data.dialog != null) {
-            marker.x_delta_dialog = this.CreateHoverElement(data.img, data.dialog.title, data.dialog.subtitle, data.type);
-            marker.classList.add("mini_modal_marker");
-            marker.getElementsByClassName("map_icon_base")[0].appendChild(marker.x_delta_dialog);
+        if (marker.x_delta_dialog != null) {
+            marker.x_delta_dialog.remove();
+            marker.x_delta_dialog = null;
         }
+
+        //Get name
+        var name = species.screen_name;
+        if (dino.tamed_name.length > 0) {
+            name = dino.tamed_name;
+        }
+
+        //Create
+        marker.x_delta_dialog = this.CreateHoverElement(species.icon.image_url, name, species.screen_name);
+        marker.classList.add("mini_modal_marker");
+        marker.getElementsByClassName("map_icon_base")[0].appendChild(marker.x_delta_dialog);
     }
 
     async OnUnload(container) {
         
     }
 
-    GetClustersOnScreen() {
-        //Get bounds
-        var bounds = this.map.map.getBounds();
-
-        //Get clusters
-        var c = this.index.getClusters([bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()], this.map.map.getZoom());
-        return c;
-    }
-
-    SubdivideToGroups(datas, gridSize) {
-        //Create array padding
-        var arr = [];
-        for (var i = 0; i < gridSize * gridSize; i += 1) {
-            arr.push([]);
-        }
-
-        //Do some calculations
-        var mapSize = this.map.server.GetMapInfo().captureSize;
-        var halfMapSize = mapSize / 2;
-
-        //Add array items
-        for (var i = 0; i < datas.length; i += 1) {
-            var d = datas[i];
-            var x = ((d.location.x / mapSize) + 0.5) * gridSize;
-            var y = ((d.location.y / mapSize) + 0.5) * gridSize;
-            arr[(Math.floor(y) * gridSize) + Math.floor(x)].push(d);
-        }
-
-        return arr;
-    }
-
-    FindMarkersInAndOutOfBounds(datas, bounds) {
-    /* Returns a list of markers that should be rendered to the screen */
-
-        //Search all icons
-        var inB = [];
-        var outB = [];
-        for (var i = 0; i < datas.length; i += 1) {
-            var d = datas[i];
-            if (d.location.x > bounds[0][0] || d.location.x < bounds[1][0] || d.location.y > bounds[0][1] || d.location.y < bounds[1][1]) {
-                outB.push(d);
-            } else {
-                inB.push(d);
-            }
-        }
-
-        return [inB, outB];
-    }
-
     AddPin(data) {
-    /* Adds a pin using the pin data format */
+        /* Adds a pin using the pin data format */
+
+        //Get dino species
+        var species = this.map.server.GetEntrySpecies(data.classname);
 
         //Get position on the map
         var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, data.location.x, data.location.y);
@@ -160,21 +123,13 @@ class MapAddonIcons extends TabMapAddon {
         var marker = DeltaTools.CreateDom("div", "map_icon_base map_icon_dino", content);
 
         //Set image
-        marker.style.backgroundImage = "url(" + data.img + ")";
+        marker.style.backgroundImage = "url(" + species.icon.image_thumb_url + ")";
 
         //Add color tag to content, if any
-        if (data.tag_color != null) {
+        if (data.tribe_prefs.tag_color != null) {
             DeltaTools.CreateDom("div", "map_icon_tag", content).style.backgroundColor = data.tag_color;
         } else {
             DeltaTools.CreateDom("div", "map_icon_tag", content).style.display = "none";
-        }
-
-        //Apply styling
-        statics.MAP_ICON_RENDER_PROFILE[data.type](data, marker, content);
-
-        //Set border from state
-        if (data.outline_color !== undefined) {
-            marker.style.borderColor = data.outline_color;
         }
 
         //Create icon
@@ -195,16 +150,8 @@ class MapAddonIcons extends TabMapAddon {
         //Add to map
         var icon_data = this.markers.addLayer(marker);
 
-        //Create icon
-        if (data.extras !== undefined) {
-            data.extras = {};
-        }
-        data.extras._id = data.id;
-        data.extras._icon = data;
-        data.extras._map = this;
-
         //Add to register
-        this.pins[data.type + "@" + data.id] = {
+        this.pins[data.dino_id] = {
             "icon": icon_data,
             "data": data,
             "marker": marker
@@ -213,16 +160,13 @@ class MapAddonIcons extends TabMapAddon {
         return icon_data;
     }
 
-    CreateHoverElement(iconImg, title, subtitle, type) {
+    CreateHoverElement(iconImg, title, subtitle) {
         //Create element
         var e = DeltaTools.CreateDom("div", "mini_modal mini_modal_anim");
 
         //Add icon
         var icon = DeltaTools.CreateDom("img", "mini_modal_icon map_icon_base map_icon_dino", e);
         icon.style.backgroundImage = "url(" + iconImg + ")";
-
-        //Render icon
-        statics.MAP_ICON_RENDER_PROFILE[type](null, icon);
 
         //Create content
         var ce = DeltaTools.CreateDom("div", "mini_modal_content", e);
@@ -232,17 +176,12 @@ class MapAddonIcons extends TabMapAddon {
         return e;
     }
 
-    GetAddedPin(type, id) {
-    /* Returns a pin by it's type and ID */
-        return this.pins[type + "@" + id];
-    }
-
     RemovePin(type, id) {
     /* Accepts DATA in THIS.PINS */
-        var data = this.pins[type + "@" + id];
+        var data = this.pins[id];
         if (data != null) {
             data.icon.remove();
-            delete this.pins[type + "@" + id];
+            delete this.pins[id];
         }
     }
 
@@ -255,55 +194,6 @@ class MapAddonIcons extends TabMapAddon {
                 delete this.pins[keys[i]];
             }
         }
-    }
-
-    RefreshPins() {
-        /* Renders new pins to the screen */
-
-        //Get pins we must add
-        var pins = this.GetClustersOnScreen();
-        console.log(pins);
-
-        //Add all
-        var added = 0;
-        
-        for (var j = 0; j < pins.length; j += 1) {
-            if (pins[j].properties.cluster) {
-                //This is a group
-                var coords = TabMap.ConvertFromMapPosToGamePos(this.map.server.session, pins[j].geometry.coordinates[0], pins[j].geometry.coordinates[1]);
-                /*this.AddPin(MapAddonIcons.CreateGroupMarkerPinData(pins[j].id, 1, {
-                    x: coords[0],
-                    y: coords[1]
-                }));*/
-                this.AddPin(MapAddonIcons.CreateGroupMarkerPinData(pins[j].id, 1, L.latLng(pins[j].geometry.coordinates[1], pins[j].geometry.coordinates[0])));
-                added++;
-            } else {
-                //Ungrouped
-                var data = pins[j].properties.data;
-                var coords = TabMap.ConvertFromMapPosToGamePos(this.map.server.session, pins[j].geometry.coordinates[0], pins[j].geometry.coordinates[1]);
-                if (this.GetAddedPin(data.type, data.id) == null) {
-                    //this.AddPin(data);
-                    added++;
-                }
-            }
-        }
-
-        return [added];
-    }
-
-    static CreateGroupMarkerPinData(index, amount, location) {
-        return {
-            "location": location,
-            "img": "",
-            "type": "group",
-            "id": index.toString(),
-            "outline_color": null,
-            "tag_color": null,
-            "dialog": null,
-            "extras": {
-                "amount": amount
-            }
-        };
     }
 
 }

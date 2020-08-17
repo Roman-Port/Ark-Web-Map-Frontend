@@ -35,6 +35,10 @@ input:focus {
     bottom: 0;
 }
 
+.map_sidebar {
+    margin-left: 10px;
+}
+
 .leaflet-control-zoom {
     display: none;
 }

@@ -49,13 +49,28 @@ class MapAddonIcons extends TabMapAddon {
             //Check if we have a pin for this
             var key = adds[i].dino_id;
             var pin = this.pins[key];
-            if (pin != null) {
-                //Remove
-                this.RemovePin("", adds[i].dino_id);
-            }
+            if (pin == null) {
+                //Add
+                this.AddPin(adds[i]);
+            } else {
+                //Update pos
+                var pos = TabMap.ConvertFromGamePosToMapPos(this.map.server, adds[i].location.x, adds[i].location.y);
+                pin.marker.setLatLng(pos);
 
-            //Add
-            this.AddPin(adds[i]);
+                //Update color tag
+                /*if (adds[i].tribe_prefs.color_tag == null && pin.marker._colorTag != null) {
+                    pin.marker._colorTag.style.display = "none";
+                } else if (adds[i].tribe_prefs.color_tag != null && pin.marker._colorTag != null) {
+                    pin.marker._colorTag.style.display = "block";
+                    pin.marker._colorTag.style.backgroundColor = adds[i].tribe_prefs.color_tag;
+                } else if (adds[i].tribe_prefs.color_tag != null && pin.marker._colorTag == null) {
+                    pin.marker._colorTag = DeltaTools.CreateDom("div", "map_icon_tag", pin.marker._content);
+                    pin.marker._colorTag.style.backgroundColor = adds[i].tribe_prefs.color_tag;
+                }*/
+
+                //Finish updating
+                pin.marker.x_last_data = adds[i];
+            }
         }
     }
 
@@ -123,10 +138,10 @@ class MapAddonIcons extends TabMapAddon {
 
         //Add color tag to content, if any
         var colorTag = null;
-        if (data.tribe_prefs.color_tag != null) {
+        /*if (data.tribe_prefs.color_tag != null) {
             colorTag = DeltaTools.CreateDom("div", "map_icon_tag", content);
             colorTag.style.backgroundColor = data.tribe_prefs.color_tag;
-        }
+        }*/
 
         //Create icon
         var icon_template = L.divIcon({
@@ -178,7 +193,7 @@ class MapAddonIcons extends TabMapAddon {
     /* Accepts DATA in THIS.PINS */
         var data = this.pins[id];
         if (data != null) {
-            data.marker.remove();
+            data.icon.remove();
             delete this.pins[id];
         }
     }

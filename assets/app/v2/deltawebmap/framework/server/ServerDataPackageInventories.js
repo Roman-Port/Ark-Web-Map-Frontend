@@ -114,7 +114,7 @@ class ServerDataPackageInventories extends ServerDataPackage {
         }
 
         //Check file type version
-        if (d.getInt32(4, true) != 1) {
+        if (d.getInt32(4, true) != 2) {
             throw "The file version of the Delta Web Map Binary Inventories File is not supported. Outdated client?";
         }
 
@@ -158,11 +158,18 @@ class ServerDataPackageInventories extends ServerDataPackage {
 
                 //Read custom data
                 for (var j = 0; j < customLength; j += 1) {
-                    var tag = d.getUint16(offset + 0, true);
-                    var tagLen = d.getUint16(offset + 2, true);
-                    var val = DeltaWebFormatDecoder.ReadStringFromBuffer(d, offset + 4, tagLen);
-                    custom[tag] = val;
-                    offset += 4 + tagLen;
+                    //Read key
+                    var tagKeyLen = d.getUint16(offset + 0, true);
+                    var key = DeltaWebFormatDecoder.ReadStringFromBuffer(d, offset + 2, tagKeyLen);
+                    offset += 2 + tagKeyLen;
+
+                    //Read value
+                    var tagValueLen = d.getUint16(offset + 2, true);
+                    var value = DeltaWebFormatDecoder.ReadStringFromBuffer(d, offset + 2, tagValueLen);
+                    offset += 2 + tagValueLen;
+
+                    //Set
+                    custom[key] = value;
                 }
 
                 //Add item data

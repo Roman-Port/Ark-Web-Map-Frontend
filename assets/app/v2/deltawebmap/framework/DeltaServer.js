@@ -360,6 +360,7 @@ class DeltaServer extends DeltaTabView {
         } else {
             var t = this.tabs[this.activeTab];
             this.app.SetActiveHeaderSearch(t.GetIsSearchQueryEnabled(), t.GetQueryPlaceholder(), t.lastQuery, (q) => {
+                this.tabs[this.activeTab].lastQuery = q;
                 this.tabs[this.activeTab].OnQueryChanged(q);
             });
         }

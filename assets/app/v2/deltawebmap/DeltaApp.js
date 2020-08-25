@@ -80,7 +80,7 @@ class DeltaApp {
         });
 
         //Show the out of box experience
-        if (this.user.settings.oobe_status == 0) {
+        if (this.user.settings.oobe_status == 0 || true) {
             DeltaOOBE.ShowOOBEPrompt(this);
         } else {
             this.OnOOBEFinished();
@@ -131,7 +131,7 @@ class DeltaApp {
                 this.maps = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/maps.json", {}, null);
 
                 //Get guild setup config
-                this.guildSetupConfig = await DeltaTools.WebRequest(LAUNCH_CONFIG.CONFIG_API_ENDPOINT + "/prod/frontend/guild_setup.json", { "noauth": true }, null);
+                this.guildSetupConfig = await DeltaTools.WebRequest(LAUNCH_CONFIG.API_ENDPOINT + "/guild_setup_config.json", {}, null);
 
                 //Begin init of structure tool (this will take a bit)
                 this.structureTool = new DeltaStructureTool(this, this.structureMetadata.metadata);
@@ -247,8 +247,7 @@ class DeltaApp {
 
         //If this server hasn't been set up yet, do so
         if (server.info != null) {
-            if (server.info.flags == 3) {
-                //TODO, fix these args
+            if (server.IsSetupRequired()) {
                 if (this.active_creator != null) {
                     if (this.active_creator.guild == null) {
                         this.active_creator._OnFoundServer(server);
@@ -260,7 +259,13 @@ class DeltaApp {
                 }
 
                 //Open guild creator
-                new DeltaGuildCreator(this, server);
+                new DeltaGuildFirstTimeSetup(server, null, () => {
+                    //Operation was cancelled. 
+                    if (this.lastServer == null) {
+                        //No other server selected. We'll need to show the list
+                        this.ShowServerList();
+                    }
+                });
 
                 //TODO
                 return;
@@ -287,6 +292,46 @@ class DeltaApp {
         server.OnSwitchedTo();
         this.RefreshBrowserMetadata();
         return null;
+    }
+
+    ShowServerList() {
+        //Shows a server list that makes the user select a server to continue
+        var modal = app.modal.AddModal(480, 540);
+        var builder = new DeltaModalBuilder();
+
+        builder.AddContentTitle("Choose Server");
+
+        //Add servers
+        var k = Object.keys(this.servers);
+        builder._AddContent(DeltaTools.CreateList(k, (kk) => {
+            var data = this.servers[kk].info;
+            var c = DeltaTools.CreateDom("div", "iconlist_container");
+            var status = "Setup";
+            if (this.servers[kk].IsSetupRequired()) {
+                status = "Setup Required";
+            }
+            DeltaTools.CreateDom("img", "iconlist_icon", c).src = data.image_url;
+            DeltaTools.CreateDom("div", "iconlist_text", c).innerText = data.display_name;
+            DeltaTools.CreateDom("div", "iconlist_sub", c).innerText = status;
+            return c;
+        }, (id) => {
+            modal.Close();
+            this.SwitchServer(this.servers[id]);
+        }));
+
+        //Add button to add a server
+        var serverCreateBtn = DeltaTools.CreateDom("div", "iconlist_container");
+        DeltaTools.CreateDom("img", "iconlist_icon", serverCreateBtn).src = "/assets/app/icons/system_menu/add.svg";
+        DeltaTools.CreateDom("div", "iconlist_text_fullheight", serverCreateBtn).innerText = "Create Server";
+        serverCreateBtn.addEventListener("click", () => {
+            modal.Close();
+            new DeltaGuildCreator(this, () => {
+                this.ShowServerList();
+            });
+        });
+        builder._AddContent(serverCreateBtn);
+
+        modal.AddPage(builder.Build());
     }
 
     GetDefaultServer() {

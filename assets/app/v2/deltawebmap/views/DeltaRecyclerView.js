@@ -24,7 +24,6 @@ class DeltaRecyclerView {
 
         //Create views
         this.container = DeltaTools.CreateDom("div", this.extraContainerClass, this.mount);
-        this.container.style.height = "100%";
         this.container.style.overflowY = "scroll";
         this.content = DeltaTools.CreateDom("div", null, this.container);
         this.content.style.position = "relative";
@@ -35,6 +34,12 @@ class DeltaRecyclerView {
 
         //Add events
         this.container.addEventListener("scroll", () => this.OnScroll());
+    }
+
+    //Sets a new sort
+    SetSortFunction(f) {
+        this.doSort = f;
+        this.ReloadAll();
     }
 
     //Forces a refresh of all entries

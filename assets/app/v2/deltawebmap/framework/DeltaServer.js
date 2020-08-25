@@ -671,6 +671,10 @@ class DeltaServer extends DeltaTabView {
         return this.info.owner_uid == this.app.user.data.id;
     }
 
+    IsSetupRequired() {
+        return this.ReadPermissionValue(2);
+    }
+
     //Reads the permission index directly
     ReadPermissionValue(index) {
         return 1 == ((this.info.permission_flags >> index) & 1);

@@ -37,6 +37,7 @@ input:focus {
 
 .map_sidebar {
     margin-left: 10px;
+    height: 100%;
 }
 
 .leaflet-control-zoom {
@@ -2955,6 +2956,52 @@ a {
     padding: 30px 15px;
 }
 
+.modal_form_container {
+    font-size: 15px;
+    margin: 10px 20px;
+    text-align: left;
+    color: #a2a2a2;
+    font-weight: 500;
+}
+
+.modal_form_title {
+    color: white;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.modal_form_validate {
+    color: #ff8c8c;
+    margin-top: 5px;
+    display: none;
+}
+
+.modal_form_validate_show {
+    display: block;
+}
+
+.modal_form_item_select {
+    color: white;
+    background-color: #2b2d31;
+    padding: 10px 5px;
+    width: 100%;
+    border-radius: 5px;
+    font-size: 13px;
+    border: 1px solid #171718;
+    outline: none;
+}
+
+.modal_form_item_input {
+    color: white;
+    background-color: #2b2d31;
+    padding: 10px;
+    width: calc(100% - 20px);
+    border-radius: 5px;
+    font-size: 13px;
+    border: 1px solid #171718;
+    outline: none;
+}
+
 .itemlist_container {
     overflow-y: scroll;
     overflow-x: auto;
@@ -3652,4 +3699,43 @@ a {
 .tableview_table_element:hover {
     background-color: #222325b8;
     border-radius: 5px;
+}
+
+.iconlist_container {
+    height: 40px;
+    margin: 10px 20px;
+    cursor: pointer;
+}
+
+.iconlist_icon {
+    height: 40px;
+    float: left;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.iconlist_text {
+    color: white;
+    font-size: 15px;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.iconlist_text_fullheight {
+    color: white;
+    font-size: 15px;
+    line-height: 40px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.iconlist_sub {
+    color: #adadad;
+    font-size: 15px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }

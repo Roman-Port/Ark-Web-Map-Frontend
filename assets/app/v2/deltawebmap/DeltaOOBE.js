@@ -42,6 +42,38 @@ class DeltaOOBE {
         modal.AddPage(builder.Build());
     }
 
+    static ShowJoinOthersWelcome(app) {
+        var modal = app.modal.AddModal(480, 590);
+
+        var builder = new DeltaModalBuilder();
+        builder.AddContentTitle("How Delta Web Map Works");
+        builder.AddContentDescription("Delta Web Map automatically finds servers that you join that are running our mod. Once you join an ARK server in-game with Delta Web Map installed, it will automatically appear here within a minute.");
+
+        builder.AddContentBigNav([
+            /*{
+                "title": "Clone a demo server",
+                "callback": () => {
+
+                },
+                "is_big": false
+            },*/
+            {
+                "title": "Add an ARK server I own to Delta Web Map",
+                "callback": () => {
+                    modal.Close();
+                    DeltaOOBE.OpenGuildCreator(app);
+                },
+                "is_big": false
+            }
+        ]);
+
+        builder.AddAction("Log Out", "NEUTRAL", () => {
+            app.user.LogOut();
+            modal.Close();
+        });
+        modal.AddPage(builder.Build());
+    }
+
     static ShowNoServersPrompt(app) {
         var modal = app.modal.AddModal(480, 590);
 
@@ -75,7 +107,10 @@ class DeltaOOBE {
     }
 
     static OpenGuildCreator(app) {
-        new DeltaGuildCreator(app);
+        new DeltaGuildCreator(app, () => {
+            //Show OOBE again
+            DeltaOOBE.ShowOOBEPrompt(app);
+        });
     }
 
 }

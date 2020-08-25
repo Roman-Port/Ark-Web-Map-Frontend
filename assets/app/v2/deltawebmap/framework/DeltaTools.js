@@ -228,4 +228,24 @@ class DeltaTools {
         this.OpenFileDialog("image/png, image/jpeg", callback);
     }
 
+    static CreateList(dataset, createElement, clickCallback) {
+        //Create container
+        var container = DeltaTools.CreateDom("div", null);
+
+        //Create each
+        for (var i = 0; i < dataset.length; i += 1) {
+            //Make
+            var m = createElement(dataset[i]);
+            container.appendChild(m);
+
+            //Set events
+            m._data = dataset[i];
+            m.addEventListener("click", (evt) => {
+                clickCallback(evt.currentTarget._data);
+            });
+        }
+
+        return container;
+    }
+
 }

@@ -4,6 +4,7 @@ class DeltaModalBuilder {
 
     constructor(addonMode, extraClassNameBody, extraClassNameElement) {
         this.working = DeltaTools.CreateDom("div", null);
+        this.formElements = [];
 
         if (addonMode == true || addonMode == null) {
             this.working.classList.add("modal_view_builder");
@@ -21,11 +22,11 @@ class DeltaModalBuilder {
     }
 
     AddContentDescription(text) {
-        this.AddContentCustomText("modal_preset_subtitle", text);
+        return this.AddContentCustomText("modal_preset_subtitle", text);
     }
 
     AddContentWarningBox(text) {
-        this.AddContentCustomText("modal_preset_warning", text);
+        return this.AddContentCustomText("modal_preset_warning", text);
     }
 
     AddContentBigNav(btns) {
@@ -88,6 +89,32 @@ class DeltaModalBuilder {
         return s;
     }
 
+    AddFormSelect(id, label, selectOptions, selectValue, settings) {
+        var s = DeltaTools.CreateDom("select", "modal_form_item_select");
+        for (var i = 0; i < selectOptions.length; i += 1) {
+            DeltaTools.CreateDom("option", null, s, selectOptions[i].text).value = selectOptions[i].id;
+        }
+        s.value = selectValue;
+        s.addEventListener("change", (evt) => {
+            this._ValidateFormElement(evt.currentTarget);
+        });
+        return this._AddFormContent(id, label, s, (e) => {
+            return e.value;
+        }, settings);
+    }
+
+    AddFormInput(id, label, defaultValue, settings) {
+        var s = DeltaTools.CreateDom("input", "modal_form_item_input");
+        s.type = "text";
+        s.value = defaultValue;
+        s.addEventListener("change", (evt) => {
+            this._ValidateFormElement(evt.currentTarget);
+        });
+        return this._AddFormContent(id, label, s, (e) => {
+            return e.value;
+        }, settings);
+    }
+
     AddContentBuilder(b) {
         this._AddContent(b.Build());
     }
@@ -97,6 +124,89 @@ class DeltaModalBuilder {
             dom.classList.add(this.extraClassNameElement);
         }
         this.working.appendChild(dom);
+    }
+
+    _AddFormContent(id, title, dom, fGetValue, options) {
+        //Create container
+        var container = DeltaTools.CreateDom("div", "modal_form_container", null);
+
+        //Add title
+        var titleDom = DeltaTools.CreateDom("div", "modal_form_title", container, title);
+
+        //Insert
+        container.appendChild(dom);
+
+        //Add validate text
+        var validateText = DeltaTools.CreateDom("div", "modal_form_validate", container, "Sorry, due to limitations of other platforms, we can't support them. You won't be able to set up Delta Web Map.");
+
+        //Add content
+        this._AddContent(container);
+
+        //Add form content
+        this.formElements.push({
+            "id": id,
+            "dom": dom,
+            "fGetValue": fGetValue,
+            "options": options,
+            "titleDom": titleDom,
+            "validateText": validateText,
+            "container": container,
+            "fValidate": options.fValidate
+        });
+
+        return container;
+    }
+
+    ValidateForm() {
+        //Loop through and check all
+        var ok = true;
+        for (var i = 0; i < this.formElements.length; i += 1) {
+            var status = this._ValidateFormIndex(i);
+            ok = ok && status;
+        }
+        return ok;
+    }
+
+    GetFormValues() {
+        //Loop through and check all
+        var values = {};
+        for (var i = 0; i < this.formElements.length; i += 1) {
+            values[this.formElements[i].id] = this.formElements[i].fGetValue(this.formElements[i].dom);
+        }
+        return values;
+    }
+
+    _ValidateFormElement(element) {
+        //Find
+        for (var i = 0; i < this.formElements.length; i += 1) {
+            if (this.formElements[i].dom == element) {
+                return this._ValidateFormIndex(i);
+            }
+        }
+        return true;
+    }
+
+    _ValidateFormIndex(i) {
+        //Get value
+        var value = this.formElements[i].fGetValue(this.formElements[i].dom);
+
+        //Validate
+        var validateResult = null;
+        if (this.formElements[i].fValidate != null) {
+            validateResult = this.formElements[i].fValidate(value);
+        }
+
+        //Set
+        if (validateResult == null) {
+            //Validated OK
+            this.formElements[i].validateText.classList.remove("modal_form_validate_show");
+            return true;
+        } else {
+            //Failed
+            this.formElements[i].validateText.innerText = validateResult;
+            this.formElements[i].validateText.classList.add("modal_form_validate_show");
+            return false;
+        }
     }
 
     AddAction(title, type, callback) {

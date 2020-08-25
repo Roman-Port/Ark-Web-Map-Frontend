@@ -1,5 +1,43 @@
 /* Guild setup */
 
+.gs_checklist_step {
+    position: relative;
+    font-size: 15px;
+    margin: 10px 20px;
+    text-align: left;
+    color: #a2a2a2;
+    font-weight: 500;
+    padding-left: 45px;
+}
+
+.gs_checklist_step_number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 32px;
+    height: 32px;
+    background-color: #3882dc;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    line-height: 32px;
+    font-size: 15px;
+    font-weight: 800;
+    border: 1px solid #2e8cff;
+}
+
+.gs_checklist_step_title {
+    color: white;
+}
+
+.gs_modid {
+    font-size: 15px;
+    margin: 0px 20px;
+    text-align:center;
+    color: #a2a2a2;
+    font-weight: 500;
+}
+
 .gs_title {
     font-size: 18px;
     color: white;

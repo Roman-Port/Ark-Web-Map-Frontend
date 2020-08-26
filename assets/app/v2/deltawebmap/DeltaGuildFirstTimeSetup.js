@@ -323,8 +323,8 @@ class DeltaGuildFirstTimeSetup {
         builder.AddContentDescription("Head into the admin tab to further refine your settings. From there, you can also add server admins.");
 
         builder.AddAction("Finish", "POSITIVE", () => {
-            this.app.SwitchServer(this.guild);
             this._Cancel();
+            this.app.SwitchServer(this.guild);
         });
         this.modal.AddPage(builder.Build());
     }

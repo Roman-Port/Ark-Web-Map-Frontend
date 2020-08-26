@@ -187,8 +187,7 @@ class DeltaServer extends DeltaTabView {
             this.info.secure_mode = m.guild.secure_mode;
 
             //Update UI
-            this.menu_icon.src = m.guild.image_url;
-            this.menu_name.innerText = m.guild.display_name;
+            this.UpdateSystemBar();
         });
     }
 
@@ -672,7 +671,12 @@ class DeltaServer extends DeltaTabView {
     }
 
     IsSetupRequired() {
-        return this.ReadPermissionValue(2);
+        return this.ReadFlagIndex(1);
+    }
+
+    //Reads flag
+    ReadFlagIndex(index) {
+        return 1 == ((this.info.flags >> index) & 1);
     }
 
     //Reads the permission index directly

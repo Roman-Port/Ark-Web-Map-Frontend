@@ -3709,6 +3709,7 @@ a {
 
 .iconlist_icon {
     height: 40px;
+    width: 40px;
     float: left;
     margin-right: 10px;
     border-radius: 5px;

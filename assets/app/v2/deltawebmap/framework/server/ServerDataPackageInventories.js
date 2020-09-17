@@ -22,6 +22,12 @@ class ServerDataPackageInventories extends ServerDataPackage {
         return e.holder_type + "@" + e.holder_type;
     }
 
+    GetDefaultSchema() {
+        return {
+
+        };
+    }
+
     //Public API
 
     GetItemsFromInventory(holderType, holderId) {
@@ -193,7 +199,8 @@ class ServerDataPackageInventories extends ServerDataPackage {
     }
 
     EntityMatchesFilter(e) {
-        return this.server.filter.CheckEntityItem(e);
+        return this.server.IsTribeFiltered(e.tribe_id);
+        //return this.server.filter.CheckEntityItem(e);
     }
 
 }

@@ -61,7 +61,7 @@ class PrimalPackage {
                 }
 
                 //Callback
-                progress(lastSize);
+                progress(lastSize, this);
             }
 
             //Set epoch
@@ -75,7 +75,11 @@ class PrimalPackage {
     }
 
     GetItemByClassName(classname) {
-        return this.content[classname];
+        var c = this.content[classname];
+        if (c != null) {
+            c._package = this;
+        }
+        return c;
     }
 
     GetByFilter(x) {

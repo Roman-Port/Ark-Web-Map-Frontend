@@ -65,6 +65,27 @@ class DeltaRecyclerView {
         this.OnDatasetUpdated();
     }
 
+    //Removes entries and updates
+    RemoveEntries(entries) {
+        //Remove each
+        for (var i = 0; i < entries.length; i += 1) {
+            //Search to see if this already exists
+            var key = this.getDataPrimaryKey(entries[i]);
+            for (var j = 0; j < this.dataset.length; j += 1) {
+                if (this.dataset[j].__recyclerKey == key) {
+                    this.dataset.splice(j, 1);
+                    j--;
+                }
+            }
+        }
+
+        //Sort
+        this.SortDataset();
+
+        //Update
+        this.OnDatasetUpdated();
+    }
+
     //Called when we update the dataset
     OnDatasetUpdated() {
         //Set height

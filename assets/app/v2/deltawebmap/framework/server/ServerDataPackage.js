@@ -38,6 +38,11 @@ class ServerDataPackage {
         throw "Must be extended.";
     }
 
+    GetDefaultSchema() {
+        //Returns the default values for an object.
+        throw "Must be extended.";
+    }
+
     //API
 
     async LoadContent() {
@@ -113,6 +118,7 @@ class ServerDataPackage {
         //Subscribe
         this.OnContentAddRemoved.Subscribe(tagName, (d) => {
             recycle.AddEntries(d.adds);
+            recycle.RemoveEntries(d.removes);
         });
 
         //Send filtered data now
@@ -133,29 +139,29 @@ class ServerDataPackage {
     FilterUpdated() {
         //Filters the content again and fires off events
 
-        //Remove all
-        this.OnContentAddRemoved.Fire({
-            "adds": [],
-            "removes": this.filteredContent
-        });
-
         //Filter
-        this.filteredContent = [];
+        var filteredContentAdds = [];
+        var filteredContentRemoves = [];
         for (var i = 0; i < this.content.length; i += 1) {
             if (this.EntityMatchesFilter(this.content[i])) {
-                this.filteredContent.push(this.content[i]);
+                filteredContentAdds.push(this.content[i]);
+            } else if (this.filteredContent.includes(this.content[i])) {
+                filteredContentRemoves.push(this.content[i]);
             }
         }
+
+        //Set
+        this.filteredContent = filteredContentAdds;
+
+        //Push added event
+        this.OnContentAddRemoved.Fire({
+            "adds": filteredContentAdds,
+            "removes": filteredContentRemoves
+        });
 
         //Push updated
         this.OnContentUpdated.Fire({
             "filtered_content": this.filteredContent
-        });
-
-        //Push added event
-        this.OnContentAddRemoved.Fire({
-            "adds": this.filteredContent,
-            "removes": []
         });
     }
 
@@ -171,30 +177,25 @@ class ServerDataPackage {
             var adds = [];
             var removes = [];
             for (var i = 0; i < p.content.length; i += 1) {
-                var c = p.content[i];
-
                 //Get the unique key
+                var c = p.content[i];
                 var unique = this.GetContentUniqueKey(c);
                 c._deltaPackageIndexedKey = unique;
 
-                //Find if this already exists in the content. If it does, replace it
-                for (var j = 0; j < this.content.length; j += 1) {
-                    if (this.content[j]._deltaPackageIndexedKey == unique) {
-                        this._UpdateItem(this.content[j], c);
-                        c = this.content[j];
-                    }
-                }
+                //Upsert this item into the master content array
+                c = this._UpsertItemToArray(this.content, c);
 
                 //Check if we fit the filter
                 var filtered = this.EntityMatchesFilter(c);
 
-                //Find if this already exists in the filtered content. If it does, replace it or remove it
-                for (var j = 0; j < this.filteredContent.length; j += 1) {
-                    if (this.filteredContent[j]._deltaPackageIndexedKey == unique) {
-                        if (filtered) {
-                            //Matched! Replace it
-                            this._UpdateItem(this.filteredContent[j], c);
-                        } else {
+                //Find if this already exists in the filtered content
+                if (filtered) {
+                    //Upsert to the filtered content array
+                    c = this._UpsertItemToArray(this.filteredContent, c);
+                } else {
+                    //Remove if needed
+                    for (var j = 0; j < this.filteredContent.length; j += 1) {
+                        if (this.filteredContent[j]._deltaPackageIndexedKey == unique) {
                             //Matched! But it no longer fits the filter. Remove it
                             this.filteredContent.splice(j, 1);
                             j--;
@@ -221,6 +222,33 @@ class ServerDataPackage {
                 "filtered_content": this.filteredContent
             });
         });
+    }
+
+    //Inserts or updates the item in a target array (content, filteredContent)
+    _UpsertItemToArray(contentArray, c) {
+        //Get the unique key of the input content
+        var unique = c._deltaPackageIndexedKey;
+
+        //Find if this already exists in the content. If it does, replace it
+        for (var j = 0; j < contentArray.length; j += 1) {
+            if (contentArray[j]._deltaPackageIndexedKey == unique) {
+                this._UpdateItem(contentArray[j], c);
+                return contentArray[j];
+            }
+        }
+
+        //This is a new item. Ensure the schema matches
+        var defaultSchema = this.GetDefaultSchema();
+        var defaultSchemaKeys = Object.keys(defaultSchema);
+        for (var j = 0; j < defaultSchemaKeys.length; j += 1) {
+            if (c[defaultSchemaKeys[j]] == null) {
+                c[defaultSchemaKeys[j]] = defaultSchema[defaultSchemaKeys[j]];
+            }
+        }
+
+        //Add to the array
+        contentArray.push(c);
+        return c;
     }
 
     _UpdateItem(target, replacement) {

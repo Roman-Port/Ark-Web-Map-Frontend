@@ -37,7 +37,7 @@ class MapAddonIcons extends TabMapAddon {
 
             //Remove
             for (var i = 0; i < d.removes.length; i += 1) {
-                this.RemovePin("dinos", d.removes[i]);
+                this.RemovePin("dinos", d.removes[i].dino_id);
             }
         });
         this.AddDinoDataPins(this.map.server.dinos.filteredContent);
@@ -67,17 +67,17 @@ class MapAddonIcons extends TabMapAddon {
                     pin.marker._colorTag = DeltaTools.CreateDom("div", "map_icon_tag", pin.marker._content);
                     pin.marker._colorTag.style.backgroundColor = adds[i].tribe_prefs.color_tag;
                 }*/
-
-                //Finish updating
-                pin.marker.x_last_data = adds[i];
             }
         }
     }
 
+    GetInteractedDino(evt) {
+        return this.map.server.dinos.GetById(evt.layer.options.x_delta_id);
+    }
+
     OnMapMarkerClickEvent(evt) {
         //Get the data of this icon
-        var dino = evt.layer.options.x_delta_data;
-        var species = this.map.server.GetEntrySpecies(dino.classname);
+        var dino = this.GetInteractedDino(evt);
         var marker = evt.layer._icon;
 
         //Execute
@@ -92,7 +92,7 @@ class MapAddonIcons extends TabMapAddon {
 
     OnMapMarkerHover(evt) {
         /* This is called when we hover over something. We'll check if we need to spawn the dialog */
-        var dino = evt.layer.options.x_delta_data;
+        var dino = this.GetInteractedDino(evt);
         var species = this.map.server.GetEntrySpecies(dino.classname);
         var marker = evt.layer._icon;
 
@@ -154,9 +154,8 @@ class MapAddonIcons extends TabMapAddon {
         var marker = L.marker(pos, {
             icon: icon_template,
             zIndexOffset: 1,
-            x_delta_data: data
+            x_delta_id: data.dino_id
         });
-        marker.x_last_data = data;
         marker._content = content;
         marker._colorTag = colorTag;
 
@@ -193,7 +192,7 @@ class MapAddonIcons extends TabMapAddon {
     /* Accepts DATA in THIS.PINS */
         var data = this.pins[id];
         if (data != null) {
-            data.icon.remove();
+            this.markers.removeLayer(data.marker);
             delete this.pins[id];
         }
     }

@@ -37,11 +37,54 @@ class ServerDataPackageDinos extends ServerDataPackage {
     }
 
     EntityMatchesFilter(e) {
-        return this.server.filter.CheckEntityDino(e) && !this.BLACKLISTED_CLASSNAMES.includes(e.classname);
+        return this.server.IsTribeFiltered(e.tribe_id) && !this.BLACKLISTED_CLASSNAMES.includes(e.classname);
+        //return this.server.filter.CheckEntityDino(e) && !this.BLACKLISTED_CLASSNAMES.includes(e.classname);
     }
 
     GetContentUniqueKey(e) {
         return e.dino_id;
+    }
+
+    GetDefaultSchema() {
+        return {
+            "tribe_id":0,
+            "dino_id": "0",
+            "is_female": false,
+            "colors": [],
+            "colors_hex": [],
+            "tamed_name": "",
+            "tamer_name": "",
+            "classname": "",
+            "current_stats": [],
+            "max_stats": [],
+            "base_levelups_applied": [],
+            "tamed_levelups_applied": [],
+            "base_level": 0,
+            "level": 0,
+            "experience": 0,
+            "is_baby": false,
+            "baby_age": 0,
+            "next_imprint_time": 0.0,
+            "imprint_quality": 0.0,
+            "location": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "pitch": 0,
+                "yaw": 0,
+                "roll": 0
+            },
+            "status": "NEUTRAL",
+            "taming_effectiveness": 0,
+            "is_cryo": false,
+            "experience_points": 0,
+            "last_sync_time": null,
+            "is_alive": true,
+            "tribe_prefs": {
+                "color_tag": null,
+                "note": ""
+            }
+        };
     }
 
 }

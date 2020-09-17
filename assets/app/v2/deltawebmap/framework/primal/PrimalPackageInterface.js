@@ -21,6 +21,7 @@ class PrimalPackageInterface {
     async DownloadContent(progress) {
         //Loop through all packages and download them all
         for (var i = 0; i < this.packages.length; i += 1) {
+            progress(0, this.packages[i]);
             await this.packages[i].DownloadContent(progress);
         }
     }

@@ -110,6 +110,11 @@ class DeltaServer extends DeltaTabView {
         };
     }
 
+    //Returns true/false if a tribe should be displayed right now
+    IsTribeFiltered(tribeId) {
+        return this.adminEnabled || tribeId == this.tribe;
+    }
+
     SubscribeRPCEvent(tag, opcode, event) {
         app.rpc.SubscribeServer(this.info.id, tag, opcode, event);
     }
@@ -255,9 +260,13 @@ class DeltaServer extends DeltaTabView {
         var bar = DeltaTools.CreateDom("div", "contentdownload_bar", dialog);
         var filling = DeltaTools.CreateDom("div", "contentdownload_filling", bar);
 
+        //Build mod list
+        var modList = this.info.mods.slice();
+        modList.push("0"); //Base game
+
         //Get primal data interface
         label.innerText = "Downloading mod content list...";
-        this.primalInterface = await this.app.primalPackageManager.RequestInterface(["0"]);
+        this.primalInterface = await this.app.primalPackageManager.RequestInterface(modList);
 
         //Get tribe list
         label.innerText = "Downloading tribe list...";
@@ -284,10 +293,14 @@ class DeltaServer extends DeltaTabView {
         await Promise.all(countsFetchTasks);
 
         //Download mod content
-        await this.primalInterface.DownloadContent((count) => {
+        await this.primalInterface.DownloadContent((count, pack) => {
             totalEntitiesDownloaded += count;
+            if (pack.info.mod_id == "0") {
+                label.innerText = "Downloading game content...";
+            } else {
+                label.innerText = "Downloading mod (" + pack.info.display_name + ")...";
+            }
             filling.style.width = ((totalEntitiesDownloaded / totalEntityCount) * 100).toString() + "%";
-            label.innerText = "Downloading mod content...";
         });
 
         //Add UI update event to all

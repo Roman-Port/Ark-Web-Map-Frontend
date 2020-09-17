@@ -25,6 +25,12 @@ class ServerDataPackageStructures extends ServerDataPackage {
         return e.structure_id;
     }
 
+    GetDefaultSchema() {
+        return {
+
+        };
+    }
+
     GetById(id) {
         var r = this.GetByFilter((x) => {
             return x.structure_id == id;
@@ -113,7 +119,8 @@ class ServerDataPackageStructures extends ServerDataPackage {
     }
 
     EntityMatchesFilter(e) {
-        return this.server.filter.CheckEntityStructure(e);
+        return this.server.IsTribeFiltered(e.tribe_id);
+        //return this.server.filter.CheckEntityStructure(e);
     }
 
 }
